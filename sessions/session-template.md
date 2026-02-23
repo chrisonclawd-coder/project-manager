@@ -1,6 +1,6 @@
 # X Strategy Session Template
 
-**Session:** [Morning/Afternoon/Evening/Night]
+**Session:** [Morning/Afternoon/Night]
 **Time:** [Time in IST]
 **Model:** zai/glm-4.7
 
@@ -35,8 +35,15 @@
 - Include relevant emoji
 - Use proven format: statement + context + question
 
-## Growth Insights (for Evening sessions)
-- What topics performed best?
-- What engagement strategies worked?
-- What to improve next session?
-- Overall growth observations
+## Metrics Tracking (This Session)
+- **Impressions:** [Number]
+- **Replies:** [Number]
+- **Likes:** [Number]
+- **Shares:** [Number]
+- **Engagement Rate:** [Percentage]
+
+## Growth Insights
+- **Best Performing Topic:** [Topic]
+- **Best Performing Time:** [Time]
+- **Improvement Area:** [What to work on]
+- **Overall Trend:** [Growth direction]
