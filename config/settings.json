@@ -1,0 +1,25 @@
+{
+  "twitter": {
+    "api_key": "",
+    "api_secret": "",
+    "access_token": "",
+    "access_token_secret": "",
+    "bearer_token": ""
+  },
+  "openrouter": {
+    "api_key": "",
+    "model": "zai/glm-4.7"
+  },
+  "sessions": {
+    "morning_ist": "10:00",
+    "afternoon_ist": "15:00",
+    "evening_ist": "18:00",
+    "night_ist": "21:00"
+  },
+  "preferences": {
+    "engagement_replies_max_chars": 100,
+    "tweet_max_chars": 250,
+    "use_twitter_optimizer": true,
+    "target_topics_with_10_plus_posts": true
+  }
+}
