@@ -48,8 +48,8 @@ const projects: Project[] = [
     tasks: [
       { id: '1', title: 'Create VS Code Extension', description: 'Set up extension structure with scanning logic', status: 'done', priority: 'high', project: 'leakguard' },
       { id: '2', title: 'Add Secret Patterns', description: 'Add 20+ API key patterns (OpenAI, AWS, GitHub, etc.)', status: 'done', priority: 'high', project: 'leakguard' },
-      { id: '3', title: 'Add Context Menu', description: 'Right-click to scan files/folders', status: 'todo', priority: 'high', project: 'leakguard' },
-      { id: '4', title: 'Add Redact Feature', description: 'One-click to redact found secrets', status: 'todo', priority: 'high', project: 'leakguard' },
+      { id: '3', title: 'Add Context Menu', description: 'Right-click to scan files/folders', status: 'done', priority: 'high', project: 'leakguard' },
+      { id: '4', title: 'Add Redact Feature', description: 'One-click to redact found secrets', status: 'done', priority: 'high', project: 'leakguard' },
       { id: '5', title: 'Test Extension', description: 'Test with real projects', status: 'todo', priority: 'high', project: 'leakguard' },
       { id: '6', title: 'Publish to VS Code Marketplace', description: 'Publish extension', status: 'todo', priority: 'medium', project: 'leakguard' },
     ]
