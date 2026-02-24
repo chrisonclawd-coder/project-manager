@@ -77,6 +77,7 @@ const xSessions: XSession[] = [
 // Bookmarks - only Robin's bookmarks
 const bookmarks: Bookmark[] = [
   { title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Learning', description: 'Companion prompts for YouTube video "OpenClaw after 50 days: 20 real workflows"', notes: 'Reference for OpenClaw automation patterns' },
+  { title: 'VS Code Extension Publish Guide', url: 'https://code.visualstudio.com/api/working-with-extensions/publishing-extension', category: 'Learning', description: 'How to publish VS Code extensions to the Marketplace', notes: 'Need: Microsoft account, Azure PAT token, vsce package' },
 ]
 
 const statusColors: Record<TaskStatus, string> = {
