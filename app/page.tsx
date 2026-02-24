@@ -12,7 +12,15 @@ const xStrategyData = {
     { id: '3', name: 'Evening Session', time: '18:00 IST', status: 'pending', date: '2026-02-24' },
     { id: '4', name: 'Night Session', time: '21:00 IST', status: 'pending', date: '2026-02-24' }
   ],
-  weeklyStats: { tweets: 12, impressions: 45200, engagementRate: 4.2, newFollowers: 87, bestDay: 'Tuesday', bestTopic: 'AI Tools' }
+  weeklyStats: { tweets: 12, impressions: 45200, engagementRate: 4.2, newFollowers: 87, bestDay: 'Tuesday', bestTopic: 'AI Tools' },
+  trendingTopics: [
+    { id: '1', title: 'AI/LLM Explainability', description: 'Steerling-8B - model that explains every token', hot: true },
+    { id: '2', title: 'Browser Security', description: 'Firefox 148 - Goodbye InnerHTML, Hello SetHTML', hot: true },
+    { id: '3', title: 'Secret Scanning', description: 'enveil - hide your .env secrets', hot: false },
+    { id: '4', title: 'Hardware Emulation', description: 'X86CSS - x86 CPU in CSS', hot: true },
+    { id: '5', title: 'Coreboot Port', description: 'ThinkPad X270 runs Coreboot', hot: false },
+    { id: '6', title: 'Stripe Valuation', description: '$159B - 2025 annual letter', hot: false }
+  ]
 }
 
 // Types
@@ -504,7 +512,7 @@ export default function MissionControl() {
               </div>
 
               {/* Recent Tweets */}
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
                 <h2 className="text-lg font-semibold mb-4">📝 Recent Tweets</h2>
                 <div className="space-y-3">
                   {xStrategyData.sessions.filter((s: any) => s.status === 'done' && s.tweet).map((session: any) => (
@@ -518,6 +526,34 @@ export default function MissionControl() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </div>
+
+              {/* Trending Topics */}
+              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  🔥 Trending Topics
+                  <span className="text-xs text-gray-500">(Updated: Today)</span>
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {xStrategyData.trendingTopics.map((topic: any) => (
+                    <div key={topic.id} className={`rounded-lg p-4 border ${topic.hot ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-800 border-gray-700'}`}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="font-medium">{topic.title}</span>
+                        {topic.hot && <span className="text-xs bg-red-500/20 text-red-400 px-2 py-0.5 rounded">🔥 HOT</span>}
+                      </div>
+                      <p className="text-sm text-gray-400">{topic.description}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-700">
+                  <a 
+                    href="https://news.ycombinator.com/" 
+                    target="_blank"
+                    className="text-blue-400 hover:underline text-sm"
+                  >
+                    View more on Hacker News →
+                  </a>
                 </div>
               </div>
             </motion.div>
