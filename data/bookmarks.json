@@ -1,10 +1,17 @@
 {
   "bookmarks": [
     {
+      "title": "OpenClaw 50 Days Workflows",
+      "url": "https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6",
+      "category": "Learning",
+      "description": "20+ automation workflows for OpenClaw - morning briefing, auto-update, backup, research, YouTube analytics",
+      "notes": "Reference prompts for OpenClaw automation"
+    },
+    {
       "title": "Project Manager Dashboard",
-      "url": "https://web-ui-jade.vercel.app",
+      "url": "https://project-manager-blue-three.vercel.app",
       "category": "Work",
-      "description": "Project management and X Strategy tracking",
+      "description": "Mission Control Board - project tracking",
       "notes": "Main dashboard - Mission Control Board"
     },
     {
