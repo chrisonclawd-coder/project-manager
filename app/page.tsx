@@ -34,6 +34,20 @@ const xStrategyData = {
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
 
+// Tweet template generator
+function getTweetTemplate(topic: string, description: string): string {
+  const templates: Record<string, string> = {
+    'AI/LLM Explainability': "Just discovered Sterling-8B - an AI model that can explain EVERY token it generates. This is huge for AI transparency! 🚀\n\nWhat's your take on AI explainability?",
+    'Firefox XSS Protection': "Firefox 148 just killed InnerHTML and introduced SetHTML - better XSS protection by default.\n\nBrowser security is evolving fast! 🔒\n\nWhat's your favorite security feature?",
+    'X86CSS': "This is wild: someone built an x86 CPU emulator entirely in CSS. No JavaScript, just pure CSS.\n\nThe web platform keeps surprising me! 🖥️\n\nMind = blown 🤯",
+    'Secret Scanning': "Pro tip: Always scan your code for leaked API keys before pushing to GitHub.\n\nI built a VS Code extension that does exactly this - because one leaked key can cost thousands! 🔐\n\nStay safe, devs!",
+    'Coreboot Port': "Retro computing win: Coreboot now runs on ThinkPad X270.\n\nOpen source firmware is getting more accessible!\n\nWhat's your favorite open source project?",
+    'Stripe Valuation': "Stripe just hit $159B valuation. Here's what we can learn from their 2025 letter 📈\n\nGreat insights on building fintech products!"
+  }
+  
+  return templates[topic] || `Interesting trend: ${topic}. ${description}\n\n#tech #trending`
+}
+
 interface FlashcardTask {
   id: string
   title: string
@@ -290,21 +304,31 @@ export default function MissionControl() {
                 ))}
               </div>
 
-              {/* Trending Topics - Pick One */}
+              {/* Trending Topics - Click to Tweet */}
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-yellow-400" />
-                Pick a Topic
+                Pick a Topic → Click to Tweet
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
-                {xStrategyData.trending.map((topic) => (
-                  <div key={topic.id} className={`rounded-lg p-4 border cursor-pointer transition hover:border-blue-500 ${topic.hot ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-900 border-gray-800'}`}>
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">{topic.title}</span>
-                      {topic.hot && <Flame className="w-4 h-4 text-red-400" />}
-                    </div>
-                    <div className="text-sm text-gray-400 mt-1">{topic.description}</div>
-                  </div>
-                ))}
+                {xStrategyData.trending.map((topic) => {
+                  const tweetText = getTweetTemplate(topic.title, topic.description)
+                  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`
+                  return (
+                    <a 
+                      key={topic.id} 
+                      href={twitterUrl}
+                      target="_blank"
+                      className={`rounded-lg p-4 border cursor-pointer transition hover:border-blue-500 hover:scale-[1.02] ${topic.hot ? 'bg-red-500/10 border-red-500/30' : 'bg-gray-900 border-gray-800'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{topic.title}</span>
+                        {topic.hot && <Flame className="w-4 h-4 text-red-400" />}
+                      </div>
+                      <div className="text-sm text-gray-400 mt-1">{topic.description}</div>
+                      <div className="text-xs text-blue-400 mt-2">�小鸟 Click to tweet →</div>
+                    </a>
+                  )
+                })}
               </div>
 
               {/* Best Performer - What Works */}
