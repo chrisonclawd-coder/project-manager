@@ -326,11 +326,11 @@ export default function MissionControl() {
 
               {/* Quick Actions */}
               <div className="flex gap-3">
-                <a href="https://twitter.com" target="_blank" className="flex-1 bg-blue-500 hover:bg-blue-600 text-center py-3 rounded-lg font-medium transition">
-                  Open X
+                <a href="https://twitter.com/intent/tweet" target="_blank" className="flex-1 bg-blue-500 hover:bg-blue-600 text-center py-3 rounded-lg font-medium transition">
+                  ✏️ New Tweet
                 </a>
                 <a href="https://news.ycombinator.com/" target="_blank" className="flex-1 bg-gray-800 hover:bg-gray-700 text-center py-3 rounded-lg font-medium transition">
-                  Check HN
+                  📰 Check HN
                 </a>
               </div>
             </motion.div>
