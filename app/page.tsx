@@ -1,8 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, ArrowUp, Flame, ExternalLink, TrendingUp } from 'lucide-react'
+import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, ArrowUp, Flame, ExternalLink, TrendingUp, RefreshCw, Loader2 } from 'lucide-react'
+
+// Default topics (shown before refresh)
+const defaultTopics = [
+  { id: 1, title: 'AI Breakthroughs 2026', source: 'MIT Tech Review', tweets: [{ text: "MIT just dropped '10 Breakthrough Technologies 2026'. AI agents are leading the charge.\n\nWe're witnessing the biggest tech shift since mobile. Are you ready?", hashtags: ['AI', 'Tech', 'Innovation'] }, { text: "Breakthrough tech alert 🚨\n\nThe technologies shaping 2026:\n• AI Agents\n• Autonomous systems\n• Clean energy\n\nBookmark this.", hashtags: ['Tech2026', 'Breakthrough'] }] },
+  { id: 2, title: 'Gartner Tech Trends', source: 'Gartner', tweets: [{ text: "Gartner's Top 10 Tech Trends for 2026 are out.\n\nIf you're in tech, you NEED to know these.", hashtags: ['Gartner', 'TechTrends'] }, { text: "These 10 tech trends will define 2026.\n\nBookmark this. Share with your team.", hashtags: ['Tech', 'Gartner'] }] },
+  { id: 3, title: 'AI Voice Agents', source: 'RingCentral', tweets: [{ text: "AI voice agents are having their moment.\n\nCall centers, customer support - all getting upgraded.\n\nThe future is voice-first.", hashtags: ['AI', 'VoiceAgents'] }, { text: "Hot take: AI voice agents will replace 80% of customer service reps by 2027.\n\nNot a threat - an upgrade.", hashtags: ['AI', 'VoiceTech'] }] },
+  { id: 4, title: 'AI Coding Trends', source: 'GitHub Blog', tweets: [{ text: "12 AI Coding Emerging Trends for 2026:\n1. Agentic AI\n2. Autonomous coding\n3. Natural language → code\n\nThe dev landscape is changing fast.", hashtags: ['AI', 'Coding', 'DevTools'] }, { text: "AI coding isn't the future. It's the present.\n\nDevelopers using AI are 10x more productive.\n\nFacts.", hashtags: ['AI', 'Coding', 'Productivity'] }] },
+  { id: 5, title: 'Agentic AI Era', source: 'Medium', tweets: [{ text: "2026 = The Orchestrator Era.\n\nAgentic coding is rewriting the SDLC.\n\nFrom writing code → to orchestrating AI agents.\n\nMind. Blown. 🤯", hashtags: ['AI', 'Agents', 'SDLC'] }, { text: "The shift: \nDevs writing code → Devs managing AI agents\n\nThis is the biggest change in software since... ever.", hashtags: ['AI', 'Agents', 'Future'] }] },
+  { id: 6, title: 'Vibe Coding', source: 'MasteringAI', tweets: [{ text: "Vibe coding is the new trend.\n\nDescribe what you want. AI builds it.\n\nNo syntax. No bugs. Just vibes.", hashtags: ['VibeCoding', 'AI', 'Coding'] }, { text: "Vibe coding vs traditional coding:\n\nTraditional: write every line\nVibe: describe, iterate, ship\n\nBoth have a place.", hashtags: ['VibeCoding', 'AI', 'Dev'] }] }
+]
 
 // X Strategy - Meaningful Data Only
 // Update this data after each session
@@ -168,6 +178,22 @@ export default function MissionControl() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [selectedProject, setSelectedProject] = useState<string>('leakguard')
   const [searchQuery, setSearchQuery] = useState('')
+  const [trendingTopics, setTrendingTopics] = useState(defaultTopics)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  const refreshTopics = async () => {
+    setIsRefreshing(true)
+    try {
+      const res = await fetch('/api/trending')
+      const data = await res.json()
+      if (data.success && data.topics) {
+        setTrendingTopics(data.topics)
+      }
+    } catch (e) {
+      console.error('Failed to refresh', e)
+    }
+    setIsRefreshing(false)
+  }
 
   const pendingSessions = xStrategyData.sessions.filter(s => s.status === 'pending')
   const completedSessions = xStrategyData.sessions.filter(s => s.status === 'done')
@@ -248,9 +274,19 @@ export default function MissionControl() {
               </div>
               
               {/* Trending Topics - Click to Tweet */}
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
-                <p className="text-sm text-blue-300 mb-1">🔥 Trending from Exa Search</p>
-                <p className="text-xs text-gray-400">Click any tweet to post instantly!</p>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-blue-300 mb-1">🔥 Trending from Exa Search</p>
+                  <p className="text-xs text-gray-400">Click any tweet to post instantly!</p>
+                </div>
+                <button 
+                  onClick={refreshTopics}
+                  disabled={isRefreshing}
+                  className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm transition disabled:opacity-50"
+                >
+                  {isRefreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                  Refresh
+                </button>
               </div>
               
               {/* Trending Topics with Tweets */}
