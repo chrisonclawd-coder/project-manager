@@ -1,12 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronUp, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, TrendingUp } from 'lucide-react'
-
-// Import data from JSON files
-import bookmarksData from '../data/bookmarks.json'
-import flashcardsTasksData from '../flashcards-tasks.md'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { ChevronDown, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, TrendingUp } from 'lucide-react'
 
 // Types
 interface FlashcardTask {
@@ -31,45 +27,18 @@ interface Bookmark {
   notes: string
 }
 
-// Parse markdown tasks
-function parseMarkdownTasks(markdown: string): FlashcardTask[] {
-  const tasks: FlashcardTask[] = []
-  const lines = markdown.split('\n')
-  let currentStatus: 'todo' | 'in-progress' | 'done' = 'todo'
-  
-  for (const line of lines) {
-    if (line.includes('## In Progress')) {
-      currentStatus = 'in-progress'
-    } else if (line.includes('## Todo')) {
-      currentStatus = 'todo'
-    } else if (line.includes('## Completed')) {
-      currentStatus = 'done'
-    } else if (line.startsWith('- [ ]')) {
-      const title = line.replace('- [ ] ', '').split(' - ')[0].trim()
-      const description = line.includes(' - ') ? line.split(' - ')[1] : ''
-      if (title) {
-        tasks.push({
-          id: `todo-${tasks.length}`,
-          title,
-          description,
-          status: currentStatus
-        })
-      }
-    } else if (line.startsWith('- [x]')) {
-      const title = line.replace('- [x] ', '').split(' - ')[0].trim()
-      const description = line.includes(' - ') ? line.split(' - ')[1] : ''
-      if (title) {
-        tasks.push({
-          id: `done-${tasks.length}`,
-          title,
-          description,
-          status: 'done'
-        })
-      }
-    }
-  }
-  return tasks
-}
+// Flashcard tasks - parsed from flashcards-tasks.md
+const flashcardTasks: FlashcardTask[] = [
+  { id: '1', title: 'Implement OpenRouter API Integration', description: 'Actually call OpenRouter GPT API for flashcard generation instead of placeholders', status: 'in-progress' },
+  { id: '2', title: 'Content Extraction', description: 'Extract article content and send to AI for flashcard generation', status: 'todo' },
+  { id: '3', title: 'Review Queue UI', description: 'Implement spaced repetition review UI in popup', status: 'todo' },
+  { id: '4', title: 'Test Extension', description: 'Test on real websites, verify API key handling', status: 'todo' },
+  { id: '5', title: 'Submit to Chrome Web Store', description: 'Prepare for submission and launch', status: 'todo' },
+  { id: '6', title: 'Project Setup & Structure', description: 'Set up folder structure, dependencies, and configuration files', status: 'done' },
+  { id: '7', title: 'Build System Fix (Windows)', description: 'Fix build script to work on Windows (cp -> node fs)', status: 'done' },
+  { id: '8', title: 'Manifest.json Fix', description: 'Fix manifest to reference .js files instead of .ts', status: 'done' },
+  { id: '9', title: 'HTML Files Copy Fix', description: 'Add HTML files to dist in build script', status: 'done' },
+]
 
 const xSessions: XSession[] = [
   { id: '1', name: 'Morning Session', time: '10:00 IST', description: 'Engage + Post on trending topics' },
@@ -78,10 +47,18 @@ const xSessions: XSession[] = [
   { id: '4', name: 'Night Session', time: '21:00 IST', description: 'Engage + Growth insights' },
 ]
 
-// Use data from JSON files
-const bookmarks: Bookmark[] = bookmarksData.bookmarks
-
-const flashcardTasks: FlashcardTask[] = parseMarkdownTasks(flashcardsTasksData)
+// Bookmarks - from data/bookmarks.json
+const bookmarks: Bookmark[] = [
+  { title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Learning', description: '20+ automation workflows for OpenClaw - morning briefing, auto-update, backup, research, YouTube analytics', notes: 'Reference prompts for OpenClaw automation' },
+  { title: 'Project Manager Dashboard', url: 'https://project-manager-blue-three.vercel.app', category: 'Work', description: 'Mission Control Board - project tracking', notes: 'Main dashboard - Mission Control Board' },
+  { title: 'Project Manager Repo', url: 'https://github.com/chrisonclawd-coder/project-manager', category: 'Work', description: 'Source code for Project Manager', notes: 'Next.js app - Mission Control Board' },
+  { title: 'InstaCards Repo', url: 'https://github.com/chrisonclawd-coder/InstaCards', category: 'Work', description: 'Article-to-Flashcards Chrome extension', notes: 'Chrome extension + Web UI' },
+  { title: 'OpenClaw', url: 'https://docs.openclaw.ai', category: 'Tools', description: 'AI assistant framework documentation', notes: 'Framework used for automation' },
+  { title: 'Exa Web Search', url: 'https://docs.exa.ai', category: 'Learning', description: 'AI-optimized web search API documentation', notes: 'Used for X Strategy research' },
+  { title: 'OpenRouter API', url: 'https://openrouter.ai/api/docs', category: 'Tools', description: 'AI model API documentation', notes: 'For InstaCards flashcard generation' },
+  { title: 'Next.js Docs', url: 'https://nextjs.org/docs', category: 'Tools', description: 'Next.js 14 documentation', notes: 'For web UI development' },
+  { title: 'Twitter/X Algorithm', url: 'https://github.com/twitter/the-algorithm', category: 'Learning', description: "Twitter's open-source recommendation algorithm", notes: 'Used for X Strategy optimization' },
+]
 
 const statusColors = {
   'todo': 'bg-gray-500',
