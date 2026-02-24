@@ -1,0 +1,47 @@
+{
+  "bookmarks": [
+    {
+      "title": "Project Manager Dashboard",
+      "url": "https://web-ui-jade.vercel.app",
+      "category": "Work",
+      "description": "Project management and X Strategy tracking",
+      "notes": "Main dashboard for tracking all projects"
+    },
+    {
+      "title": "Project Manager Repo",
+      "url": "https://github.com/chrisonclawd-coder/project-manager",
+      "category": "Work",
+      "description": "Source code for Project Manager",
+      "notes": "Stores session templates and metrics"
+    },
+    {
+      "title": "InstaCards Repo",
+      "url": "https://github.com/chrisonclawd-coder/InstaCards",
+      "category": "Work",
+      "description": "Source code for Article-to-Flashcards Chrome extension",
+      "notes": "Chrome extension + Web UI"
+    },
+    {
+      "title": "Exa Web Search",
+      "url": "https://docs.exa.ai",
+      "category": "Learning",
+      "description": "AI-optimized web search API documentation",
+      "notes": "Used for X Strategy research"
+    },
+    {
+      "title": "OpenRouter API",
+      "url": "https://openrouter.ai/api/docs",
+      "category": "Tools",
+      "description": "AI model API documentation",
+      "notes": "Used for extension AI flashcard generation"
+    },
+    {
+      "title": "Next.js Docs",
+      "url": "https://nextjs.org/docs",
+      "category": "Tools",
+      "description": "Next.js 14 documentation",
+      "notes": "Used for web UI development"
+    }
+  ],
+  "lastUpdated": "2026-02-24"
+}
