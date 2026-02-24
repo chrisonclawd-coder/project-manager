@@ -82,13 +82,6 @@ const xSessions: XSession[] = [
 const bookmarks: Bookmark[] = bookmarksData.bookmarks
 
 const flashcardTasks: FlashcardTask[] = parseMarkdownTasks(flashcardsTasksData)
-  { id: '4', title: 'Test Extension', description: 'Test on real websites', status: 'todo' },
-  { id: '5', title: 'Submit to Chrome Web Store', description: 'Prepare for submission', status: 'todo' },
-  { id: '6', title: 'Project Setup & Structure', description: 'Set up folder structure', status: 'done' },
-  { id: '7', title: 'Build System Fix (Windows)', description: 'Fix build script for Windows', status: 'done' },
-  { id: '8', title: 'Manifest.json Fix', description: 'Reference .js files instead of .ts', status: 'done' },
-  { id: '9', title: 'HTML Files Copy Fix', description: 'Add HTML files to dist', status: 'done' },
-]
 
 const statusColors = {
   'todo': 'bg-gray-500',
