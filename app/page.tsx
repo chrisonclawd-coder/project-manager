@@ -47,17 +47,9 @@ const xSessions: XSession[] = [
   { id: '4', name: 'Night Session', time: '21:00 IST', description: 'Engage + Growth insights' },
 ]
 
-// Bookmarks - from data/bookmarks.json
+// Bookmarks - from bookmark.md (only Robin's saved bookmarks)
 const bookmarks: Bookmark[] = [
-  { title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Learning', description: '20+ automation workflows for OpenClaw - morning briefing, auto-update, backup, research, YouTube analytics', notes: 'Reference prompts for OpenClaw automation' },
-  { title: 'Project Manager Dashboard', url: 'https://project-manager-blue-three.vercel.app', category: 'Work', description: 'Mission Control Board - project tracking', notes: 'Main dashboard - Mission Control Board' },
-  { title: 'Project Manager Repo', url: 'https://github.com/chrisonclawd-coder/project-manager', category: 'Work', description: 'Source code for Project Manager', notes: 'Next.js app - Mission Control Board' },
-  { title: 'InstaCards Repo', url: 'https://github.com/chrisonclawd-coder/InstaCards', category: 'Work', description: 'Article-to-Flashcards Chrome extension', notes: 'Chrome extension + Web UI' },
-  { title: 'OpenClaw', url: 'https://docs.openclaw.ai', category: 'Tools', description: 'AI assistant framework documentation', notes: 'Framework used for automation' },
-  { title: 'Exa Web Search', url: 'https://docs.exa.ai', category: 'Learning', description: 'AI-optimized web search API documentation', notes: 'Used for X Strategy research' },
-  { title: 'OpenRouter API', url: 'https://openrouter.ai/api/docs', category: 'Tools', description: 'AI model API documentation', notes: 'For InstaCards flashcard generation' },
-  { title: 'Next.js Docs', url: 'https://nextjs.org/docs', category: 'Tools', description: 'Next.js 14 documentation', notes: 'For web UI development' },
-  { title: 'Twitter/X Algorithm', url: 'https://github.com/twitter/the-algorithm', category: 'Learning', description: "Twitter's open-source recommendation algorithm", notes: 'Used for X Strategy optimization' },
+  { title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Learning', description: 'Companion prompts for YouTube video "OpenClaw after 50 days: 20 real workflows". Contains 20+ automation workflows.', notes: 'Reference for OpenClaw automation patterns' },
 ]
 
 const statusColors = {
