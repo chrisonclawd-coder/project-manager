@@ -4,6 +4,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronUp, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, TrendingUp } from 'lucide-react'
 
+// Import data from JSON files
+import bookmarksData from '../data/bookmarks.json'
+import flashcardsTasksData from '../flashcards-tasks.md'
+
 // Types
 interface FlashcardTask {
   id: string
@@ -41,19 +45,27 @@ function parseMarkdownTasks(markdown: string): FlashcardTask[] {
     } else if (line.includes('## Completed')) {
       currentStatus = 'done'
     } else if (line.startsWith('- [ ]')) {
-      tasks.push({
-        id: `todo-${tasks.length}`,
-        title: line.replace('- [ ] ', '').split(' - ')[0].trim(),
-        description: line.includes(' - ') ? line.split(' - ')[1] : '',
-        status: currentStatus
-      })
+      const title = line.replace('- [ ] ', '').split(' - ')[0].trim()
+      const description = line.includes(' - ') ? line.split(' - ')[1] : ''
+      if (title) {
+        tasks.push({
+          id: `todo-${tasks.length}`,
+          title,
+          description,
+          status: currentStatus
+        })
+      }
     } else if (line.startsWith('- [x]')) {
-      tasks.push({
-        id: `done-${tasks.length}`,
-        title: line.replace('- [x] ', '').split(' - ')[0].trim(),
-        description: line.includes(' - ') ? line.split(' - ')[1] : '',
-        status: 'done'
-      })
+      const title = line.replace('- [x] ', '').split(' - ')[0].trim()
+      const description = line.includes(' - ') ? line.split(' - ')[1] : ''
+      if (title) {
+        tasks.push({
+          id: `done-${tasks.length}`,
+          title,
+          description,
+          status: 'done'
+        })
+      }
     }
   }
   return tasks
@@ -66,18 +78,10 @@ const xSessions: XSession[] = [
   { id: '4', name: 'Night Session', time: '21:00 IST', description: 'Engage + Growth insights' },
 ]
 
-// Demo data (in production, fetch from files)
-const bookmarks: Bookmark[] = [
-  { title: 'Project Manager Dashboard', url: 'https://web-ui-jade.vercel.app', category: 'Work', description: 'Project management and X Strategy tracking', notes: 'Main dashboard' },
-  { title: 'InstaCards Repo', url: 'https://github.com/chrisonclawd-coder/InstaCards', category: 'Work', description: 'Chrome extension source code', notes: '' },
-  { title: 'Exa Web Search', url: 'https://docs.exa.ai', category: 'Learning', description: 'AI-optimized web search API', notes: 'Used for X Strategy' },
-  { title: 'OpenRouter API', url: 'https://openrouter.ai/api/docs', category: 'Tools', description: 'AI model API documentation', notes: 'For flashcard generation' },
-]
+// Use data from JSON files
+const bookmarks: Bookmark[] = bookmarksData.bookmarks
 
-const flashcardTasks: FlashcardTask[] = [
-  { id: '1', title: 'Implement OpenRouter API Integration', description: 'Actually call OpenRouter GPT API for flashcard generation', status: 'in-progress' },
-  { id: '2', title: 'Content Extraction', description: 'Extract article content and send to AI', status: 'todo' },
-  { id: '3', title: 'Review Queue UI', description: 'Implement spaced repetition review UI', status: 'todo' },
+const flashcardTasks: FlashcardTask[] = parseMarkdownTasks(flashcardsTasksData)
   { id: '4', title: 'Test Extension', description: 'Test on real websites', status: 'todo' },
   { id: '5', title: 'Submit to Chrome Web Store', description: 'Prepare for submission', status: 'todo' },
   { id: '6', title: 'Project Setup & Structure', description: 'Set up folder structure', status: 'done' },
