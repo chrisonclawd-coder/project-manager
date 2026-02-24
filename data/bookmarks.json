@@ -5,21 +5,28 @@
       "url": "https://web-ui-jade.vercel.app",
       "category": "Work",
       "description": "Project management and X Strategy tracking",
-      "notes": "Main dashboard for tracking all projects"
+      "notes": "Main dashboard - Mission Control Board"
     },
     {
       "title": "Project Manager Repo",
       "url": "https://github.com/chrisonclawd-coder/project-manager",
       "category": "Work",
       "description": "Source code for Project Manager",
-      "notes": "Stores session templates and metrics"
+      "notes": "Next.js app - Mission Control Board"
     },
     {
       "title": "InstaCards Repo",
       "url": "https://github.com/chrisonclawd-coder/InstaCards",
       "category": "Work",
-      "description": "Source code for Article-to-Flashcards Chrome extension",
+      "description": "Article-to-Flashcards Chrome extension",
       "notes": "Chrome extension + Web UI"
+    },
+    {
+      "title": "OpenClaw",
+      "url": "https://docs.openclaw.ai",
+      "category": "Tools",
+      "description": "AI assistant framework documentation",
+      "notes": "Framework used for automation"
     },
     {
       "title": "Exa Web Search",
@@ -33,14 +40,21 @@
       "url": "https://openrouter.ai/api/docs",
       "category": "Tools",
       "description": "AI model API documentation",
-      "notes": "Used for extension AI flashcard generation"
+      "notes": "For InstaCards flashcard generation"
     },
     {
       "title": "Next.js Docs",
       "url": "https://nextjs.org/docs",
       "category": "Tools",
       "description": "Next.js 14 documentation",
-      "notes": "Used for web UI development"
+      "notes": "For web UI development"
+    },
+    {
+      "title": "Twitter/X Algorithm",
+      "url": "https://github.com/twitter/the-algorithm",
+      "category": "Learning",
+      "description": "Twitter's open-source recommendation algorithm",
+      "notes": "Used for X Strategy optimization"
     }
   ],
   "lastUpdated": "2026-02-24"
