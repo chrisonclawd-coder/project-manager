@@ -42,19 +42,16 @@ interface Project {
 // Projects data
 const projects: Project[] = [
   {
-    id: 'instacards',
-    name: 'InstaCards',
-    icon: '📖',
+    id: 'leakguard',
+    name: 'Leak Guard',
+    icon: '🔒',
     tasks: [
-      { id: '1', title: 'Implement OpenRouter API Integration', description: 'Actually call OpenRouter GPT API for flashcard generation', status: 'in-progress', priority: 'high', project: 'instacards' },
-      { id: '2', title: 'Content Extraction', description: 'Extract article content and send to AI', status: 'todo', priority: 'high', project: 'instacards' },
-      { id: '3', title: 'Review Queue UI', description: 'Implement spaced repetition review UI in popup', status: 'todo', priority: 'medium', project: 'instacards' },
-      { id: '4', title: 'Test Extension', description: 'Test on real websites', status: 'todo', priority: 'high', project: 'instacards' },
-      { id: '5', title: 'Submit to Chrome Web Store', description: 'Prepare for submission', status: 'todo', priority: 'high', project: 'instacards' },
-      { id: '6', title: 'Project Setup & Structure', description: 'Set up folder structure', status: 'done', priority: 'high', project: 'instacards' },
-      { id: '7', title: 'Build System Fix (Windows)', description: 'Fix build script for Windows', status: 'done', priority: 'high', project: 'instacards' },
-      { id: '8', title: 'Manifest.json Fix', description: 'Reference .js files instead of .ts', status: 'done', priority: 'high', project: 'instacards' },
-      { id: '9', title: 'HTML Files Copy Fix', description: 'Add HTML files to dist', status: 'done', priority: 'medium', project: 'instacards' },
+      { id: '1', title: 'Create VS Code Extension', description: 'Set up extension structure with scanning logic', status: 'done', priority: 'high', project: 'leakguard' },
+      { id: '2', title: 'Add Secret Patterns', description: 'Add 20+ API key patterns (OpenAI, AWS, GitHub, etc.)', status: 'done', priority: 'high', project: 'leakguard' },
+      { id: '3', title: 'Add Context Menu', description: 'Right-click to scan files/folders', status: 'todo', priority: 'high', project: 'leakguard' },
+      { id: '4', title: 'Add Redact Feature', description: 'One-click to redact found secrets', status: 'todo', priority: 'high', project: 'leakguard' },
+      { id: '5', title: 'Test Extension', description: 'Test with real projects', status: 'todo', priority: 'high', project: 'leakguard' },
+      { id: '6', title: 'Publish to VS Code Marketplace', description: 'Publish extension', status: 'todo', priority: 'medium', project: 'leakguard' },
     ]
   },
   {
