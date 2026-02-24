@@ -66,6 +66,51 @@ const trendingTopics = [
       { text: "Every app is becoming 'intelligent' now.\n\nYour app needs AI. Not as a feature - as the foundation.\n\nIf it's not smart, it's obsolete.", hashtags: ['AI', 'Apps', 'Tech'] },
       { text: "The app store is dead. Long live the AI agent store.\n\nWe're witnessing the biggest platform shift since mobile.\n\nAre you building for it?", hashtags: ['AI', 'Apps', 'Platform'] }
     ]
+  },
+  { 
+    id: 6, 
+    title: 'AI Coding Trends', 
+    source: 'GitHub Blog',
+    tweets: [
+      { text: "12 AI Coding Emerging Trends for 2026:\n\n1. Agentic AI\n2. Autonomous coding\n3. Natural language → code\n4. Automated testing\n\nThe dev landscape is changing fast.", hashtags: ['AI', 'Coding', 'DevTools'] },
+      { text: "AI coding isn't the future. It's the present.\n\nDevelopers using AI are 10x more productive.\n\nThose who aren't? They're being left behind.\n\nFacts.", hashtags: ['AI', 'Coding', 'Productivity'] }
+    ]
+  },
+  { 
+    id: 7, 
+    title: 'Agentic AI Era', 
+    source: 'Medium',
+    tweets: [
+      { text: "2026 = The Orchestrator Era.\n\nAgentic coding is rewriting the SDLC.\n\nFrom writing code → to orchestrating AI agents.\n\nMind. Blown. 🤯", hashtags: ['AI', 'Agents', 'SDLC'] },
+      { text: "The shift: \nDevs writing code → Devs managing AI agents\n\nThis is the biggest change in software since... ever.\n\nAre you ready to adapt?", hashtags: ['AI', 'Agents', 'Future'] }
+    ]
+  },
+  { 
+    id: 8, 
+    title: 'Vibe Coding', 
+    source: 'MasteringAI',
+    tweets: [
+      { text: "Vibe coding is the new trend.\n\nDescribe what you want. AI builds it.\n\nNo syntax. No bugs. Just vibes.\n\nIs this the end of traditional coding?", hashtags: ['VibeCoding', 'AI', 'Coding'] },
+      { text: "Vibe coding vs traditional coding:\n\nTraditional: write every line\nVibe: describe, iterate, ship\n\nBoth have a place. Which wins?\n\n👇", hashtags: ['VibeCoding', 'AI', 'Dev'] }
+    ]
+  },
+  { 
+    id: 9, 
+    title: 'Developer Productivity', 
+    source: 'Octopus',
+    tweets: [
+      { text: "AI adoption is directly impacting developer productivity.\n\nCompanies using AI see 40%+ velocity increases.\n\nThe data doesn't lie.\n\n🚀", hashtags: ['AI', 'Productivity', 'Dev'] },
+      { text: "Your developers are 40% more productive with AI.\n\nNot a guess - data.\n\nIf your team isn't using AI, you're falling behind.\n\nSimple.", hashtags: ['AI', 'Productivity', 'Tech'] }
+    ]
+  },
+  { 
+    id: 10, 
+    title: 'AI Trends 2026', 
+    source: 'Various',
+    tweets: [
+      { text: "7 AI trends to watch in 2026:\n\n1. Agentic AI\n2. Multimodal models\n3. Edge AI\n4. Open source dominance\n5. Custom fine-tuned models\n6. AI regulation\n7.垂直 AI\n\nSave. Share.", hashtags: ['AI', 'Trends', '2026'] },
+      { text: "AI in 2026 = multimodal + agents + edge.\n\nWe're not talking chatbots anymore.\n\nWe're talking autonomous systems.\n\nThis is the year AI grows up.", hashtags: ['AI', 'Trends', 'Future'] }
+    ]
   }
 ]
 
