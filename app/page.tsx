@@ -144,13 +144,21 @@ export default function MissionControl() {
 
   return (
     <div className="flex min-h-screen bg-gray-950 text-white">
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+      
       {/* Sidebar */}
       <motion.aside
         initial={{ x: -256 }}
         animate={{ x: isSidebarOpen ? 0 : -256 }}
         className={`fixed lg:static z-50 w-64 bg-gray-900 border-r border-gray-800 h-screen flex flex-col ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}
       >
-        <div className="p-6 border-b border-gray-800">
+        <div className="p-4 border-b border-gray-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
               🎯
@@ -160,6 +168,13 @@ export default function MissionControl() {
               <p className="text-gray-400 text-sm">Project Tracker</p>
             </div>
           </div>
+          {/* Mobile close button */}
+          <button 
+            onClick={() => setIsSidebarOpen(false)} 
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-800"
+          >
+            ✕
+          </button>
         </div>
 
         {/* Navigation */}
