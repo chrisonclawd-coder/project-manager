@@ -1,0 +1,57 @@
+{
+  "sessions": [
+    {
+      "id": "1",
+      "name": "Morning Session",
+      "time": "10:00 IST",
+      "status": "done",
+      "date": "2026-02-24",
+      "topic": "AI coding assistants",
+      "tweet": "AI coding assistants are changing how we write code. Here are 5 tools I use daily...",
+      "stats": {
+        "likes": 45,
+        "retweets": 12,
+        "replies": 8,
+        "impressions": 2300
+      }
+    },
+    {
+      "id": "2",
+      "name": "Afternoon Session",
+      "time": "15:00 IST",
+      "status": "done",
+      "date": "2026-02-24",
+      "topic": "Web performance",
+      "tweet": "Web performance tips that actually work: 1. Lazy load images 2. Cache everything...",
+      "stats": {
+        "likes": 32,
+        "retweets": 8,
+        "replies": 5,
+        "impressions": 1800
+      }
+    },
+    {
+      "id": "3",
+      "name": "Evening Session",
+      "time": "18:00 IST",
+      "status": "pending",
+      "date": "2026-02-24"
+    },
+    {
+      "id": "4",
+      "name": "Night Session",
+      "time": "21:00 IST",
+      "status": "pending",
+      "date": "2026-02-24"
+    }
+  ],
+  "weeklyStats": {
+    "tweets": 12,
+    "impressions": 45200,
+    "engagementRate": 4.2,
+    "newFollowers": 87,
+    "bestDay": "Tuesday",
+    "bestTopic": "AI Tools"
+  },
+  "lastUpdated": "2026-02-24T15:00:00Z"
+}

@@ -4,6 +4,17 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, TrendingUp, Plus } from 'lucide-react'
 
+// X Strategy Data
+const xStrategyData = {
+  sessions: [
+    { id: '1', name: 'Morning Session', time: '10:00 IST', status: 'done', date: '2026-02-24', topic: 'AI coding assistants', tweet: 'AI coding assistants are changing how we write code. Here are 5 tools I use daily...', stats: { likes: 45, retweets: 12, replies: 8, impressions: 2300 } },
+    { id: '2', name: 'Afternoon Session', time: '15:00 IST', status: 'done', date: '2026-02-24', topic: 'Web performance', tweet: 'Web performance tips that actually work: 1. Lazy load images 2. Cache everything...', stats: { likes: 32, retweets: 8, replies: 5, impressions: 1800 } },
+    { id: '3', name: 'Evening Session', time: '18:00 IST', status: 'pending', date: '2026-02-24' },
+    { id: '4', name: 'Night Session', time: '21:00 IST', status: 'pending', date: '2026-02-24' }
+  ],
+  weeklyStats: { tweets: 12, impressions: 45200, engagementRate: 4.2, newFollowers: 87, bestDay: 'Tuesday', bestTopic: 'AI Tools' }
+}
+
 // Types
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
@@ -426,35 +437,87 @@ export default function MissionControl() {
                 </div>
               </div>
 
-              {/* Cron Schedule */}
-              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-8">
+              {/* Today's Sessions */}
+              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-blue-500" />
-                  Daily Schedule
+                  📅 Today's Sessions
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {xSessions.map((session) => (
-                    <div key={session.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                      <div className="text-sm text-gray-400 mb-1">{session.time}</div>
-                      <div className="font-semibold">{session.name}</div>
-                      <div className="text-xs text-gray-500 mt-2">{session.description}</div>
+                <div className="space-y-4">
+                  {xStrategyData.sessions.map((session: any) => (
+                    <div key={session.id} className={`rounded-lg p-4 border ${session.status === 'done' ? 'bg-green-500/10 border-green-500/30' : 'bg-gray-800 border-gray-700'}`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{session.id === '1' ? '☀️' : session.id === '2' ? '🌤️' : session.id === '3' ? '🌙' : '🌑'}</span>
+                          <span className="font-medium">{session.name}</span>
+                          <span className="text-sm text-gray-400">({session.time})</span>
+                        </div>
+                        {session.status === 'done' ? (
+                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs">✅ Done</span>
+                        ) : (
+                          <span className="px-2 py-1 bg-gray-600/20 text-gray-400 rounded text-xs">⏳ Pending</span>
+                        )}
+                      </div>
+                      {session.status === 'done' && session.topic && (
+                        <div className="ml-8 text-sm">
+                          <div className="text-gray-300">Posted about: <span className="text-blue-400">{session.topic}</span></div>
+                          {session.stats && (
+                            <div className="flex gap-4 mt-2 text-gray-400">
+                              <span>❤️ {session.stats.likes}</span>
+                              <span>🔁 {session.stats.retweets}</span>
+                              <span>👁️ {session.stats.impressions?.toLocaleString()}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Session Files */}
+              {/* Weekly Stats */}
+              <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 mb-6">
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  📊 Weekly Stats
+                </h2>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <div className="text-2xl font-bold">{xStrategyData.weeklyStats.tweets}</div>
+                    <div className="text-sm text-gray-400">Tweets</div>
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <div className="text-2xl font-bold">{(xStrategyData.weeklyStats.impressions / 1000).toFixed(1)}K</div>
+                    <div className="text-sm text-gray-400">Impressions</div>
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <div className="text-2xl font-bold">{xStrategyData.weeklyStats.engagementRate}%</div>
+                    <div className="text-sm text-gray-400">Engagement</div>
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <div className="text-2xl font-bold text-green-400">+{xStrategyData.weeklyStats.newFollowers}</div>
+                    <div className="text-sm text-gray-400">New Followers</div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-700 flex justify-between text-sm text-gray-400">
+                  <span>Best Day: <span className="text-white">{xStrategyData.weeklyStats.bestDay}</span></span>
+                  <span>Best Topic: <span className="text-white">{xStrategyData.weeklyStats.bestTopic}</span></span>
+                </div>
+              </div>
+
+              {/* Recent Tweets */}
               <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
-                <h2 className="text-lg font-semibold mb-4">Session Templates</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <a href="https://github.com/chrisonclawd-coder/project-manager/tree/main/sessions" target="_blank" className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500 transition">
-                    <div className="font-medium">📁 sessions/</div>
-                    <div className="text-sm text-gray-400">Morning, Afternoon, Evening, Night templates</div>
-                  </a>
-                  <a href="https://github.com/chrisonclawd-coder/project-manager/tree/main/tweets" target="_blank" className="bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500 transition">
-                    <div className="font-medium">📁 tweets/</div>
-                    <div className="text-sm text-gray-400">Tweet generator and templates</div>
-                  </a>
+                <h2 className="text-lg font-semibold mb-4">📝 Recent Tweets</h2>
+                <div className="space-y-3">
+                  {xStrategyData.sessions.filter((s: any) => s.status === 'done' && s.tweet).map((session: any) => (
+                    <div key={session.id} className="bg-gray-800 rounded-lg p-4">
+                      <p className="text-sm text-gray-300 mb-2">"{session.tweet}"</p>
+                      <div className="flex gap-4 text-xs text-gray-400">
+                        <span>❤️ {session.stats?.likes || 0}</span>
+                        <span>🔁 {session.stats?.retweets || 0}</span>
+                        <span>💬 {session.stats?.replies || 0}</span>
+                        <span>👁️ {session.stats?.impressions?.toLocaleString() || 0}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
