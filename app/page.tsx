@@ -20,14 +20,18 @@ const xStrategyData = {
   bestTweet: { text: 'AI coding assistants are changing how we write code...', topic: 'AI coding', score: 67 }
 }
 
-// Pre-built tweet templates for quick posting
-const tweetTemplates = [
-  { id: 1, title: 'VS Code Tip', text: 'Pro tip: Use these VS Code shortcuts to 10x your productivity 🛠️\n\n1. Cmd+Shift+P: Command palette\n2. Cmd+D: Select next occurrence\n3. Cmd+Shift+L: Select all occurrences\n\nWhich one is your favorite?', tags: ['vscode', 'productivity', 'coding'] },
-  { id: 2, title: 'AI Tool', text: 'Been using AI coding assistants daily. Here are my favorites:\n\n1. Cursor - AI-first VS Code\n2. GitHub Copilot - integrated everywhere\n3. Claude - great for reasoning\n\nWhich do you prefer?', tags: ['ai', 'coding', 'tools'] },
-  { id: 3, title: 'Web Performance', text: 'Fast websites = better UX + SEO\n\nQuick wins:\n• Lazy load images\n• Minify CSS/JS\n• Use CDN\n\nWhat\'s your favorite optimization?', tags: ['webdev', 'performance', 'tips'] },
-  { id: 4, title: 'Open Source', text: 'Just discovered a cool open source project. Love seeing what the community builds! 🌍\n\nWhat open source projects are you excited about?', tags: ['opensource', 'dev'] },
-  { id: 5, title: 'Debugging', text: 'Spend more time debugging than writing code? Same 😅\n\nBest debugging tips:\n• Use console.log strategically\n• Breakpoints > print statements\n• Read error messages first\n\nWhat\'s your go-to?', tags: ['debugging', 'coding', 'tips'] }
+// Pre-built topics for tweet generation
+const topics = [
+  { id: 1, title: 'Secret Scanning', description: 'API keys, leaked secrets, security' },
+  { id: 2, title: 'AI Coding', description: 'AI assistants, tools, productivity' },
+  { id: 3, title: 'VS Code', description: 'Extensions, tips, productivity' },
+  { id: 4, title: 'Web Performance', description: 'Speed, optimization, tips' },
+  { id: 5, title: 'Open Source', description: 'Projects, community, contribution' },
+  { id: 6, title: 'Debugging', description: 'Tips, tools, stories' }
 ]
+
+// Tweet generation guide
+const tweetGuide = "Tell me to generate: 'Write viral tweet about [TOPIC]' - I'll use Twitter's algorithm to optimize it!"
 
 // Quick tweet URLs
 const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
@@ -152,15 +156,21 @@ export default function MissionControl() {
                 ))}
               </div>
 
-              {/* Quick Post Templates */}
-              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-yellow-400" />Quick Post</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-                {tweetTemplates.map((t) => (
-                  <a key={t.id} href={getTweetUrl(t.text)} target="_blank" className="bg-gray-900 rounded-xl p-4 border border-gray-800 hover:border-blue-500 transition">
-                    <div className="font-medium mb-1">{t.title}</div>
-                    <div className="text-xs text-gray-400 line-clamp-2">{t.text.substring(0, 80)}...</div>
-                    <div className="flex flex-wrap gap-1 mt-2">{t.tags.map(tag => <span key={tag} className="text-xs text-blue-400">#{tag}</span>)}</div>
-                  </a>
+              {/* AI Tweet Generator */}
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2"><Zap className="w-5 h-5 text-yellow-400" />AI Tweet Generator</h2>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
+                <p className="text-sm text-blue-300 mb-2">✨ Tell me: "Generate viral tweet about [TOPIC]"</p>
+                <p className="text-xs text-gray-400">I'll use Twitter's algorithm to optimize your tweet for maximum engagement!</p>
+              </div>
+              
+              {/* Topic Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                {topics.map((topic) => (
+                  <div key={topic.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800 hover:border-blue-500 transition cursor-pointer">
+                    <div className="font-medium mb-1">{topic.title}</div>
+                    <div className="text-xs text-gray-400">{topic.description}</div>
+                    <div className="text-xs text-blue-400 mt-2">Say: "Generate tweet about {topic.title}"</div>
+                  </div>
                 ))}
               </div>
 
