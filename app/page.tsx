@@ -20,18 +20,57 @@ const xStrategyData = {
   bestTweet: { text: 'AI coding assistants are changing how we write code...', topic: 'AI coding', score: 67 }
 }
 
-// Pre-built topics for tweet generation
-const topics = [
-  { id: 1, title: 'Secret Scanning', description: 'API keys, leaked secrets, security' },
-  { id: 2, title: 'AI Coding', description: 'AI assistants, tools, productivity' },
-  { id: 3, title: 'VS Code', description: 'Extensions, tips, productivity' },
-  { id: 4, title: 'Web Performance', description: 'Speed, optimization, tips' },
-  { id: 5, title: 'Open Source', description: 'Projects, community, contribution' },
-  { id: 6, title: 'Debugging', description: 'Tips, tools, stories' }
+// Trending topics from Exa search - Feb 2026
+const trendingTopics = [
+  { 
+    id: 1, 
+    title: 'AI Breakthroughs 2026', 
+    source: 'MIT Tech Review',
+    tweets: [
+      { text: "MIT just dropped '10 Breakthrough Technologies 2026'. AI agents are leading the charge.\n\nWe're witnessing the biggest tech shift since mobile. Are you ready?", hashtags: ['AI', 'Tech', 'Innovation'] },
+      { text: "Breakthrough tech alert 🚨\n\nThe technologies shaping 2026:\n• AI Agents\n• Autonomous systems\n• Clean energy\n\nBookmark this. You'll thank me later.", hashtags: ['Tech2026', 'Breakthrough'] }
+    ]
+  },
+  { 
+    id: 2, 
+    title: 'Gartner Tech Trends', 
+    source: 'Gartner',
+    tweets: [
+      { text: "Gartner's Top 10 Tech Trends for 2026 are out.\n\nIf you're in tech, you NEED to know these.\n\nThread 🧵👇", hashtags: ['Gartner', 'TechTrends', '2026'] },
+      { text: "These 10 tech trends will define 2026.\n\nBookmark this. Share with your team.\n\nWhich one are you most excited about?", hashtags: ['Tech', 'Gartner'] }
+    ]
+  },
+  { 
+    id: 3, 
+    title: 'AI Voice Agents', 
+    source: 'RingCentral',
+    tweets: [
+      { text: "AI voice agents are having their moment.\n\nCall centers, customer support, personal assistants - all getting upgraded.\n\nThe future is voice-first.", hashtags: ['AI', 'VoiceAgents', 'Future'] },
+      { text: "Hot take: AI voice agents will replace 80% of customer service reps by 2027.\n\nNot a threat - an upgrade.\n\nAgree or disagree? 👇", hashtags: ['AI', 'VoiceTech'] }
+    ]
+  },
+  { 
+    id: 4, 
+    title: 'Hyperscale AI Data Centers', 
+    source: 'MIT Tech Review',
+    tweets: [
+      { text: "Hyperscale AI data centers are consuming more energy than ever.\n\nThe irony: AI needs clean energy to be truly sustainable.\n\nBig opportunity here.", hashtags: ['AI', 'DataCenters', 'GreenTech'] },
+      { text: "AI data centers are the new oil refineries.\n\nThe companies solving the energy problem will win big.\n\nBookmark this prediction. 📌", hashtags: ['AI', 'Energy', 'Tech'] }
+    ]
+  },
+  { 
+    id: 5, 
+    title: 'Intelligent Apps', 
+    source: 'Capgemini',
+    tweets: [
+      { text: "Every app is becoming 'intelligent' now.\n\nYour app needs AI. Not as a feature - as the foundation.\n\nIf it's not smart, it's obsolete.", hashtags: ['AI', 'Apps', 'Tech'] },
+      { text: "The app store is dead. Long live the AI agent store.\n\nWe're witnessing the biggest platform shift since mobile.\n\nAre you building for it?", hashtags: ['AI', 'Apps', 'Platform'] }
+    ]
+  }
 ]
 
-// Tweet generation guide
-const tweetGuide = "Tell me to generate: 'Write viral tweet about [TOPIC]' - I'll use Twitter's algorithm to optimize it!"
+// Get tweet URL
+const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
 
 // Quick tweet URLs
 const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
@@ -163,16 +202,44 @@ export default function MissionControl() {
                 <p className="text-xs text-gray-400">I'll use Twitter's algorithm to optimize your tweet for maximum engagement!</p>
               </div>
               
-              {/* Topic Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
-                {topics.map((topic) => (
-                  <div key={topic.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800 hover:border-blue-500 transition cursor-pointer">
-                    <div className="font-medium mb-1">{topic.title}</div>
-                    <div className="text-xs text-gray-400">{topic.description}</div>
-                    <div className="text-xs text-blue-400 mt-2">Say: "Generate tweet about {topic.title}"</div>
-                  </div>
-                ))}
+              {/* Trending Topics - Click to Tweet */}
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 mb-4">
+                <p className="text-sm text-blue-300 mb-1">🔥 Trending from Exa Search</p>
+                <p className="text-xs text-gray-400">Click any tweet to post instantly!</p>
               </div>
+              
+              {/* Trending Topics with Tweets */}
+              {trendingTopics.map((topic) => (
+                <div key={topic.id} className="bg-gray-900 rounded-xl p-4 border border-gray-800 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold">{topic.title}</h3>
+                      <p className="text-xs text-gray-400">Source: {topic.source}</p>
+                    </div>
+                    <span className="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">🔥 HOT</span>
+                  </div>
+                  
+                  {/* 2 Tweets per topic */}
+                  <div className="space-y-2">
+                    {topic.tweets.map((tweet, idx) => (
+                      <a 
+                        key={idx}
+                        href={getTweetUrl(tweet.text)}
+                        target="_blank"
+                        className="block bg-gray-800 rounded-lg p-3 hover:border-blue-500 border border-transparent transition"
+                      >
+                        <p className="text-sm text-gray-300 mb-2">{tweet.text}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {tweet.hashtags.map(tag => (
+                            <span key={tag} className="text-xs text-blue-400">#{tag}</span>
+                          ))}
+                        </div>
+                        <div className="text-xs text-blue-400 mt-2">🐦 Click to tweet →</div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
 
               {/* Best Performer */}
               {xStrategyData.bestTweet && (
