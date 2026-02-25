@@ -180,7 +180,7 @@ export default function Home() {
   const [trendingTopics] = useState(defaultTopics)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [team] = useState<TeamMember[]>(teamMembers)
-  const [isTeamExpanded, setIsTeamExpanded] = useState(true)
+  const [isTeamExpanded, setIsTeamExpanded] = useState(false)
   
   // Live team status from API
   const [liveTeamStatus, setLiveTeamStatus] = useState<Record<string, { name: string; status: string; currentTask: string }> | null>(null)
