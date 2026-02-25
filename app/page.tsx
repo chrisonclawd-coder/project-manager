@@ -131,7 +131,7 @@ interface BookmarkItem {
 // Team members with live status
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
-  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', icon: Target, status: 'working', currentTask: 'Managing X Strategy - creating tweets & engagement' },
+  { id: 'xmax', name: 'xMax', role: 'X Strategy & Product Marketing', icon: Target, status: 'working', currentTask: 'Managing X Strategy & Product Marketing' },
   { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
   { id: 'qa', name: 'QA', role: 'QA', icon: Beaker, status: 'idle' },
   { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
@@ -192,7 +192,7 @@ const statusColors = {
 
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('projects')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
@@ -272,7 +272,6 @@ export default function Home() {
 
   const menuItems: { id: string; label: string; icon: any; badge?: string }[] = [
     { id: 'projects', label: 'Projects', icon: BookOpen },
-    { id: 'xstrategy', label: 'X Strategy', icon: Twitter },
     { id: 'xmax-work', label: 'xMax Work', icon: Target },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'software-team', label: 'Software Team', icon: Users },
@@ -460,77 +459,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* X Strategy Tab */}
-        {activeTab === 'xstrategy' && (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-400">Pick a topic to tweet</p>
-              <button
-                onClick={refreshTopics}
-                disabled={isRefreshing}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg text-sm hover:bg-gray-700 transition-colors disabled:opacity-50"
-              >
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </button>
-            </div>
-
-            {/* Topics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {trendingTopics.map((topic) => (
-                <button
-                  key={topic.id}
-                  onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)}
-                  className={`bg-gray-800 rounded-lg p-4 border text-left transition-all hover:border-yellow-400/50 ${
-                    selectedTopic === topic.id ? 'border-yellow-400' : 'border-gray-700'
-                  }`}
-                >
-                  <h3 className="font-medium mb-1">{topic.title}</h3>
-                  <p className="text-gray-400 text-sm">{topic.source}</p>
-                  <p className="text-gray-500 text-xs mt-2">{topic.tweets.length} tweets ready</p>
-                </button>
-              ))}
-            </div>
-
-            {/* Tweet Preview */}
-            <AnimatePresence>
-              {selectedTopic && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="mt-6 bg-gray-800 rounded-lg border border-gray-700 overflow-hidden"
-                >
-                  <div className="p-4 border-b border-gray-700">
-                    <h3 className="font-medium">
-                      {trendingTopics.find(t => t.id === selectedTopic)?.title}
-                    </h3>
-                  </div>
-                  <div className="divide-y divide-gray-700">
-                    {trendingTopics.find(t => t.id === selectedTopic)?.tweets.map((tweet, idx) => (
-                      <div key={idx} className="p-4">
-                        <p className="text-sm text-gray-300 whitespace-pre-wrap mb-4">{tweet.text}</p>
-                        <div className="flex items-center gap-3">
-                          <a
-                            href={getTweetUrl(tweet.text)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm font-medium transition-colors"
-                          >
-                            <Twitter className="w-4 h-4" />
-                            Tweet
-                          </a>
-                          <span className="text-gray-500 text-xs">{tweet.text.length}/280</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
         {/* Bookmarks Tab */}
         {activeTab === 'bookmarks' && (
           <div>
@@ -565,7 +493,7 @@ export default function Home() {
           <div>
             <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
               <Target className="w-6 h-6 text-yellow-400" />
-              xMax Work
+              xMax Work - X Strategy & Product Marketing
             </h2>
 
             {/* Stats */}
@@ -588,38 +516,65 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Recent Tweets */}
-            <h3 className="text-lg font-semibold mb-4">Ready to Post</h3>
-            <div className="space-y-4 mb-6">
+            {/* xMax Generated Tweets */}
+            <h3 className="text-lg font-semibold mb-4">🤖 xMax Generated</h3>
+            <div className="space-y-4 mb-8">
               {xmaxWork?.recentTweets?.map((tweet: any) => (
-                <div key={tweet.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div key={tweet.id} className="bg-gray-800 rounded-lg p-4 border border-yellow-400/30">
                   <div className="flex items-center justify-between mb-2">
                     <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 rounded text-xs">{tweet.topic}</span>
                     <span className="text-green-400 text-xs">{tweet.status}</span>
                   </div>
                   <p className="text-white mb-3">{tweet.content}</p>
-                  <p className="text-gray-500 text-xs">{tweet.charCount} characters</p>
-                </div>
-              ))}
-              {!xmaxWork?.recentTweets?.length && (
-                <p className="text-gray-500">No tweets generated yet</p>
-              )}
-            </div>
-
-            {/* Topics */}
-            <h3 className="text-lg font-semibold mb-4">Topics</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {xmaxWork?.topics?.map((topic: any) => (
-                <div key={topic.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{topic.name}</span>
-                    <span className={topic.tweetsGenerated > 0 ? "text-yellow-400 text-sm" : "text-gray-500 text-sm"}>
-                      {topic.tweetsGenerated} tweet{topic.tweetsGenerated !== 1 ? 's' : ''}
-                    </span>
+                  <div className="flex items-center gap-3">
+                    <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet.content)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">Post</a>
+                    <span className="text-gray-500 text-xs">{tweet.charCount} chars</span>
                   </div>
                 </div>
               ))}
+              {!xmaxWork?.recentTweets?.length && (
+                <p className="text-gray-500">No tweets generated yet. xMax runs at 10:30am, 3:30pm, 6:30pm, 9:30pm IST</p>
+              )}
             </div>
+
+            {/* Default Topics for Product Marketing */}
+            <h3 className="text-lg font-semibold mb-4">📈 Product Marketing Topics</h3>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-gray-400">Click a topic to see tweets</p>
+              <button onClick={refreshTopics} disabled={isRefreshing} className="flex items-center gap-2 px-3 py-1 bg-gray-800 rounded text-sm hover:bg-gray-700 disabled:opacity-50">
+                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+              {trendingTopics.map((topic) => (
+                <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-gray-800 rounded-lg p-3 border text-left transition-all hover:border-yellow-400/50 ${selectedTopic === topic.id ? 'border-yellow-400' : 'border-gray-700'}`}>
+                  <span className="font-medium text-sm">{topic.title}</span>
+                  <span className="text-gray-500 text-xs ml-2">({topic.tweets.length} tweets)</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Tweet Preview */}
+            <AnimatePresence>
+              {selectedTopic && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+                  <div className="p-3 border-b border-gray-700 bg-yellow-400/10">
+                    <span className="font-medium text-yellow-400">{trendingTopics.find(t => t.id === selectedTopic)?.title}</span>
+                  </div>
+                  {trendingTopics.find(t => t.id === selectedTopic)?.tweets.map((tweet, idx) => (
+                    <div key={idx} className="p-4 border-b border-gray-700 last:border-0">
+                      <p className="text-sm text-gray-300 mb-3">{tweet.text}</p>
+                      <div className="flex items-center gap-3">
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet.text)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
+                          <Twitter className="w-3 h-3" /> Post
+                        </a>
+                        <span className="text-gray-500 text-xs">{tweet.text.length}/280</span>
+                      </div>
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
 
