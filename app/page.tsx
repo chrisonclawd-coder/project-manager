@@ -192,7 +192,7 @@ const statusColors = {
 
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'bookmarks' | 'software-team' | 'products'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('projects')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
@@ -270,7 +270,7 @@ export default function Home() {
     b.url.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const menuItems = [
+  const menuItems: { id: string; label: string; icon: any; badge?: string }[] = [
     { id: 'projects', label: 'Projects', icon: BookOpen },
     { id: 'xstrategy', label: 'X Strategy', icon: Twitter },
     { id: 'xmax-work', label: 'xMax Work', icon: Target },
