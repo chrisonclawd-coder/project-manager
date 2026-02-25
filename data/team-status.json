@@ -1,5 +1,6 @@
 {
   "manager": { "name": "Chrisly", "status": "idle", "currentTask": "" },
+  "xmax": { "name": "xMax", "status": "working", "currentTask": "Running X Strategy session - engaging with 10 posts + creating viral tweets" },
   "developer": { "name": "Developer", "status": "idle", "currentTask": "" },
   "qa": { "name": "QA", "status": "idle", "currentTask": "" },
   "devops": { "name": "DevOps", "status": "idle", "currentTask": "" },

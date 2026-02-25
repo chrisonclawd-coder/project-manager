@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package } from 'lucide-react'
+import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package, Target } from 'lucide-react'
 
 // Viral tweets - 280 characters max
 const defaultTopics = [
@@ -131,6 +131,7 @@ interface BookmarkItem {
 // Team members with live status
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
+  { id: 'xmax', name: 'xMax', role: 'X Content Creator', icon: Target, status: 'working', currentTask: 'Increasing engagement by 20%' },
   { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
   { id: 'qa', name: 'QA', role: 'QA', icon: Beaker, status: 'idle' },
   { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
