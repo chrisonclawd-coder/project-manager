@@ -127,9 +127,6 @@ const trendingTopics = [
 // Get tweet URL
 const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
 
-// Quick tweet URLs
-const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-
 // Types
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
