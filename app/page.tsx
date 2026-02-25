@@ -592,6 +592,42 @@ export default function Home() {
             </div>
           </div>
         )}
+
+        {/* Products Tab */}
+        {activeTab === 'products' && (
+          <div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Package className="w-6 h-6 text-yellow-400" />
+              Products
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {products.map((product) => (
+                <a
+                  key={product.id}
+                  href={product.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-yellow-400/50 transition-colors block"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="text-lg font-bold">{product.name}</h3>
+                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                      product.platform === 'npm' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+                    }`}>
+                      {product.platform === 'npm' ? 'NPM' : 'Chrome'}
+                    </span>
+                  </div>
+                  <p className="text-gray-400 text-sm mb-4">{product.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-bold text-yellow-400">{product.installs}</span>
+                    <span className="text-gray-500 text-sm">installs</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )
