@@ -172,6 +172,7 @@ export default function Home() {
   const [trendingTopics] = useState(defaultTopics)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [team] = useState<TeamMember[]>(teamMembers)
+  const [isTeamExpanded, setIsTeamExpanded] = useState(true)
 
   const refreshTopics = () => {
     setIsRefreshing(true)
@@ -219,24 +220,40 @@ export default function Home() {
 
           {/* Team Members */}
           <div className="mb-6">
-            <h2 className="text-xs uppercase tracking-wider text-gray-500 mb-3 font-semibold">Team Status</h2>
-            <div className="space-y-2">
-              {team.map((member) => (
-                <div 
-                  key={member.id}
-                  className="flex items-center gap-3 p-2 rounded-lg bg-gray-700/50"
+            <button 
+              onClick={() => setIsTeamExpanded(!isTeamExpanded)}
+              className="w-full flex items-center justify-between mb-3 group"
+            >
+              <h2 className="text-xs uppercase tracking-wider text-gray-500 font-semibold group-hover:text-gray-400 transition-colors">Team Status</h2>
+              <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isTeamExpanded ? 'rotate-0' : '-rotate-90'}`} />
+            </button>
+            <AnimatePresence>
+              {isTeamExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-2 overflow-hidden"
                 >
-                  <div className={`p-2 rounded-lg ${statusColors[member.status]} bg-opacity-20`}>
-                    <member.icon className={`w-4 h-4 ${statusColors[member.status].replace('bg-', 'text-')}`} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{member.name}</p>
-                    <p className="text-xs text-gray-400 truncate">{member.currentTask || member.role}</p>
-                  </div>
-                  <span className={`w-2 h-2 rounded-full ${statusColors[member.status]}`} />
-                </div>
-              ))}
-            </div>
+                  {team.map((member) => (
+                    <div 
+                      key={member.id}
+                      className="flex items-center gap-3 p-2 rounded-lg bg-gray-700/50"
+                    >
+                      <div className={`p-2 rounded-lg ${statusColors[member.status]} bg-opacity-20`}>
+                        <member.icon className={`w-4 h-4 ${statusColors[member.status].replace('bg-', 'text-')}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{member.name}</p>
+                        <p className="text-xs text-gray-400 truncate">{member.currentTask || member.role}</p>
+                      </div>
+                      <span className={`w-2 h-2 rounded-full ${statusColors[member.status]}`} />
+                    </div>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Stats */}
