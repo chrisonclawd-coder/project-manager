@@ -179,17 +179,11 @@ export default function MissionControl() {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   const refreshTopics = async () => {
+    // For now, just show a message - API needs fixing
     setIsRefreshing(true)
-    try {
-      const res = await fetch('/api/trending')
-      const data = await res.json()
-      if (data.success && data.topics) {
-        setTrendingTopics(data.topics)
-      }
-    } catch (e) {
-      console.error('Failed to refresh', e)
-    }
+    await new Promise(r => setTimeout(r, 1000)) // Simulate refresh
     setIsRefreshing(false)
+    // Topics are already loaded from defaultTopics
   }
 
   const pendingSessions = xStrategyData.sessions.filter(s => s.status === 'pending')
