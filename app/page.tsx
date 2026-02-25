@@ -158,7 +158,7 @@ interface Project {
 const projects: Project[] = [
   { id: 'leakguard', name: 'Leak Guard', icon: '🔒', tasks: [
     { id: '1', title: 'VS Code Extension', description: 'Build and test', status: 'done', priority: 'high', project: 'leakguard' },
-    { id: '2', title: 'Publish to Marketplace', description: 'Release extension', status: 'todo', priority: 'medium', project: 'leakguard' }
+    { id: '2', title: 'Published to Marketplace', description: 'Released!', status: 'done', priority: 'medium', project: 'leakguard' }
   ]}
 ]
 
