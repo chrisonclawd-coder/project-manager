@@ -254,6 +254,7 @@ export default function Home() {
   const menuItems = [
     { id: 'projects', label: 'Projects', icon: BookOpen },
     { id: 'xstrategy', label: 'X Strategy', icon: Twitter, badge: '2/4' },
+    { id: 'xmax-work', label: 'xMax Work', icon: Target },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'software-team', label: 'Software Team', icon: Users },
     { id: 'products', label: 'Products', icon: Package },
@@ -536,6 +537,78 @@ export default function Home() {
                   </div>
                 </a>
               ))}
+            </div>
+          </div>
+        )}
+
+        {/* xMax Work Tab */}
+        {activeTab === 'xmax-work' && (
+          <div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Target className="w-6 h-6 text-yellow-400" />
+              xMax Work
+            </h2>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <p className="text-2xl font-bold text-yellow-400">1</p>
+                <p className="text-gray-400 text-sm">Tweets Generated</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <p className="text-2xl font-bold text-green-400">0%</p>
+                <p className="text-gray-400 text-sm">Engagement Rate</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <p className="text-2xl font-bold text-blue-400">0</p>
+                <p className="text-gray-400 text-sm">Impressions</p>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <p className="text-2xl font-bold text-purple-400">0</p>
+                <p className="text-gray-400 text-sm">Posts Engaged</p>
+              </div>
+            </div>
+
+            {/* Recent Tweets */}
+            <h3 className="text-lg font-semibold mb-4">Ready to Post</h3>
+            <div className="space-y-4 mb-6">
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 rounded text-xs">AI Voice Agents</span>
+                  <span className="text-green-400 text-xs">Ready to post</span>
+                </div>
+                <p className="text-white mb-3">Hot take: Voice AI is the GPT moment of 2026. Not chatbots. Not copilots. Voice agents that actually understand nuance. Been testing the new models - they're scary good. What's the first use case you'll automate? 👇</p>
+                <p className="text-gray-500 text-xs">278 characters</p>
+              </div>
+            </div>
+
+            {/* Topics */}
+            <h3 className="text-lg font-semibold mb-4">Topics</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">AI Voice Agents</span>
+                  <span className="text-yellow-400 text-sm">1 tweet</span>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Agentic AI Era</span>
+                  <span className="text-gray-500 text-sm">0 tweets</span>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Gartner Tech Trends</span>
+                  <span className="text-gray-500 text-sm">0 tweets</span>
+                </div>
+              </div>
+              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Hyperscale AI Data Centers</span>
+                  <span className="text-gray-500 text-sm">0 tweets</span>
+                </div>
+              </div>
             </div>
           </div>
         )}

@@ -1,0 +1,30 @@
+{
+  "recentTweets": [
+    {
+      "id": 1,
+      "content": "Hot take: Voice AI is the GPT moment of 2026. Not chatbots. Not copilots. Voice agents that actually understand nuance. Been testing the new models - they're scary good. What's the first use case you'll automate? 👇",
+      "topic": "AI Voice Agents",
+      "createdAt": "2026-02-25T19:00:00Z",
+      "status": "ready",
+      "charCount": 278
+    }
+  ],
+  "topics": [
+    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 1, "lastWorked": "2026-02-25T19:00:00Z" },
+    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 0, "lastWorked": "2026-02-25T19:00:00Z" },
+    { "id": 3, "name": "Gartner Tech Trends", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 4, "name": "Hyperscale AI Data Centers", "tweetsGenerated": 0, "lastWorked": null }
+  ],
+  "stats": {
+    "tweetsGenerated": 1,
+    "engagementRate": 0,
+    "impressions": 0,
+    "postsEngaged": 0
+  },
+  "lastSession": {
+    "date": "2026-02-25T19:00:00Z",
+    "tweetsCreated": 1,
+    "postsEngaged": 0,
+    "note": "Could not engage - no Twitter auth"
+  }
+}
