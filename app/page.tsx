@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users } from 'lucide-react'
 
@@ -128,7 +128,7 @@ interface BookmarkItem {
   addedAt: string
 }
 
-// Team members
+// Team members with live status
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
   { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
@@ -136,6 +136,14 @@ const teamMembers: TeamMember[] = [
   { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
   { id: 'tester', name: 'Manual Test', role: 'Manual Tester', icon: Eye, status: 'idle' },
 ]
+
+// Map API status to MemberStatus
+const mapApiStatusToMemberStatus = (status: string): MemberStatus => {
+  if (status === 'working') return 'working'
+  if (status === 'done') return 'done'
+  if (status === 'blocked') return 'blocked'
+  return 'idle'
+}
 
 // Sample tasks
 const defaultTasks: Task[] = [
@@ -173,6 +181,38 @@ export default function Home() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [team] = useState<TeamMember[]>(teamMembers)
   const [isTeamExpanded, setIsTeamExpanded] = useState(true)
+  
+  // Live team status from API
+  const [liveTeamStatus, setLiveTeamStatus] = useState<Record<string, { name: string; status: string; currentTask: string }> | null>(null)
+  
+  // Fetch team status from API
+  useEffect(() => {
+    const fetchTeamStatus = async () => {
+      try {
+        const res = await fetch('/api/status')
+        const data = await res.json()
+        setLiveTeamStatus(data)
+      } catch (err) {
+        console.error('Failed to fetch team status:', err)
+      }
+    }
+    
+    // Initial fetch
+    fetchTeamStatus()
+    
+    // Poll every 5 seconds
+    const interval = setInterval(fetchTeamStatus, 5000)
+    return () => clearInterval(interval)
+  }, [])
+  
+  // Use live team status if available, otherwise use default
+  const displayTeam = liveTeamStatus 
+    ? team.map((member) => ({
+        ...member,
+        status: mapApiStatusToMemberStatus(liveTeamStatus[member.id]?.status || 'idle'),
+        currentTask: liveTeamStatus[member.id]?.currentTask || member.currentTask
+      }))
+    : team
 
   const refreshTopics = () => {
     setIsRefreshing(true)
@@ -236,7 +276,7 @@ export default function Home() {
                   transition={{ duration: 0.2 }}
                   className="space-y-2 overflow-hidden"
                 >
-                  {team.map((member) => (
+                  {displayTeam.map((member) => (
                     <div 
                       key={member.id}
                       className="flex items-center gap-3 p-2 rounded-lg bg-gray-700/50"
@@ -488,7 +528,7 @@ export default function Home() {
             
             {/* Desks Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {team.slice(1).map((member) => (
+              {displayTeam.slice(1).map((member) => (
                 <div
                   key={member.id}
                   className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden relative"
