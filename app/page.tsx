@@ -131,7 +131,7 @@ interface BookmarkItem {
 // Team members with live status
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
-  { id: 'xmax', name: 'xMax', role: 'X Content Creator', icon: Target, status: 'working', currentTask: 'Increasing engagement by 20%' },
+  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', icon: Target, status: 'working', currentTask: 'Managing X Strategy - creating tweets & engagement' },
   { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
   { id: 'qa', name: 'QA', role: 'QA', icon: Beaker, status: 'idle' },
   { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
@@ -253,7 +253,7 @@ export default function Home() {
 
   const menuItems = [
     { id: 'projects', label: 'Projects', icon: BookOpen },
-    { id: 'xstrategy', label: 'X Strategy', icon: Twitter, badge: '2/4' },
+    { id: 'xstrategy', label: 'X Strategy', icon: Twitter },
     { id: 'xmax-work', label: 'xMax Work', icon: Target },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'software-team', label: 'Software Team', icon: Users },
