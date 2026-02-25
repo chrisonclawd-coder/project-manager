@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users } from 'lucide-react'
+import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package } from 'lucide-react'
 
 // Viral tweets - 280 characters max
 const defaultTopics = [
@@ -158,6 +158,26 @@ const defaultBookmarks: BookmarkItem[] = [
   { id: 1, title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Work', addedAt: '2026-02-24' },
 ]
 
+// Products data
+const products = [
+  { 
+    id: 'guardskills', 
+    name: 'guardskills', 
+    platform: 'npm', 
+    url: 'https://www.npmjs.com/package/guardskills',
+    installs: '1.2.1', // show version for now
+    description: 'Scan AI skills before use, flag risky behavior'
+  },
+  { 
+    id: 'mdify', 
+    name: 'mdify', 
+    platform: 'chrome', 
+    url: 'https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki',
+    installs: '1K+ users', // placeholder
+    description: 'Turn any website into clean markdown'
+  }
+]
+
 const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
 
 const stats = { total: 4, inProgress: 0, todo: 0, done: 4 }
@@ -171,7 +191,7 @@ const statusColors = {
 
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'bookmarks' | 'software-team'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'bookmarks' | 'software-team' | 'products'>('projects')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
@@ -235,6 +255,7 @@ export default function Home() {
     { id: 'xstrategy', label: 'X Strategy', icon: Twitter, badge: '2/4' },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
     { id: 'software-team', label: 'Software Team', icon: Users },
+    { id: 'products', label: 'Products', icon: Package },
   ]
 
   return (
