@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X } from 'lucide-react'
+import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users } from 'lucide-react'
 
 // Viral tweets - 280 characters max
 const defaultTopics = [
@@ -102,6 +102,17 @@ const defaultTopics = [
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
 
+type MemberStatus = 'idle' | 'working' | 'done' | 'blocked'
+
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  icon: any
+  status: MemberStatus
+  currentTask?: string
+}
+
 interface Task {
   id: number
   title: string
@@ -116,6 +127,15 @@ interface BookmarkItem {
   category: string
   addedAt: string
 }
+
+// Team members
+const teamMembers: TeamMember[] = [
+  { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
+  { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
+  { id: 'qa', name: 'QA', role: 'QA', icon: Beaker, status: 'idle' },
+  { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
+  { id: 'tester', name: 'Manual Test', role: 'Manual Tester', icon: Eye, status: 'idle' },
+]
 
 // Sample tasks
 const defaultTasks: Task[] = [
@@ -134,9 +154,16 @@ const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${e
 
 const stats = { total: 4, inProgress: 0, todo: 0, done: 4 }
 
+const statusColors = {
+  idle: 'bg-gray-600',
+  working: 'bg-blue-500',
+  done: 'bg-green-500',
+  blocked: 'bg-red-500',
+}
+
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'bookmarks'>('projects')
+  const [activeTab, setActiveTab] = useState<'projects' | 'xstrategy' | 'bookmarks' | 'software-team'>('projects')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
@@ -144,6 +171,7 @@ export default function Home() {
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
   const [trendingTopics] = useState(defaultTopics)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [team] = useState<TeamMember[]>(teamMembers)
 
   const refreshTopics = () => {
     setIsRefreshing(true)
@@ -165,6 +193,7 @@ export default function Home() {
     { id: 'projects', label: 'Projects', icon: BookOpen },
     { id: 'xstrategy', label: 'X Strategy', icon: Twitter, badge: '2/4' },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
+    { id: 'software-team', label: 'Software Team', icon: Users },
   ]
 
   return (
@@ -179,14 +208,36 @@ export default function Home() {
 
       {/* Drawer - Left Side */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 w-64 bg-gray-800 border-r border-gray-700 transform transition-transform duration-200 z-40
+        fixed lg:static inset-y-0 left-0 w-72 bg-gray-800 border-r border-gray-700 transform transition-transform duration-200 z-40
         ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="p-6">
-          <h1 className="text-2xl font-bold flex items-center gap-2 mb-8">
+        <div className="p-6 h-full overflow-y-auto">
+          <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
             <Zap className="w-8 h-8 text-yellow-400" />
             Mission Control
           </h1>
+
+          {/* Team Members */}
+          <div className="mb-6">
+            <h2 className="text-xs uppercase tracking-wider text-gray-500 mb-3 font-semibold">Team Status</h2>
+            <div className="space-y-2">
+              {team.map((member) => (
+                <div 
+                  key={member.id}
+                  className="flex items-center gap-3 p-2 rounded-lg bg-gray-700/50"
+                >
+                  <div className={`p-2 rounded-lg ${statusColors[member.status]} bg-opacity-20`}>
+                    <member.icon className={`w-4 h-4 ${statusColors[member.status].replace('bg-', 'text-')}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{member.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{member.currentTask || member.role}</p>
+                  </div>
+                  <span className={`w-2 h-2 rounded-full ${statusColors[member.status]}`} />
+                </div>
+              ))}
+            </div>
+          </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-2 mb-6">
@@ -227,7 +278,7 @@ export default function Home() {
         </div>
 
         {/* Footer in drawer */}
-        <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-700">
+        <div className="p-6 border-t border-gray-700">
           <p className="text-gray-500 text-sm text-center">{new Date().toLocaleDateString()}</p>
         </div>
       </aside>
@@ -405,6 +456,60 @@ export default function Home() {
                     <span className="text-gray-500 text-xs">{bookmark.addedAt}</span>
                   </div>
                 </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Software Team Tab */}
+        {activeTab === 'software-team' && (
+          <div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Users className="w-6 h-6 text-yellow-400" />
+              Software Team
+            </h2>
+            
+            {/* Desks Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {team.slice(1).map((member) => (
+                <div
+                  key={member.id}
+                  className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden relative"
+                >
+                  {/* Desk Top */}
+                  <div className="bg-gray-700 h-3 flex items-center justify-center">
+                    <div className="w-20 h-2 bg-gray-600 rounded-b-lg" />
+                  </div>
+                  
+                  {/* Person Area */}
+                  <div className="p-6 flex flex-col items-center">
+                    {/* Avatar */}
+                    <div className={`w-20 h-20 rounded-full ${statusColors[member.status]} bg-opacity-20 flex items-center justify-center mb-4 ring-4 ring-gray-700`}>
+                      <member.icon className={`w-10 h-10 ${statusColors[member.status].replace('bg-', 'text-')}`} />
+                    </div>
+                    
+                    {/* Name & Role */}
+                    <h3 className="font-bold text-lg">{member.name}</h3>
+                    <p className="text-gray-400 text-sm">{member.role}</p>
+                    
+                    {/* Status Indicator */}
+                    <div className="flex items-center gap-2 mt-3">
+                      <span className={`w-3 h-3 rounded-full ${statusColors[member.status]} animate-pulse`} />
+                      <span className="text-xs text-gray-400 capitalize">{member.status}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Speech Bubble */}
+                  <div className="px-4 pb-4">
+                    <div className="bg-gray-700 rounded-lg p-3 relative">
+                      {/* Bubble arrow */}
+                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-gray-700" />
+                      <p className="text-sm text-gray-300 text-center">
+                        {member.currentTask || `Ready for ${member.role.toLowerCase()} tasks`}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
