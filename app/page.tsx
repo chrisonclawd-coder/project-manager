@@ -206,6 +206,25 @@ export default function Home() {
   // Live team status from API
   const [liveTeamStatus, setLiveTeamStatus] = useState<Record<string, { name: string; status: string; currentTask: string }> | null>(null)
   
+  // xMax work data from API
+  const [xmaxWork, setXmaxWork] = useState<any>(null)
+  
+  // Fetch xMax work from API
+  useEffect(() => {
+    const fetchXmaxWork = async () => {
+      try {
+        const res = await fetch('/api/xmax')
+        const data = await res.json()
+        setXmaxWork(data)
+      } catch (err) {
+        console.error('Failed to fetch xMax work:', err)
+      }
+    }
+    fetchXmaxWork()
+    const interval = setInterval(fetchXmaxWork, 10000)
+    return () => clearInterval(interval)
+  }, [])
+  
   // Fetch team status from API
   useEffect(() => {
     const fetchTeamStatus = async () => {
@@ -552,19 +571,19 @@ export default function Home() {
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-yellow-400">1</p>
+                <p className="text-2xl font-bold text-yellow-400">{xmaxWork?.stats?.tweetsGenerated || 0}</p>
                 <p className="text-gray-400 text-sm">Tweets Generated</p>
               </div>
               <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-green-400">0%</p>
+                <p className="text-2xl font-bold text-green-400">{xmaxWork?.stats?.engagementRate || 0}%</p>
                 <p className="text-gray-400 text-sm">Engagement Rate</p>
               </div>
               <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-blue-400">0</p>
+                <p className="text-2xl font-bold text-blue-400">{xmaxWork?.stats?.impressions || 0}</p>
                 <p className="text-gray-400 text-sm">Impressions</p>
               </div>
               <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-purple-400">0</p>
+                <p className="text-2xl font-bold text-purple-400">{xmaxWork?.stats?.postsEngaged || 0}</p>
                 <p className="text-gray-400 text-sm">Posts Engaged</p>
               </div>
             </div>
@@ -572,43 +591,34 @@ export default function Home() {
             {/* Recent Tweets */}
             <h3 className="text-lg font-semibold mb-4">Ready to Post</h3>
             <div className="space-y-4 mb-6">
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 rounded text-xs">AI Voice Agents</span>
-                  <span className="text-green-400 text-xs">Ready to post</span>
+              {xmaxWork?.recentTweets?.map((tweet: any) => (
+                <div key={tweet.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 rounded text-xs">{tweet.topic}</span>
+                    <span className="text-green-400 text-xs">{tweet.status}</span>
+                  </div>
+                  <p className="text-white mb-3">{tweet.content}</p>
+                  <p className="text-gray-500 text-xs">{tweet.charCount} characters</p>
                 </div>
-                <p className="text-white mb-3">Hot take: Voice AI is the GPT moment of 2026. Not chatbots. Not copilots. Voice agents that actually understand nuance. Been testing the new models - they're scary good. What's the first use case you'll automate? 👇</p>
-                <p className="text-gray-500 text-xs">278 characters</p>
-              </div>
+              ))}
+              {!xmaxWork?.recentTweets?.length && (
+                <p className="text-gray-500">No tweets generated yet</p>
+              )}
             </div>
 
             {/* Topics */}
             <h3 className="text-lg font-semibold mb-4">Topics</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">AI Voice Agents</span>
-                  <span className="text-yellow-400 text-sm">1 tweet</span>
+              {xmaxWork?.topics?.map((topic: any) => (
+                <div key={topic.id} className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{topic.name}</span>
+                    <span className={topic.tweetsGenerated > 0 ? "text-yellow-400 text-sm" : "text-gray-500 text-sm"}>
+                      {topic.tweetsGenerated} tweet{topic.tweetsGenerated !== 1 ? 's' : ''}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Agentic AI Era</span>
-                  <span className="text-gray-500 text-sm">0 tweets</span>
-                </div>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Gartner Tech Trends</span>
-                  <span className="text-gray-500 text-sm">0 tweets</span>
-                </div>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Hyperscale AI Data Centers</span>
-                  <span className="text-gray-500 text-sm">0 tweets</span>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         )}
