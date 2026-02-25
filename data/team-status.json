@@ -1,5 +1,5 @@
 {
-  "manager": { "name": "Chrisly", "status": "idle", "currentTask": "" },
+  "manager": { "name": "Chrisly", "status": "working", "currentTask": "Testing live status" },
   "developer": { "name": "Developer", "status": "idle", "currentTask": "" },
   "qa": { "name": "QA", "status": "idle", "currentTask": "" },
   "devops": { "name": "DevOps", "status": "idle", "currentTask": "" },
