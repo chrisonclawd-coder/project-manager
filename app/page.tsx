@@ -190,7 +190,7 @@ function MissionControlContent() {
         </div>
       </nav>
 
-      <main className="pt-20 p-4 md:p-6">
+      <main className="pt-16 p-4 md:p-6">
         <div className="grid grid-cols-4 gap-2 mb-6">
           <div className="bg-[#111] border border-amber-900/30 p-3">
             <p className="text-amber-600 text-xs tracking-wider mb-1">TOTAL</p>
