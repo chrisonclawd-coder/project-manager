@@ -1,30 +1,39 @@
 {
-  "recentTweets": [
+  "products": [
     {
       "id": 1,
-      "content": "Hot take: Voice AI is the GPT moment of 2026. Not chatbots. Not copilots. Voice agents that actually understand nuance. Been testing the new models - they're scary good. What's the first use case you'll automate? 👇",
-      "topic": "AI Voice Agents",
-      "createdAt": "2026-02-25T19:00:00Z",
-      "status": "ready",
-      "charCount": 278
+      "name": "Mdify",
+      "tagline": "One click away from turning any X Article into a clean knowledge base for your @openclaw agent",
+      "description": "Stop pasting bloated links. Stop fighting bot protection. Stop wasting tokens on engagement fluff. Convert the post to clean .md with #Mdify → feed it directly to your agent → done",
+      "url": "https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+      "hashtags": ["#Mdify", "#OpenClaw", "#AI", "#OpenSource"]
+    },
+    {
+      "id": 2,
+      "name": "Guardskills",
+      "tagline": "Safeguard your system environment by scanning AI skills for malicious code",
+      "description": "Why risk your keys and credentials for installing malicious and unknow skills. Just use @guardskills_ and safeguard your system environment. It supports scanning skills.sh, GitHub, Clawhub, and local skills.",
+      "url": "https://www.npmjs.com/package/guardskills",
+      "hashtags": ["#Guardskills", "#OpenClaw", "#Security", "#AI", "#OpenSource"]
     }
   ],
+  "recentTweets": [],
   "topics": [
-    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 1, "lastWorked": "2026-02-25T19:00:00Z" },
-    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 0, "lastWorked": "2026-02-25T19:00:00Z" },
+    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 0, "lastWorked": null },
     { "id": 3, "name": "Gartner Tech Trends", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 4, "name": "Hyperscale AI Data Centers", "tweetsGenerated": 0, "lastWorked": null }
+    { "id": 4, "name": "Hyperscale AI Data Centers", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 5, "name": "Intelligent Apps", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 6, "name": "AI Coding Trends", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 7, "name": "Vibe Coding", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 8, "name": "Developer Productivity", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 9, "name": "Mdify Product Marketing", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 10, "name": "Guardskills Product Marketing", "tweetsGenerated": 0, "lastWorked": null }
   ],
   "stats": {
-    "tweetsGenerated": 1,
+    "tweetsGenerated": 0,
     "engagementRate": 0,
     "impressions": 0,
     "postsEngaged": 0
-  },
-  "lastSession": {
-    "date": "2026-02-25T19:00:00Z",
-    "tweetsCreated": 1,
-    "postsEngaged": 0,
-    "note": "Could not engage - no Twitter auth"
   }
 }

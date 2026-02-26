@@ -592,6 +592,58 @@ export default function Home() {
           </div>
         )}
 
+        {/* Products Tab */}
+        {activeTab === 'products' && (
+          <div>
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+              <Package className="w-6 h-6 text-yellow-400" />
+              My Products
+            </h2>
+
+            {/* Mdify */}
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-6">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-bold text-yellow-400">Mdify</h3>
+                  <p className="text-gray-400 text-sm">Chrome Extension</p>
+                </div>
+                <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">View</a>
+              </div>
+              <p className="text-gray-300 mb-4">One click away from turning any X Article into a clean knowledge base for your @openclaw agent.</p>
+              <div className="border-t border-gray-700 pt-4">
+                <p className="text-gray-500 text-xs mb-2">Sample Tweet:</p>
+                <div className="bg-gray-900 rounded p-3 text-sm text-gray-300 mb-3">
+                  Stop pasting bloated links. Stop fighting bot protection. Stop wasting tokens on engagement fluff. Convert the post to clean .md with #Mdify → feed it directly to your agent → done. No scraping issues. No JS rendering failures. Just structured signal your agent can actually use.
+                </div>
+                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Stop%20fighting%20bot%20protection.%20Stop%20wasting%20tokens%20on%20engagement%20fluff.%20Convert%20the%20post%20to%20clean%20.md%20with%20%23Mdify%20%E2%86%92%20feed%20it%20directly%20to%20your%20agent%20%E2%86%92%20done.%20No%20scraping%20issues.%20No%20JS%20rendering%20failures.%20Just%20structured%20signal%20your%20agent%20can%20actually%20use." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
+                  <Twitter className="w-3 h-3" /> Post Tweet
+                </a>
+              </div>
+            </div>
+
+            {/* Guardskills */}
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="text-xl font-bold text-yellow-400">Guardskills</h3>
+                  <p className="text-gray-400 text-sm">NPM Package</p>
+                </div>
+                <a href="https://www.npmjs.com/package/guardskills" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">View</a>
+              </div>
+              <p className="text-gray-300 mb-4">Safeguard your system environment by scanning AI skills for malicious code.</p>
+              <div className="border-t border-gray-700 pt-4">
+                <p className="text-gray-500 text-xs mb-2">Sample Tweet:</p>
+                <div className="bg-gray-900 rounded p-3 text-sm text-gray-300 mb-3">
+                  Why risk your keys and credentials for installing malicious and unknow skills. Just use @guardskills_ and safeguard your system environment. It supports scanning skills.sh, GitHub, Clawhub, and local skills. Security and Privacy - @guardskills_ 🔒 #OpenClaw #Skills #AI #OpenSource
+                </div>
+                <a href="https://twitter.com/intent/tweet?text=Why%20risk%20your%20keys%20and%20credentials%20for%20installing%20malicious%20and%20unknow%20skills.%20Just%20use%20%40guardskills_%20and%20safeguard%20your%20system%20environment.%20It%20supports%20scanning%20skills.sh%2C%20GitHub%2C%20Clawhub%2C%20and%20local%20skills.%20Security%20and%20Privacy%20-%20%40guardskills_%20%F0%9F%94%92%20%23OpenClaw%20%23Skills%20%23AI%20%23OpenSource" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
+                  <Twitter className="w-3 h-3" /> Post Tweet
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Software Team Tab */}
         {activeTab === 'software-team' && (
           <div>
