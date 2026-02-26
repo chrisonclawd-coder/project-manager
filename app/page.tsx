@@ -33,7 +33,7 @@ interface TeamMember {
 
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', status: 'idle', currentTask: '' },
-  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', status: 'idle', currentTask: '' },
+  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', status: 'working', currentTask: 'Running X Strategy - creating tweets' },
   { id: 'developer', name: 'Developer', role: 'Developer', status: 'idle', currentTask: '' },
   { id: 'qa', name: 'QA', role: 'QA', status: 'idle', currentTask: '' },
   { id: 'devops', name: 'DevOps', role: 'DevOps', status: 'idle', currentTask: '' },
@@ -45,6 +45,8 @@ const defaultTasks: Task[] = [
   { id: 2, title: 'Build Mission Control Dashboard', status: 'done', priority: 'high' },
   { id: 3, title: 'Setup X Strategy automation', status: 'done', priority: 'high' },
   { id: 4, title: 'Deploy to Vercel', status: 'done', priority: 'high' },
+  { id: 5, title: 'Mdify - Chrome Extension', status: 'done', priority: 'high' },
+  { id: 6, title: 'Guardskills - NPM Package', status: 'done', priority: 'high' },
 ]
 
 const defaultBookmarks: BookmarkItem[] = [
@@ -74,7 +76,7 @@ function MissionControlContent() {
   const [bookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
   const [trendingTopics] = useState(defaultTopics)
   const [teamData, setTeamData] = useState(teamMembers)
-  const [teamDrawerOpen, setTeamDrawerOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   // Home page data
   const verseOfTheDay = {
@@ -88,8 +90,8 @@ function MissionControlContent() {
   const wordOfTheDay = {
     word: 'Sempervirent',
     pronunciation: '/ˌsempərˈvīrənt/',
-    definition: 'Remaining green and lush throughout the year; evergreen. Metaphorically, enduring or permanent.',
-    example: 'The sempervirent principles of integrity guided his decisions through every season of business.'
+    definition: 'Remaining green and lush throughout the year; evergreen.',
+    example: 'The sempervirent principles guided his decisions.'
   }
 
   const calendarEvents = [
@@ -111,7 +113,6 @@ function MissionControlContent() {
   function getGreeting() {
     const now = new Date()
     const hours = now.getHours()
-    
     if (hours >= 5 && hours < 12) return { greeting: 'GOOD MORNING', motivational: motivationalLines.morning }
     if (hours >= 12 && hours < 17) return { greeting: 'GOOD AFTERNOON', motivational: motivationalLines.afternoon }
     return { greeting: 'GOOD EVENING', motivational: motivationalLines.evening }
@@ -165,32 +166,57 @@ function MissionControlContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-amber-50 font-mono">
-      <nav className="fixed top-0 left-0 right-0 h-14 bg-[#111] border-b border-amber-900/30 z-50 flex items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <button onClick={() => setTeamDrawerOpen(true)} className="p-1 hover:bg-amber-900/20 rounded">
-            <Menu className="w-5 h-5 text-amber-500" />
-          </button>
-          <Zap className="w-5 h-5 text-amber-500" />
-          <span className="text-amber-500 font-bold tracking-wider">MISSION CONTROL</span>
+      {/* Sidebar - Left */}
+      <aside className={`fixed top-0 left-0 w-64 h-full bg-[#111] border-r border-amber-900/30 z-50 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className="h-14 flex items-center px-4 border-b border-amber-900/30">
+          <Zap className="w-6 h-6 text-amber-500" />
+          <span className="text-amber-500 font-bold tracking-wider ml-2">MISSION</span>
         </div>
-        <div className="flex items-center gap-1">
+        
+        <div className="p-2 space-y-1">
           {menuItems.map(item => (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`px-3 py-2 text-xs tracking-wider transition-colors hidden md:block ${
+              onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+              className={`w-full p-3 flex items-center gap-3 transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' 
-                  : 'text-amber-700 hover:text-amber-400'
+                  ? 'bg-amber-500/10 border-l-2 border-amber-500' 
+                  : 'hover:bg-amber-900/20'
               }`}
             >
-              {item.label}
+              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-amber-500' : 'text-amber-700'}`} />
+              <span className={`text-sm font-bold ${activeTab === item.id ? 'text-amber-400' : 'text-amber-50'}`}>{item.label}</span>
             </button>
           ))}
         </div>
-      </nav>
+        
+        <div className="absolute bottom-0 w-full p-4 border-t border-amber-900/30">
+          <p className="text-amber-700 text-xs tracking-wider mb-2">TEAM STATUS</p>
+          <div className="space-y-2">
+            {teamData.filter(m => m.status === 'working').map(member => (
+              <div key={member.id} className="bg-amber-900/20 p-2 rounded">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full" />
+                  <span className="text-amber-400 text-xs">{member.name}</span>
+                </div>
+                <p className="text-amber-600 text-xs ml-4 truncate">{member.currentTask}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </aside>
 
-      <main className="pt-16 p-4 md:p-6">
+      {/* Mobile menu button */}
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#111] rounded border border-amber-900/30">
+        {sidebarOpen ? <X className="w-5 h-5 text-amber-500" /> : <Menu className="w-5 h-5 text-amber-500" />}
+      </button>
+
+      {/* Overlay for mobile */}
+      {sidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Main Content */}
+      <main className="lg:ml-64 min-h-screen p-4 md:p-6 pt-16 lg:pt-6">
+        {/* Stats */}
         <div className="grid grid-cols-4 gap-2 mb-6">
           <div className="bg-[#111] border border-amber-900/30 p-3">
             <p className="text-amber-600 text-xs tracking-wider mb-1">TOTAL</p>
@@ -210,6 +236,7 @@ function MissionControlContent() {
           </div>
         </div>
 
+        {/* Search */}
         <div className="relative mb-6">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-700" />
           <input
@@ -221,6 +248,7 @@ function MissionControlContent() {
           />
         </div>
 
+        {/* Filters */}
         <div className="flex gap-1 mb-6">
           {(['all', 'in-progress', 'todo', 'done'] as const).map(status => (
             <button
@@ -238,103 +266,68 @@ function MissionControlContent() {
         </div>
 
         <AnimatePresence mode="wait">
+          {/* HOME */}
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-3xl mx-auto">
-              {/* Greeting */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-amber-400 tracking-tight">
-                  {getGreeting().greeting} <span className="text-amber-500">CHRIS</span>
-                </h1>
+              <div className="mb-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-amber-400 tracking-tight">{getGreeting().greeting} <span className="text-amber-500">CHRIS</span></h1>
                 <p className="text-amber-700 text-sm tracking-widest mt-1">{formatDate(new Date())}</p>
-                <p className="text-amber-600 text-xs mt-3 border-l-2 border-amber-500 pl-3 tracking-wider">
-                  {getGreeting().motivational}
-                </p>
-              </motion.div>
+                <p className="text-amber-600 text-xs mt-3 border-l-2 border-amber-500 pl-3 tracking-wider">{getGreeting().motivational}</p>
+              </div>
 
-              {/* Weather */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+              <div className="bg-[#111] border border-amber-900/30 p-4 mb-4">
                 <h2 className="text-xs text-amber-700 tracking-widest mb-3">WEATHER - CHENNAI</h2>
                 <div className="flex items-baseline gap-4">
                   <span className="text-4xl font-bold text-amber-400">{weather.temp}°C</span>
-                  <div className="space-y-1">
-                    <p className="text-amber-600 text-sm">H: {weather.high}° / L: {weather.low}°</p>
-                    <p className="text-amber-800 text-xs">{weather.condition}</p>
-                  </div>
+                  <div><p className="text-amber-600 text-sm">H: {weather.high}° / L: {weather.low}°</p><p className="text-amber-800 text-xs">{weather.condition}</p></div>
                 </div>
-              </motion.div>
+              </div>
 
-              {/* Verse */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+              <div className="bg-[#111] border border-amber-900/30 p-4 mb-4">
                 <h2 className="text-xs text-amber-700 tracking-widest mb-3">VERSE OF THE DAY</h2>
-                <blockquote className="text-amber-300 text-sm leading-relaxed italic">
-                  "{verseOfTheDay.text}"
-                </blockquote>
-                <p className="text-amber-700 text-xs mt-3">
-                  {verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}
-                </p>
-              </motion.div>
+                <p className="text-amber-300 text-sm leading-relaxed italic">"{verseOfTheDay.text}"</p>
+                <p className="text-amber-700 text-xs mt-3">{verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}</p>
+              </div>
 
-              {/* Calendar */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+              <div className="bg-[#111] border border-amber-900/30 p-4 mb-4">
                 <h2 className="text-xs text-amber-700 tracking-widest mb-3">TODAY'S SCHEDULE</h2>
-                <div className="space-y-2">
-                  {calendarEvents.map(event => (
-                    <div key={event.id} className="flex items-center justify-between py-2 border-b border-amber-900/20 last:border-0">
-                      <span className="text-amber-400 text-sm">{event.title}</span>
-                      <span className="text-amber-500 text-xs font-mono">{event.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Word */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-[#111] border border-amber-900/30 p-4">
-                <h2 className="text-xs text-amber-700 tracking-widest mb-3">WORD OF THE DAY</h2>
-                <div className="space-y-2">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-xl text-amber-400 font-bold">{wordOfTheDay.word}</span>
-                    <span className="text-amber-700 text-xs font-mono">{wordOfTheDay.pronunciation}</span>
+                {calendarEvents.map(e => (
+                  <div key={e.id} className="flex justify-between py-2 border-b border-amber-900/20 last:border-0">
+                    <span className="text-amber-400 text-sm">{e.title}</span>
+                    <span className="text-amber-500 text-xs font-mono">{e.time}</span>
                   </div>
-                  <p className="text-amber-500 text-sm leading-relaxed">{wordOfTheDay.definition}</p>
-                  <p className="text-amber-800 text-xs italic mt-2">"{wordOfTheDay.example}"</p>
-                </div>
-              </motion.div>
+                ))}
+              </div>
 
-              {/* Enter Button */}
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="text-center mt-6">
-                <button 
-                  onClick={() => setActiveTab('projects')}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-black font-bold tracking-wider hover:bg-amber-400 transition-colors"
-                >
-                  ENTER MISSION CONTROL
-                </button>
-              </motion.div>
+              <div className="bg-[#111] border border-amber-900/30 p-4">
+                <h2 className="text-xs text-amber-700 tracking-widest mb-3">WORD OF THE DAY</h2>
+                <div className="flex items-baseline gap-3"><span className="text-xl text-amber-400 font-bold">{wordOfTheDay.word}</span><span className="text-amber-700 text-xs font-mono">{wordOfTheDay.pronunciation}</span></div>
+                <p className="text-amber-500 text-sm mt-2">{wordOfTheDay.definition}</p>
+              </div>
             </motion.div>
           )}
 
+          {/* PROJECTS */}
           {activeTab === 'projects' && (
             <motion.div key="projects" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               {filteredTasks.map(task => (
-                <div key={task.id} className={`bg-[#111] border p-4 flex items-center justify-between ${
-                  task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-amber-900/30'
-                }`}>
+                <div key={task.id} className={`bg-[#111] border p-4 flex items-center justify-between ${task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-amber-900/30'}`}>
                   <div className="flex items-center gap-3">
                     {task.status === 'done' ? <CheckCircle className="w-5 h-5 text-green-500" /> : task.status === 'in-progress' ? <Clock className="w-5 h-5 text-blue-500" /> : <Circle className="w-5 h-5 text-amber-700" />}
                     <span className={task.status === 'done' ? 'line-through text-amber-800' : ''}>{task.title}</span>
                   </div>
-                  <span className={`text-xs px-2 py-1 ${
-                    task.priority === 'high' ? 'bg-red-900/30 text-red-500' : task.priority === 'medium' ? 'bg-amber-900/30 text-amber-500' : 'bg-amber-900/10 text-amber-700'
-                  }`}>{task.priority.toUpperCase()}</span>
+                  <span className={`text-xs px-2 py-1 ${task.priority === 'high' ? 'bg-red-900/30 text-red-500' : task.priority === 'medium' ? 'bg-amber-900/30 text-amber-500' : 'bg-amber-900/10 text-amber-700'}`}>{task.priority.toUpperCase()}</span>
                 </div>
               ))}
             </motion.div>
           )}
 
+          {/* XMAX WORK */}
           {activeTab === 'xmax-work' && (
             <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {trendingTopics.map(topic => (
-                  <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left transition-colors ${selectedTopic === topic.id ? 'border-amber-500' : 'border-amber-900/30 hover:border-amber-700'}`}>
+                  <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left ${selectedTopic === topic.id ? 'border-amber-500' : 'border-amber-900/30 hover:border-amber-700'}`}>
                     <p className="text-amber-400 text-sm font-bold">{topic.title}</p>
                     <p className="text-amber-800 text-xs mt-1">{topic.tweets.length} READY</p>
                   </button>
@@ -351,29 +344,47 @@ function MissionControlContent() {
             </motion.div>
           )}
 
+          {/* BOOKMARKS */}
           {activeTab === 'bookmarks' && (
             <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              {bookmarks.map(bookmark => (
-                <a key={bookmark.id} href={bookmark.url} target="_blank" rel="noopener noreferrer" className="bg-[#111] border border-amber-900/30 p-4 flex items-center justify-between hover:border-amber-500 transition-colors">
-                  <div><p className="text-amber-400">{bookmark.title}</p><p className="text-amber-800 text-xs">{bookmark.url}</p></div>
+              {bookmarks.map(b => (
+                <a key={b.id} href={b.url} target="_blank" rel="noopener noreferrer" className="bg-[#111] border border-amber-900/30 p-4 flex items-center justify-between hover:border-amber-500 transition-colors">
+                  <div><p className="text-amber-400">{b.title}</p><p className="text-amber-800 text-xs">{b.url}</p></div>
                   <Bookmark className="w-5 h-5 text-amber-700" />
                 </a>
               ))}
             </motion.div>
           )}
 
+          {/* TEAM */}
           {activeTab === 'software-team' && (
-            <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <button
-                onClick={() => setTeamDrawerOpen(true)}
-                className="w-full bg-[#111] border border-amber-500/30 p-6 text-left hover:border-amber-500 transition-colors"
-              >
-                <p className="text-amber-400 font-bold text-lg">MY TEAM</p>
-                <p className="text-amber-700 text-sm">Tap to view team status</p>
-              </button>
+            <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
+              <p className="text-amber-700 text-xs tracking-wider mb-2">TEAM STATUS</p>
+              {teamData.map(member => (
+                <div key={member.id} className="bg-[#111] border border-amber-900/30 p-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'blocked' ? 'bg-red-500' : 'bg-amber-800'}`} />
+                    <div>
+                      <p className="text-amber-400 font-bold text-sm">{member.name}</p>
+                      <p className="text-amber-700 text-xs">{member.role}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    {member.status === 'idle' || !member.currentTask ? (
+                      <span className="text-amber-600 text-xs">Idle</span>
+                    ) : (
+                      <div>
+                        <p className="text-amber-400 text-xs">{member.currentTask}</p>
+                        <p className="text-amber-600 text-xs capitalize">{member.status}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </motion.div>
           )}
 
+          {/* PRODUCTS */}
           {activeTab === 'products' && (
             <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="bg-[#111] border border-amber-900/30 p-6">
@@ -396,54 +407,6 @@ function MissionControlContent() {
           )}
         </AnimatePresence>
       </main>
-
-      {/* Navigation Drawer */}
-      {teamDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div className="flex-1 bg-black/50" onClick={() => setTeamDrawerOpen(false)} />
-          <div className="w-full max-w-sm bg-[#0a0a0a] border-l border-amber-900/30 p-4 overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-amber-400 font-bold tracking-wider">MENU</p>
-              <button onClick={() => setTeamDrawerOpen(false)}><X className="w-5 h-5 text-amber-700" /></button>
-            </div>
-            <div className="space-y-2">
-              {menuItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => { setActiveTab(item.id); setTeamDrawerOpen(false); }}
-                  className={`w-full p-3 flex items-center gap-3 transition-colors ${
-                    activeTab === item.id 
-                      ? 'bg-amber-500/10 border border-amber-500' 
-                      : 'bg-[#111] border border-amber-900/30 hover:border-amber-700'
-                  }`}
-                >
-                  <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-amber-500' : 'text-amber-700'}`} />
-                  <span className={`text-sm font-bold ${activeTab === item.id ? 'text-amber-400' : 'text-amber-50'}`}>{item.label}</span>
-                </button>
-              ))}
-            </div>
-            
-            {/* Team Status Section */}
-            <div className="mt-6 pt-4 border-t border-amber-900/30">
-              <p className="text-amber-700 text-xs tracking-wider mb-3">TEAM STATUS</p>
-              <div className="space-y-2">
-                {teamData.filter(m => m.status === 'working').map(member => (
-                  <div key={member.id} className="bg-[#111] border border-green-900/30 p-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-500 animate-pulse" />
-                      <span className="text-amber-400 text-xs">{member.name}</span>
-                    </div>
-                    <p className="text-amber-600 text-xs ml-4">{member.currentTask}</p>
-                  </div>
-                ))}
-                {teamData.filter(m => m.status !== 'working').length > 0 && (
-                  <p className="text-amber-800 text-xs">{teamData.filter(m => m.status !== 'working').length} idle</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       <div className="fixed inset-0 pointer-events-none z-0 opacity-5" style={{ backgroundImage: 'linear-gradient(amber 1px, transparent 1px), linear-gradient(90deg, amber 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
     </div>
