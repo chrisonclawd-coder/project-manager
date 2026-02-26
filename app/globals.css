@@ -9,6 +9,7 @@
 }
 
 body {
+  font-family: var(--font-poppins), sans-serif;
   color: rgb(var(--foreground-rgb));
   background: rgb(var(--background-start-rgb));
 }

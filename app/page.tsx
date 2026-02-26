@@ -166,7 +166,7 @@ function MissionControlContent() {
   }
 
   return (
-    <div className={`min-h-screen font-mono transition-colors duration-200 ${
+    <div className={`min-h-screen font-sans transition-colors duration-200 ${
       darkMode 
         ? 'bg-[#0a0a0a] text-gray-50' 
         : 'bg-white text-gray-900'
@@ -175,7 +175,7 @@ function MissionControlContent() {
       <aside className={`fixed top-0 left-0 w-64 h-full z-50 transform transition-colors duration-200 ${
         darkMode 
           ? 'bg-[#111] border-gray-700/30' 
-          : 'bg-gray-100 border-gray-200'
+          : 'bg-white border-gray-200'
       } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
         <div className={`h-14 flex items-center justify-between px-4 border-b transition-colors duration-200 ${
           darkMode ? 'border-gray-700/30' : 'border-gray-200'
@@ -248,7 +248,7 @@ function MissionControlContent() {
 
       {/* Mobile menu button */}
       <button onClick={() => setSidebarOpen(!sidebarOpen)} className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded border transition-colors duration-200 ${
-        darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-100 border-gray-200'
+        darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
       }`}>
         {sidebarOpen ? <X className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-800'}`} /> : <Menu className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-800'}`} />}
       </button>
@@ -261,25 +261,25 @@ function MissionControlContent() {
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2 mb-6">
           <div className={`border p-3 transition-colors duration-200 ${
-            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
           }`}>
             <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TOTAL</p>
             <p className={`text-2xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{stats.total}</p>
           </div>
           <div className={`border p-3 transition-colors duration-200 ${
-            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
           }`}>
             <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>DONE</p>
             <p className={`text-2xl font-bold ${darkMode ? 'text-green-500' : 'text-green-600'}`}>{stats.done}</p>
           </div>
           <div className={`border p-3 transition-colors duration-200 ${
-            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
           }`}>
             <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>IN PROG</p>
             <p className={`text-2xl font-bold ${darkMode ? 'text-blue-500' : 'text-blue-600'}`}>{stats.inProgress}</p>
           </div>
           <div className={`border p-3 transition-colors duration-200 ${
-            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
           }`}>
             <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TODO</p>
             <p className={`text-2xl font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{stats.todo}</p>
@@ -297,7 +297,7 @@ function MissionControlContent() {
             className={`w-full border pl-10 pr-4 py-2 transition-colors duration-200 placeholder-gray-600 focus:outline-none text-sm tracking-wider ${
               darkMode 
                 ? 'bg-[#111] border-gray-700/30 text-gray-50' 
-                : 'bg-gray-50 border-gray-200 text-gray-900'
+                : 'bg-white border-gray-200 text-gray-900'
             }`}
           />
         </div>
@@ -313,7 +313,7 @@ function MissionControlContent() {
                   ? darkMode ? 'bg-gray-300 text-black font-bold' : 'bg-gray-800 text-white font-bold'
                   : darkMode 
                     ? 'bg-[#111] text-gray-500 hover:text-gray-200' 
-                    : 'bg-gray-50 text-gray-500 hover:text-gray-800'
+                    : 'bg-white text-gray-500 hover:text-gray-800'
               }`}
             >
               {status.toUpperCase().replace('-', ' ')}
@@ -332,7 +332,7 @@ function MissionControlContent() {
               </div>
 
               <div className={`border p-4 mb-4 transition-colors duration-200 ${
-                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
               }`}>
                 <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>WEATHER - CHENNAI</h2>
                 <div className="flex items-baseline gap-4">
@@ -342,7 +342,7 @@ function MissionControlContent() {
               </div>
 
               <div className={`border p-4 mb-4 transition-colors duration-200 ${
-                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
               }`}>
                 <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>VERSE OF THE DAY</h2>
                 <p className={`text-sm leading-relaxed italic ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>"{verseOfTheDay.text}"</p>
@@ -350,22 +350,22 @@ function MissionControlContent() {
               </div>
 
               <div className={`border p-4 mb-4 transition-colors duration-200 ${
-                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
               }`}>
                 <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>TODAY'S SCHEDULE</h2>
                 {calendarEvents.map(e => (
                   <div key={e.id} className={`flex justify-between py-2 ${darkMode ? 'border-gray-700/20' : 'border-gray-200'} last:border-0 border-b`}>
                     <span className={`text-sm ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{e.title}</span>
-                    <span className={`text-xs font-mono ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{e.time}</span>
+                    <span className={`text-xs font-sans ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{e.time}</span>
                   </div>
                 ))}
               </div>
 
               <div className={`border p-4 transition-colors duration-200 ${
-                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-white border-gray-200'
               }`}>
                 <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>WORD OF THE DAY</h2>
-                <div className="flex items-baseline gap-3"><span className={`text-xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{wordOfTheDay.word}</span><span className={`text-xs font-mono ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{wordOfTheDay.pronunciation}</span></div>
+                <div className="flex items-baseline gap-3"><span className={`text-xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{wordOfTheDay.word}</span><span className={`text-xs font-sans ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{wordOfTheDay.pronunciation}</span></div>
                 <p className={`text-sm mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{wordOfTheDay.definition}</p>
               </div>
             </motion.div>
@@ -379,7 +379,7 @@ function MissionControlContent() {
                   darkMode 
                     ? task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-gray-700/30'
                     : task.status === 'done' ? 'border-green-200 opacity-60' : task.status === 'in-progress' ? 'border-blue-200' : 'border-gray-200'
-                } ${darkMode ? 'bg-[#111]' : 'bg-gray-50'}`}>
+                } ${darkMode ? 'bg-[#111]' : 'bg-white'}`}>
                   <div className="flex items-center gap-3">
                     {task.status === 'done' ? <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-green-500' : 'text-green-600'}`} /> : task.status === 'in-progress' ? <Clock className={`w-5 h-5 ${darkMode ? 'text-blue-500' : 'text-blue-600'}`} /> : <Circle className={`w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />}
                     <span className={task.status === 'done' ? (darkMode ? 'line-through text-gray-600' : 'line-through text-gray-400') : (darkMode ? 'text-gray-200' : 'text-gray-800')}>{task.title}</span>
@@ -403,13 +403,13 @@ function MissionControlContent() {
               <section>
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-bold text-gray-200 tracking-wider border-l-4 border-gray-300 pl-3">X GROWTH STRATEGY</h2>
-                  <button onClick={refreshTopics} disabled={isRefreshing} className="px-3 py-1 text-xs bg-[#111] border border-gray-700/30 text-gray-400 hover:text-gray-200 hover:border-gray-300 transition-colors">
+                  <button onClick={refreshTopics} disabled={isRefreshing} className="px-3 py-1 text-xs {darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 text-gray-400 hover:text-gray-200 hover:border-gray-300 transition-colors">
                     {isRefreshing ? 'REFRESHING...' : 'REFRESH'}
                   </button>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
                   {trendingTopics.map(topic => (
-                    <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left transition-all ${selectedTopic === topic.id ? 'border-gray-300 bg-gray-900/50' : 'border-gray-700/30 hover:border-gray-500'}`}>
+                    <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`{darkMode ? 'bg-[#111]' : 'bg-white'} border p-3 text-left transition-all ${selectedTopic === topic.id ? 'border-gray-300 bg-gray-900/50' : 'border-gray-700/30 hover:border-gray-500'}`}>
                       <p className="text-gray-200 text-sm font-bold">{topic.title}</p>
                       <p className="text-gray-600 text-xs mt-1">{topic.source}</p>
                     </button>
@@ -417,7 +417,7 @@ function MissionControlContent() {
                 </div>
                 <AnimatePresence>
                   {selectedTopic && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-[#111] border border-gray-300 p-4">
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-300 p-4">
                       <p className="text-gray-300 text-sm mb-4">{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
                       <div className="flex gap-3">
                         <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-black text-sm font-bold tracking-wider hover:bg-gray-200"><Twitter className="w-4 h-4" /> POST TO X</a>
@@ -432,7 +432,7 @@ function MissionControlContent() {
                 <h2 className="text-lg font-bold text-gray-200 tracking-wider border-l-4 border-gray-300 pl-3 mb-4">MARKETING</h2>
                 <div className="grid md:grid-cols-2 gap-4">
                   {/* Mdify */}
-                  <div className="bg-[#111] border border-gray-700/30 p-4">
+                  <div className={`${darkMode ? 'bg-[#111]' : 'bg-white'} border ${darkMode ? 'border-gray-700/30' : 'border-gray-200'} p-4`}>
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="text-lg text-gray-200 font-bold">MDIFY</h3>
@@ -443,18 +443,24 @@ function MissionControlContent() {
                     <p className="text-gray-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
                     <div className="space-y-3">
                       <div className="border border-gray-700/30 p-3">
-                        <p className="text-gray-500 text-xs mb-2">X POST</p>
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-500 text-xs">X POST</p>
+                          <p className="text-gray-600 text-xs">280 chars</p>
+                        </div>
                         <p className="text-gray-300 text-sm">"Stop pasting bloated links. Use #Mdify to convert posts to clean .md for your AI agent."</p>
                         <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-3 py-1 border border-gray-300 text-gray-300 text-xs hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> POST</a>
                       </div>
                       <div className="border border-gray-700/30 p-3">
-                        <p className="text-gray-500 text-xs mb-2">REDDIT POST</p>
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-500 text-xs">REDDIT POST</p>
+                          <p className="text-gray-600 text-xs">500+ chars</p>
+                        </div>
                         <p className="text-gray-300 text-xs">"I've been using this Chrome extension and it's been a game changer for my AI workflows. No more messy copy-paste, just clean .md files ready for any AI agent to process."</p>
                       </div>
                     </div>
                   </div>
                   {/* Guardskills */}
-                  <div className="bg-[#111] border border-gray-700/30 p-4">
+                  <div className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div>
                         <h3 className="text-lg text-gray-200 font-bold">GUARDSKILLS</h3>
@@ -465,12 +471,18 @@ function MissionControlContent() {
                     <p className="text-gray-300 text-sm mb-4">Scan AI skills for malicious code before installing.</p>
                     <div className="space-y-3">
                       <div className="border border-gray-700/30 p-3">
-                        <p className="text-gray-500 text-xs mb-2">X POST</p>
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-500 text-xs">X POST</p>
+                          <p className="text-gray-600 text-xs">280 chars</p>
+                        </div>
                         <p className="text-gray-300 text-sm">"Stop risking your keys. Use @guardskills_ to scan AI skills for malicious code. Security matters."</p>
                         <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-3 py-1 border border-gray-300 text-gray-300 text-xs hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> POST</a>
                       </div>
                       <div className="border border-gray-700/30 p-3">
-                        <p className="text-gray-500 text-xs mb-2">REDDIT POST</p>
+                        <div className="flex justify-between items-center mb-2">
+                          <p className="text-gray-500 text-xs">REDDIT POST</p>
+                          <p className="text-gray-600 text-xs">500+ chars</p>
+                        </div>
                         <p className="text-gray-300 text-xs">"Worried about malicious AI skills? This NPM package scans AI skills for malicious code before you install them. Protect your API keys and your AI workflows."</p>
                       </div>
                     </div>
@@ -485,7 +497,7 @@ function MissionControlContent() {
           {activeTab === 'bookmarks' && (
             <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               {bookmarks.map(b => (
-                <a key={b.id} href={b.url} target="_blank" rel="noopener noreferrer" className="bg-[#111] border border-gray-700/30 p-4 flex items-center justify-between hover:border-gray-300 transition-colors">
+                <a key={b.id} href={b.url} target="_blank" rel="noopener noreferrer" className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 p-4 flex items-center justify-between hover:border-gray-300 transition-colors">
                   <div><p className="text-gray-200">{b.title}</p><p className="text-gray-600 text-xs">{b.url}</p></div>
                   <Bookmark className="w-5 h-5 text-gray-500" />
                 </a>
@@ -498,7 +510,7 @@ function MissionControlContent() {
             <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               <p className="text-gray-500 text-xs tracking-wider mb-2">TEAM STATUS</p>
               {teamData.map(member => (
-                <div key={member.id} className="bg-[#111] border border-gray-700/30 p-3 flex items-center justify-between">
+                <div key={member.id} className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'blocked' ? 'bg-red-500' : 'bg-gray-600'}`} />
                     <div>
@@ -524,7 +536,7 @@ function MissionControlContent() {
           {/* PRODUCTS */}
           {activeTab === 'products' && (
             <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className="bg-[#111] border border-gray-700/30 p-6">
+              <div className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div><h3 className="text-xl text-gray-200 font-bold">MDIFY</h3><p className="text-gray-500 text-sm">Chrome Extension</p></div>
                   <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" className="px-3 py-1 bg-gray-300 text-black text-sm font-bold">VIEW</a>
@@ -532,7 +544,7 @@ function MissionControlContent() {
                 <p className="text-gray-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
                 <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-gray-300 text-gray-300 text-sm hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> TWEET</a>
               </div>
-              <div className="bg-[#111] border border-gray-700/30 p-6">
+              <div className="{darkMode ? 'bg-[#111]' : 'bg-white'} border border-gray-700/30 p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div><h3 className="text-xl text-gray-200 font-bold">GUARDSKILLS</h3><p className="text-gray-500 text-sm">NPM Package</p></div>
                   <a href="https://www.npmjs.com/package/guardskills" target="_blank" className="px-3 py-1 bg-gray-300 text-black text-sm font-bold">VIEW</a>
@@ -552,7 +564,7 @@ function MissionControlContent() {
 
 export default function MissionControl() {
   return (
-    <Suspense fallback={<div className='min-h-screen bg-[#0a0a0a] text-gray-50 font-mono p-6'>LOADING...</div>}>
+    <Suspense fallback={<div className='min-h-screen bg-[#0a0a0a] text-gray-50 font-sans p-6'>LOADING...</div>}>
       <MissionControlContent />
     </Suspense>
   )
