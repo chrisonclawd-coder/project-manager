@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, Users, Package, Target, Home as HomeIcon } from 'lucide-react'
+import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, Menu, Users, Package, Target, Home as HomeIcon, X } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
@@ -74,6 +74,7 @@ function MissionControlContent() {
   const [bookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
   const [trendingTopics] = useState(defaultTopics)
   const [teamData, setTeamData] = useState(teamMembers)
+  const [teamDrawerOpen, setTeamDrawerOpen] = useState(false)
 
   useEffect(() => {
     fetch('/data/team-status.json')
@@ -246,29 +247,14 @@ function MissionControlContent() {
           )}
 
           {activeTab === 'software-team' && (
-            <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              <p className="text-amber-700 text-xs tracking-wider mb-2">TEAM STATUS</p>
-              {teamData.map(member => (
-                <div key={member.id} className="bg-[#111] border border-amber-900/30 p-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'done' ? 'bg-blue-500' : member.status === 'blocked' ? 'bg-red-500' : 'bg-amber-800'}`} />
-                    <div>
-                      <p className="text-amber-400 font-bold text-sm">{member.name}</p>
-                      <p className="text-amber-700 text-xs">{member.role}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    {member.status === 'idle' || !member.currentTask ? (
-                      <span className="text-amber-600 text-xs">Idle</span>
-                    ) : (
-                      <div>
-                        <p className="text-amber-400 text-xs">{member.currentTask}</p>
-                        <p className="text-amber-600 text-xs capitalize">{member.status}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+            <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <button
+                onClick={() => setTeamDrawerOpen(true)}
+                className="w-full bg-[#111] border border-amber-500/30 p-6 text-left hover:border-amber-500 transition-colors"
+              >
+                <p className="text-amber-400 font-bold text-lg">MY TEAM</p>
+                <p className="text-amber-700 text-sm">Tap to view team status</p>
+              </button>
             </motion.div>
           )}
 
@@ -294,6 +280,38 @@ function MissionControlContent() {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Team Drawer */}
+      {teamDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          <div className="flex-1 bg-black/50" onClick={() => setTeamDrawerOpen(false)} />
+          <div className="w-full max-w-sm bg-[#0a0a0a] border-l border-amber-900/30 p-4 overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-amber-400 font-bold">MY TEAM</p>
+              <button onClick={() => setTeamDrawerOpen(false)}><X className="w-5 h-5 text-amber-700" /></button>
+            </div>
+            <div className="space-y-2">
+              {teamData.map(member => (
+                <div key={member.id} className="bg-[#111] border border-amber-900/30 p-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500' : member.status === 'blocked' ? 'bg-red-500' : 'bg-amber-800'}`} />
+                    <span className="text-amber-400 font-bold text-sm">{member.name}</span>
+                    <span className="text-amber-700 text-xs">({member.role})</span>
+                  </div>
+                  {member.status === 'idle' || !member.currentTask ? (
+                    <p className="text-amber-600 text-xs">Idle</p>
+                  ) : (
+                    <div>
+                      <p className="text-amber-400 text-xs">{member.currentTask}</p>
+                      <p className="text-amber-600 text-xs capitalize">{member.status}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="fixed inset-0 pointer-events-none z-0 opacity-5" style={{ backgroundImage: 'linear-gradient(amber 1px, transparent 1px), linear-gradient(90deg, amber 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
     </div>
