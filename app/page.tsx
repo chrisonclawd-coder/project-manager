@@ -130,7 +130,7 @@ function MissionControlContent() {
           {menuItems.map(item => (
             <button
               key={item.id}
-              onClick={() => router.push('/?tab=' + item.id)}
+              onClick={() => setActiveTab(item.id)}
               className={`px-3 py-2 text-xs tracking-wider transition-colors hidden md:block ${
                 activeTab === item.id 
                   ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' 
@@ -297,7 +297,7 @@ function MissionControlContent() {
               {menuItems.map(item => (
                 <button
                   key={item.id}
-                  onClick={() => { router.push('/?tab=' + item.id); setTeamDrawerOpen(false); }}
+                  onClick={() => { setActiveTab(item.id); setTeamDrawerOpen(false); }}
                   className={`w-full p-3 flex items-center gap-3 transition-colors ${
                     activeTab === item.id 
                       ? 'bg-amber-500/10 border border-amber-500' 
