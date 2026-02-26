@@ -94,14 +94,29 @@ export default function HomeScreen() {
     return () => clearInterval(interval)
   }, [])
   
-  // Simulated weather - in production, fetch from API
+  // Fetch weather from API
   useEffect(() => {
-    setWeather({
-      temp: 72,
-      high: 78,
-      low: 65,
-      condition: 'Partly cloudy'
-    })
+    fetch('/api/weather')
+      .then(res => res.json())
+      .then(data => {
+        if (data.temp) {
+          setWeather({
+            temp: data.temp,
+            high: data.high,
+            low: data.low,
+            condition: data.condition
+          })
+        }
+      })
+      .catch(() => {
+        // Fallback
+        setWeather({
+          temp: 26,
+          high: 29,
+          low: 21,
+          condition: 'Mist'
+        })
+      })
   }, [])
 
   return (
