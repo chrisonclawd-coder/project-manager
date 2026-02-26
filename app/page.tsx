@@ -1,117 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package, Target, Home as HomeIcon } from 'lucide-react'
-
-// Viral tweets - 280 characters max
-const defaultTopics = [
-  { 
-    id: 1, 
-    title: 'AI Breakthroughs 2026', 
-    source: 'MIT Tech Review',
-    tweets: [
-      { text: "MIT's 10 Breakthrough Technologies 2026 is out. AI agents are leading. The shift from chatbots to autonomous agents is faster than anyone predicted. We're witnessing the biggest paradigm shift since mobile. Are you ready?", hashtags: ['AI', 'Tech', 'Innovation'] },
-      { text: "Breakthrough tech alert 🚨 AI agents are going from \"tools\" to \"teammates.\" Companies adapting fastest are winning. If you're not experimenting with agents today, you're already behind. #AI #Future #2026", hashtags: ['Breakthrough', 'AI', 'Future'] }
-    ]
-  },
-  { 
-    id: 2, 
-    title: 'Gartner Tech Trends', 
-    source: 'Gartner',
-    tweets: [
-      { text: "Gartner's Top 10 Tech Trends 2026: Agentic AI is THE trend. Not chatbots. Autonomous agents that DO work. Spatial computing, energy-efficient AI, and the convergence of everything. This decade will be defined by adaptation. #Gartner #TechTrends", hashtags: ['Gartner', 'TechTrends'] },
-      { text: "Here's what Gartner's trends mean for you: Agentic AI = AI coworker who gets stuff done. Spatial Computing = mixed reality. Energy-Efficient AI = sustainable at scale. The companies acting fastest will lead. #Strategy #2026", hashtags: ['Tech', 'Strategy'] }
-    ]
-  },
-  { 
-    id: 3, 
-    title: 'AI Voice Agents', 
-    source: 'RingCentral',
-    tweets: [
-      { text: "AI voice agents are HERE and better than most humans at customer service. 24/7 availability, infinite scalability, 70-90% cost reduction. The future isn't AI vs humans - it's AI + humans = incredible experiences. #AI #VoiceAgents", hashtags: ['AI', 'VoiceAgents'] },
-      { text: "Hot take: 80% of customer service reps replaced by AI in 3 years. Not a threat - an upgrade. AI handles routine, humans handle complex empathy. Better experience + lower costs + happier agents. Agree? #FutureOfWork", hashtags: ['AI', 'Future'] }
-    ]
-  },
-  { 
-    id: 4, 
-    title: 'Hyperscale AI Data Centers', 
-    source: 'MIT Tech Review',
-    tweets: [
-      { text: "AI data centers consuming insane energy. One GPT-4 training = power 100 homes/year. But it's temporary. Nuclear + fusion + renewables coming. Companies solving the energy problem will dominate. #AI #CleanEnergy", hashtags: ['AI', 'DataCenters'] },
-      { text: "AI data centers = new oil refineries. Microsoft signed nuclear deal. Google 100% renewable. Amazon building solar farms. Future belongs to companies that solve energy. Sustainable AI = competitive advantage. #GreenTech", hashtags: ['AI', 'Energy'] }
-    ]
-  },
-  { 
-    id: 5, 
-    title: 'Intelligent Apps', 
-    source: 'Capgemini',
-    tweets: [
-      { text: "Every app without AI is obsolete. Shift from \"AI features\" to \"AI-native apps\" is happening NOW. AI as foundation, not feature. The app store is dead. Long live the AI agent store. Biggest shift since mobile. #AI #Apps", hashtags: ['AI', 'Apps'] },
-      { text: "Nobody wants 50 apps. They want ONE assistant that does everything. AI-native apps = context-aware, proactive, learning. More AI, fewer apps. App stores become AI aggregators. Developers become prompt engineers. #AIFirst", hashtags: ['AI', 'Innovation'] }
-    ]
-  },
-  { 
-    id: 6, 
-    title: 'AI Coding Trends', 
-    source: 'GitHub Blog',
-    tweets: [
-      { text: "12 AI Coding Trends 2026:\n1. Agentic AI\n2. Autonomous coding\n3. Natural language → code\n4. Automated testing\n5. Self-healing code\n6. Voice-coding\n7. AI pair programming\n\nDev landscape being rewritten. Which trend excites you most?", hashtags: ['AICoding', 'DevTools'] },
-      { text: "AI coding isn't future - it's PRESENT. Companies using AI: 10x more productive. Not using AI: struggling to compete. Best devs direct AI, not fight it. Your job: understand problems, verify output, focus on hard stuff. #Coding #AI", hashtags: ['AI', 'Coding'] }
-    ]
-  },
-  { 
-    id: 7, 
-    title: 'Agentic AI Era', 
-    source: 'Medium',
-    tweets: [
-      { text: "2026 = Year Agents Take Over. Not chatbots. AUTONOMOUS AI that plans, executes, learns, collaborates. Biggest shift in software ever. Before: write code. Now: direct AI. Winners direct AI most effectively. Are you ready? #AI #Agents", hashtags: ['AI', 'Agents'] },
-      { text: "Shift from \"coding\" to \"orchestrating\" is biggest career change in tech. Developer directing 10 AI agents = work of 100 devs. Skills: prompt engineering, system design, verification, orchestration. Syntax → context. #FutureOfWork", hashtags: ['AI', 'SDLC'] }
-    ]
-  },
-  { 
-    id: 8, 
-    title: 'Vibe Coding', 
-    source: 'MasteringAI',
-    tweets: [
-      { text: "Vibe coding: Describe what you want. AI builds it. No syntax. No bugs. Just vibes. \n\nYES for 80%: landing pages, CRUD, integrations.\nNO for 20%: architecture, algorithms, security.\n\nFuture: BOTH. What's your mix? #VibeCoding", hashtags: ['VibeCoding', 'AI'] },
-      { text: "Vibe vs Traditional coding - which wins? ANSWER: Both. Forever.\n\nVibe: fast, prototyping, democratizing.\nTraditional: performance, security, complex algorithms.\n\nBest devs master BOTH. 80% vibe, 20% hand-code what matters. #Coding", hashtags: ['VibeCoding', 'Dev'] }
-    ]
-  },
-  { 
-    id: 9, 
-    title: 'Developer Productivity', 
-    source: 'Octopus',
-    tweets: [
-      { text: "Data from 1000+ companies: AI = 40-60% productivity gains.\n\nCode generation (30%): AI writes boilerplate\nDebugging (25%): AI finds bugs in seconds\nResearch (20%): AI finds solutions instantly\n\nCompanies seeing 60% gains? They trained teams, established workflows. #AI #Productivity", hashtags: ['AI', 'Productivity'] },
-      { text: "Your devs are 40% more productive with AI. DATA, not prediction.\n\nNot using AI in 2026 = refusing Google in 2005.\nExcuses: \"it makes mistakes\" (so do humans, fewer), \"takes time to learn\" (so does everything worth having). #Future", hashtags: ['AI', 'Dev'] }
-    ]
-  },
-  { 
-    id: 10, 
-    title: 'AI Trends 2026', 
-    source: 'Various',
-    tweets: [
-      { text: "7 AI trends defining 2026:\n1. Agentic AI\n2. Multimodal\n3. Edge AI\n4. Open source dominance\n5. Custom fine-tuned models\n6. AI regulation\n7. Vertical AI\n\nWe're past experimentation. In implementation phase. ROI now. #AITrends #2026", hashtags: ['AI', 'Trends'] },
-      { text: "AI 2026 = Multimodal + Agents + Edge + Vertical. Not chatbots. AUTONOMOUS SYSTEMS that see, hear, speak, act. Edge AI: your phone = GPT-4. Privacy improves, speed increases, costs decrease. AI becomes invisible but omnipresent. #Future", hashtags: ['AI', 'Tech'] }
-    ]
-  }
-]
 
 // Types
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
-
-type MemberStatus = 'idle' | 'working' | 'done' | 'blocked'
-
-interface TeamMember {
-  id: string
-  name: string
-  role: string
-  icon: any
-  status: MemberStatus
-  currentTask?: string
-}
 
 interface Task {
   id: number
@@ -128,25 +24,34 @@ interface BookmarkItem {
   addedAt: string
 }
 
-// Team members with live status
+interface TeamMember {
+  id: string
+  name: string
+  role: string
+  icon: any
+  status: 'idle' | 'working' | 'done' | 'blocked'
+  currentTask?: string
+}
+
+// Viral tweets
+const defaultTopics = [
+  { id: 1, title: 'AI Breakthroughs 2026', source: 'MIT Tech Review', tweets: [{ text: "MIT's 10 Breakthrough Technologies 2026 is out. AI agents are leading. The shift from chatbots to autonomous agents is faster than anyone predicted.", hashtags: ['AI', 'Tech'] }] },
+  { id: 2, title: 'Gartner Tech Trends', source: 'Gartner', tweets: [{ text: "Gartner's Top 10 Tech Trends 2026: Agentic AI is THE trend. Not chatbots. Autonomous agents that DO work.", hashtags: ['Gartner'] }] },
+  { id: 3, title: 'AI Voice Agents', source: 'RingCentral', tweets: [{ text: "AI voice agents are HERE and better than most humans at customer service. 24/7 availability, infinite scalability.", hashtags: ['AI'] }] },
+  { id: 4, title: 'Hyperscale AI Data Centers', source: 'MIT Tech Review', tweets: [{ text: "AI data centers consuming insane energy. Companies solving the energy problem will dominate.", hashtags: ['AI'] }] },
+  { id: 5, title: 'Intelligent Apps', source: 'Capgemini', tweets: [{ text: "Every app without AI is obsolete. Shift from 'AI features' to 'AI-native apps' is happening NOW.", hashtags: ['AI'] }] },
+  { id: 6, title: 'AI Coding Trends', source: 'GitHub', tweets: [{ text: "AI coding isn't future - it's PRESENT. Companies using AI: 10x more productive.", hashtags: ['AICoding'] }] },
+]
+
 const teamMembers: TeamMember[] = [
-  { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'working', currentTask: 'Overseeing team' },
-  { id: 'xmax', name: 'xMax', role: 'X Strategy & Product Marketing', icon: Target, status: 'working', currentTask: 'Managing X Strategy & Product Marketing' },
+  { id: 'manager', name: 'Chrisly', role: 'Manager', icon: Bot, status: 'idle' },
+  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', icon: Target, status: 'idle' },
   { id: 'developer', name: 'Developer', role: 'Developer', icon: User, status: 'idle' },
   { id: 'qa', name: 'QA', role: 'QA', icon: Beaker, status: 'idle' },
   { id: 'devops', name: 'DevOps', role: 'DevOps', icon: Rocket, status: 'idle' },
-  { id: 'tester', name: 'Manual Test', role: 'Manual Tester', icon: Eye, status: 'idle' },
+  { id: 'tester', name: 'Tester', role: 'Manual Tester', icon: Eye, status: 'idle' },
 ]
 
-// Map API status to MemberStatus
-const mapApiStatusToMemberStatus = (status: string): MemberStatus => {
-  if (status === 'working') return 'working'
-  if (status === 'done') return 'done'
-  if (status === 'blocked') return 'blocked'
-  return 'idle'
-}
-
-// Sample tasks
 const defaultTasks: Task[] = [
   { id: 1, title: 'Complete InstaCards Chrome Extension', status: 'done', priority: 'high' },
   { id: 2, title: 'Build Mission Control Dashboard', status: 'done', priority: 'high' },
@@ -154,586 +59,382 @@ const defaultTasks: Task[] = [
   { id: 4, title: 'Deploy to Vercel', status: 'done', priority: 'high' },
 ]
 
-// Sample bookmarks
 const defaultBookmarks: BookmarkItem[] = [
   { id: 1, title: 'OpenClaw 50 Days Workflows', url: 'https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6', category: 'Work', addedAt: '2026-02-24' },
 ]
 
-// Products data
-const products = [
-  { 
-    id: 'guardskills', 
-    name: 'guardskills', 
-    platform: 'npm', 
-    url: 'https://www.npmjs.com/package/guardskills',
-    installs: '1.2.1', // show version for now
-    description: 'Scan AI skills before use, flag risky behavior'
-  },
-  { 
-    id: 'mdify', 
-    name: 'mdify', 
-    platform: 'chrome', 
-    url: 'https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki',
-    installs: '1K+ users', // placeholder
-    description: 'Turn any website into clean markdown'
-  }
-]
-
-const getTweetUrl = (text: string) => `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
-
-const stats = { total: 4, inProgress: 0, todo: 0, done: 4 }
-
-const statusColors = {
-  idle: 'bg-gray-600',
-  working: 'bg-blue-500',
-  done: 'bg-green-500',
-  blocked: 'bg-red-500',
+function getGreeting() {
+  const h = new Date().getHours()
+  if (h >= 5 && h < 12) return 'Good morning'
+  if (h >= 12 && h < 17) return 'Good afternoon'
+  return 'Good evening'
 }
 
-export default function Home() {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'home' | 'projects' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('home')
-  const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks)
-  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
-  const [searchQuery, setSearchQuery] = useState('')
+function MissionControlContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const initialTab = searchParams.get('tab') || 'home'
+  
+  const [activeTab, setActiveTab] = useState(initialTab as any)
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
-  const [trendingTopics] = useState(defaultTopics)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [team] = useState<TeamMember[]>(teamMembers)
-  const [isTeamExpanded, setIsTeamExpanded] = useState(false)
-  
-  // Live team status from API
-  const [liveTeamStatus, setLiveTeamStatus] = useState<Record<string, { name: string; status: string; currentTask: string }> | null>(null)
-  
-  // xMax work data from API
-  const [xmaxWork, setXmaxWork] = useState<any>(null)
-  
-  // Fetch xMax work from API
-  useEffect(() => {
-    const fetchXmaxWork = async () => {
-      try {
-        const res = await fetch('/api/xmax')
-        const data = await res.json()
-        setXmaxWork(data)
-      } catch (err) {
-        console.error('Failed to fetch xMax work:', err)
-      }
-    }
-    fetchXmaxWork()
-    const interval = setInterval(fetchXmaxWork, 10000)
-    return () => clearInterval(interval)
-  }, [])
-  
-  // Fetch team status from API
-  useEffect(() => {
-    const fetchTeamStatus = async () => {
-      try {
-        const res = await fetch('/api/status')
-        const data = await res.json()
-        setLiveTeamStatus(data)
-      } catch (err) {
-        console.error('Failed to fetch team status:', err)
-      }
-    }
-    
-    // Initial fetch
-    fetchTeamStatus()
-    
-    // Poll every 5 seconds
-    const interval = setInterval(fetchTeamStatus, 5000)
-    return () => clearInterval(interval)
-  }, [])
-  
-  // Use live team status if available, otherwise use default
-  const displayTeam = liveTeamStatus 
-    ? team.map((member) => ({
-        ...member,
-        status: mapApiStatusToMemberStatus(liveTeamStatus[member.id]?.status || 'idle'),
-        currentTask: liveTeamStatus[member.id]?.currentTask || member.currentTask
-      }))
-    : team
+  const [tasks] = useState<Task[]>(defaultTasks)
+  const [bookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
+  const [trendingTopics] = useState(defaultTopics)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const refreshTopics = () => {
-    setIsRefreshing(true)
-    setTimeout(() => setIsRefreshing(false), 1000)
-  }
-
-  const filteredTasks = tasks.filter(task => {
-    const matchesStatus = filterStatus === 'all' || task.status === filterStatus
-    const matchesSearch = task.title.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesStatus && matchesSearch
-  })
-
-  const filteredBookmarks = bookmarks.filter(b => 
-    b.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    b.url.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-
-  const menuItems: { id: string; label: string; icon: any; badge?: string }[] = [
-    { id: 'home', label: 'Home', icon: HomeIcon },
-    { id: 'projects', label: 'Projects', icon: BookOpen },
-    { id: 'xmax-work', label: 'xMax Work', icon: Target },
-    { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
-    { id: 'software-team', label: 'Software Team', icon: Users },
-    { id: 'products', label: 'Products', icon: Package },
+  const menuItems = [
+    { id: 'home', label: 'HOME', icon: HomeIcon },
+    { id: 'projects', label: 'PROJECTS', icon: BookOpen },
+    { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
+    { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
+    { id: 'software-team', label: 'TEAM', icon: Users },
+    { id: 'products', label: 'PRODUCTS', icon: Package },
   ]
 
+  const filteredTasks = tasks.filter(t => 
+    (filterStatus === 'all' || t.status === filterStatus) &&
+    t.title.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const stats = {
+    total: tasks.length,
+    done: tasks.filter(t => t.status === 'done').length,
+    inProgress: tasks.filter(t => t.status === 'in-progress').length,
+    todo: tasks.filter(t => t.status === 'todo').length,
+  }
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white flex">
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-lg"
-      >
-        {isDrawerOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
-
-      {/* Drawer - Left Side */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 w-72 bg-gray-800 border-r border-gray-700 transform transition-transform duration-200 z-40
-        ${isDrawerOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        <div className="p-6 h-full overflow-y-auto">
-          <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
-            <Zap className="w-8 h-8 text-yellow-400" />
-            Mission Control
-          </h1>
-
-          {/* Team Members */}
-          <div className="mb-6">
-            <button 
-              onClick={() => setIsTeamExpanded(!isTeamExpanded)}
-              className="w-full flex items-center justify-between mb-3 group"
+    <div className="min-h-screen bg-[#0a0a0a] text-amber-50 font-mono">
+      {/* Top Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 h-14 bg-[#111] border-b border-amber-900/30 z-50 flex items-center justify-between px-4">
+        <div className="flex items-center gap-4">
+          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden p-2 hover:bg-amber-900/20 rounded">
+            <Menu className="w-5 h-5 text-amber-500" />
+          </button>
+          <div className="flex items-center gap-2">
+            <Zap className="w-5 h-5 text-amber-500" />
+            <span className="text-amber-500 font-bold tracking-wider">MISSION CONTROL</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          {menuItems.map(item => (
+            <button
+              key={item.id}
+              onClick={() => { setActiveTab(item.id); router.push('/?tab=' + item.id); setMobileMenuOpen(false); }}
+              className={`px-3 py-2 text-xs tracking-wider transition-colors hidden md:block ${
+                activeTab === item.id 
+                  ? 'bg-amber-500/10 text-amber-500 border-b-2 border-amber-500' 
+                  : 'text-amber-700 hover:text-amber-400'
+              }`}
             >
-              <h2 className="text-xs uppercase tracking-wider text-gray-500 font-semibold group-hover:text-gray-400 transition-colors">Team Status</h2>
-              <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isTeamExpanded ? 'rotate-0' : '-rotate-90'}`} />
+              {item.label}
             </button>
-            <AnimatePresence>
-              {isTeamExpanded && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-2 overflow-hidden"
-                >
-                  {displayTeam.map((member) => (
-                    <div 
-                      key={member.id}
-                      className="flex items-center gap-3 p-2 rounded-lg bg-gray-700/50"
-                    >
-                      <div className={`p-2 rounded-lg ${statusColors[member.status]} bg-opacity-20`}>
-                        <member.icon className={`w-4 h-4 ${statusColors[member.status].replace('bg-', 'text-')}`} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{member.name}</p>
-                        <p className="text-xs text-gray-400 truncate">{member.currentTask || member.role}</p>
-                      </div>
-                      <span className={`w-2 h-2 rounded-full ${statusColors[member.status]}`} />
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
+          ))}
+        </div>
+      </nav>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 gap-2 mb-6">
-            <div className="bg-gray-700 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold">{stats.total}</p>
-              <p className="text-gray-400 text-xs">Total</p>
-            </div>
-            <div className="bg-gray-700 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-green-400">{stats.done}</p>
-              <p className="text-gray-400 text-xs">Done</p>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className="space-y-1">
-            {menuItems.map((item) => (
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="fixed top-14 left-0 right-0 bg-[#111] border-b border-amber-900/30 z-40 lg:hidden"
+          >
+            {menuItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => { setActiveTab(item.id as any); setIsDrawerOpen(false); }}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
-                  activeTab === item.id 
-                    ? 'bg-yellow-400/20 text-yellow-400' 
-                    : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                onClick={() => { setActiveTab(item.id); router.push('/?tab=' + item.id); setMobileMenuOpen(false); }}
+                className={`w-full px-4 py-3 text-left flex items-center gap-3 ${
+                  activeTab === item.id ? 'bg-amber-500/10 text-amber-500' : 'text-amber-700 hover:bg-amber-900/20'
                 }`}
               >
-                <span className="flex items-center gap-3">
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
-                </span>
-                {item.badge && (
-                  <span className="text-xs bg-yellow-400/20 text-yellow-400 px-2 py-0.5 rounded-full">
-                    {item.badge}
-                  </span>
-                )}
+                <item.icon className="w-4 h-4" />
+                <span className="text-sm tracking-wider">{item.label}</span>
               </button>
             ))}
-          </nav>
-        </div>
-
-        {/* Footer in drawer */}
-        <div className="p-6 border-t border-gray-700">
-          <p className="text-gray-500 text-sm text-center">{new Date().toLocaleDateString()}</p>
-        </div>
-      </aside>
-
-      {/* Overlay for mobile */}
-      {isDrawerOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
-          onClick={() => setIsDrawerOpen(false)}
-        />
-      )}
-
-      {/* Main Content - Right Side */}
-      <main className="flex-1 min-h-screen p-6 lg:p-8 pt-16 lg:pt-8">
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-yellow-400"
-            />
-          </div>
-        </div>
-
-        {/* Home Tab - Redirect to /home */}
-        {activeTab === 'home' && (
-          <div>
-            <div className="text-center py-12">
-              <h2 className="text-2xl font-bold mb-4">Mission Control Home</h2>
-              <a href="/home" className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-300 transition-colors">
-                <HomeIcon className="w-5 h-5" />
-                Enter Mission Control
-              </a>
-            </div>
-          </div>
+          </motion.div>
         )}
+      </AnimatePresence>
 
-        {/* Projects Tab */}
-        {activeTab === 'projects' && (
-          <div>
-            {/* Filter */}
-            <div className="flex gap-2 mb-4">
-              {(['all', 'in-progress', 'todo', 'done'] as const).map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setFilterStatus(status)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    filterStatus === status
-                      ? 'bg-yellow-400 text-gray-900'
-                      : 'bg-gray-800 text-gray-400 hover:text-white'
-                  }`}
-                >
-                  {status === 'all' ? 'All' : status === 'in-progress' ? 'In Progress' : status === 'todo' ? 'To Do' : 'Done'}
-                </button>
-              ))}
-            </div>
+      {/* Main Content */}
+      <main className="pt-14 min-h-screen p-4 md:p-6">
+        
+        {/* Header Stats Bar */}
+        <div className="grid grid-cols-4 gap-2 mb-6">
+          <div className="bg-[#111] border border-amber-900/30 p-3">
+            <p className="text-amber-600 text-xs tracking-wider mb-1">TOTAL</p>
+            <p className="text-2xl font-bold text-amber-400">{stats.total}</p>
+          </div>
+          <div className="bg-[#111] border border-amber-900/30 p-3">
+            <p className="text-amber-600 text-xs tracking-wider mb-1">DONE</p>
+            <p className="text-2xl font-bold text-green-500">{stats.done}</p>
+          </div>
+          <div className="bg-[#111] border border-amber-900/30 p-3">
+            <p className="text-amber-600 text-xs tracking-wider mb-1">IN PROG</p>
+            <p className="text-2xl font-bold text-blue-500">{stats.inProgress}</p>
+          </div>
+          <div className="bg-[#111] border border-amber-900/30 p-3">
+            <p className="text-amber-600 text-xs tracking-wider mb-1">TODO</p>
+            <p className="text-2xl font-bold text-amber-500">{stats.todo}</p>
+          </div>
+        </div>
 
-            {/* Task List */}
-            <div className="space-y-3">
-              {filteredTasks.map((task) => (
-                <motion.div
+        {/* Search */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-amber-700" />
+          <input
+            type="text"
+            placeholder="SEARCH..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[#111] border border-amber-900/30 pl-10 pr-4 py-2 text-amber-50 placeholder-amber-800 focus:outline-none focus:border-amber-500 text-sm tracking-wider"
+          />
+        </div>
+
+        {/* Filter Tabs */}
+        <div className="flex gap-1 mb-6">
+          {(['all', 'in-progress', 'todo', 'done'] as const).map(status => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`px-4 py-2 text-xs tracking-wider transition-colors ${
+                filterStatus === status 
+                  ? 'bg-amber-500 text-black font-bold' 
+                  : 'bg-[#111] text-amber-700 hover:text-amber-400'
+              }`}
+            >
+              {status.toUpperCase().replace('-', ' ')}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          
+          {/* HOME TAB */}
+          {activeTab === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-center py-20"
+            >
+              <Zap className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+              <h2 className="text-2xl text-amber-400 mb-2">MISSION CONTROL</h2>
+              <p className="text-amber-700 text-sm tracking-wider">SELECT A MODULE FROM NAVIGATION</p>
+            </motion.div>
+          )}
+
+          {/* PROJECTS TAB */}
+          {activeTab === 'projects' && (
+            <motion.div
+              key="projects"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              {filteredTasks.map(task => (
+                <div
                   key={task.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="bg-gray-800 rounded-lg p-4 border border-gray-700 flex items-center justify-between"
+                  className={`bg-[#111] border p-4 flex items-center justify-between ${
+                    task.status === 'done' 
+                      ? 'border-green-900/30 opacity-60' 
+                      : task.status === 'in-progress'
+                        ? 'border-blue-900/30'
+                        : 'border-amber-900/30'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     {task.status === 'done' ? (
-                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <CheckCircle className="w-5 h-5 text-green-500" />
                     ) : task.status === 'in-progress' ? (
-                      <Clock className="w-5 h-5 text-blue-400" />
+                      <Clock className="w-5 h-5 text-blue-500" />
                     ) : (
-                      <Circle className="w-5 h-5 text-gray-400" />
+                      <Circle className="w-5 h-5 text-amber-700" />
                     )}
-                    <span className={task.status === 'done' ? 'text-gray-400 line-through' : ''}>
+                    <span className={task.status === 'done' ? 'line-through text-amber-800' : ''}>
                       {task.title}
                     </span>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    task.priority === 'high' ? 'bg-red-400/20 text-red-400' :
-                    task.priority === 'medium' ? 'bg-yellow-400/20 text-yellow-400' :
-                    'bg-gray-400/20 text-gray-400'
+                  <span className={`text-xs px-2 py-1 ${
+                    task.priority === 'high' ? 'bg-red-900/30 text-red-500' :
+                    task.priority === 'medium' ? 'bg-amber-900/30 text-amber-500' :
+                    'bg-amber-900/10 text-amber-700'
                   }`}>
-                    {task.priority}
+                    {task.priority.toUpperCase()}
                   </span>
-                </motion.div>
+                </div>
               ))}
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {/* Bookmarks Tab */}
-        {activeTab === 'bookmarks' && (
-          <div>
-            <div className="space-y-3">
-              {filteredBookmarks.map((bookmark) => (
+          {/* XMAX WORK TAB */}
+          {activeTab === 'xmax-work' && (
+            <motion.div
+              key="xmax-work"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-4"
+            >
+              {/* Topics Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {trendingTopics.map(topic => (
+                  <button
+                    key={topic.id}
+                    onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)}
+                    className={`bg-[#111] border p-3 text-left transition-colors ${
+                      selectedTopic === topic.id 
+                        ? 'border-amber-500' 
+                        : 'border-amber-900/30 hover:border-amber-700'
+                    }`}
+                  >
+                    <p className="text-amber-400 text-sm font-bold">{topic.title}</p>
+                    <p className="text-amber-800 text-xs mt-1">{topic.tweets.length} READY</p>
+                  </button>
+                ))}
+              </div>
+
+              {/* Tweet Preview */}
+              <AnimatePresence>
+                {selectedTopic && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="bg-[#111] border border-amber-500 p-4"
+                  >
+                    <p className="text-amber-300 text-sm mb-3">
+                      {trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}
+                    </p>
+                    <a 
+                      href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 text-black text-sm font-bold tracking-wider hover:bg-amber-400"
+                    >
+                      <Twitter className="w-4 h-4" /> POST
+                    </a>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {/* BOOKMARKS TAB */}
+          {activeTab === 'bookmarks' && (
+            <motion.div
+              key="bookmarks"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
+              {bookmarks.map(bookmark => (
                 <a
                   key={bookmark.id}
                   href={bookmark.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-yellow-400/50 transition-colors"
+                  className="bg-[#111] border border-amber-900/30 p-4 flex items-center justify-between hover:border-amber-500 transition-colors"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-medium mb-1">{bookmark.title}</h3>
-                      <p className="text-gray-400 text-sm truncate max-w-md">{bookmark.url}</p>
-                    </div>
-                    <Bookmark className="w-5 h-5 text-yellow-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-amber-400">{bookmark.title}</p>
+                    <p className="text-amber-800 text-xs">{bookmark.url}</p>
                   </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <span className="px-2 py-1 bg-gray-700 rounded text-xs">{bookmark.category}</span>
-                    <span className="text-gray-500 text-xs">{bookmark.addedAt}</span>
-                  </div>
+                  <Bookmark className="w-5 h-5 text-amber-700" />
                 </a>
               ))}
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {/* xMax Work Tab */}
-        {activeTab === 'xmax-work' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Target className="w-6 h-6 text-yellow-400" />
-              xMax Work - X Strategy & Product Marketing
-            </h2>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-yellow-400">{xmaxWork?.stats?.tweetsGenerated || 0}</p>
-                <p className="text-gray-400 text-sm">Tweets Generated</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-green-400">{xmaxWork?.stats?.engagementRate || 0}%</p>
-                <p className="text-gray-400 text-sm">Engagement Rate</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-blue-400">{xmaxWork?.stats?.impressions || 0}</p>
-                <p className="text-gray-400 text-sm">Impressions</p>
-              </div>
-              <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
-                <p className="text-2xl font-bold text-purple-400">{xmaxWork?.stats?.postsEngaged || 0}</p>
-                <p className="text-gray-400 text-sm">Posts Engaged</p>
-              </div>
-            </div>
-
-            {/* xMax Generated Tweets */}
-            <h3 className="text-lg font-semibold mb-4">🤖 xMax Generated</h3>
-            <div className="space-y-4 mb-8">
-              {xmaxWork?.recentTweets?.map((tweet: any) => (
-                <div key={tweet.id} className="bg-gray-800 rounded-lg p-4 border border-yellow-400/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="px-2 py-1 bg-yellow-400/20 text-yellow-400 rounded text-xs">{tweet.topic}</span>
-                    <span className="text-green-400 text-xs">{tweet.status}</span>
-                  </div>
-                  <p className="text-white mb-3">{tweet.content}</p>
-                  <div className="flex items-center gap-3">
-                    <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet.content)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">Post</a>
-                    <span className="text-gray-500 text-xs">{tweet.charCount} chars</span>
-                  </div>
-                </div>
-              ))}
-              {!xmaxWork?.recentTweets?.length && (
-                <p className="text-gray-500">No tweets generated yet. xMax runs at 10:30am, 3:30pm, 6:30pm, 9:30pm IST</p>
-              )}
-            </div>
-
-            {/* Default Topics for Product Marketing */}
-            <h3 className="text-lg font-semibold mb-4">📈 Product Marketing Topics</h3>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-gray-400">Click a topic to see tweets</p>
-              <button onClick={refreshTopics} disabled={isRefreshing} className="flex items-center gap-2 px-3 py-1 bg-gray-800 rounded text-sm hover:bg-gray-700 disabled:opacity-50">
-                <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-              </button>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-              {trendingTopics.map((topic) => (
-                <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-gray-800 rounded-lg p-3 border text-left transition-all hover:border-yellow-400/50 ${selectedTopic === topic.id ? 'border-yellow-400' : 'border-gray-700'}`}>
-                  <span className="font-medium text-sm">{topic.title}</span>
-                  <span className="text-gray-500 text-xs ml-2">({topic.tweets.length} tweets)</span>
-                </button>
-              ))}
-            </div>
-
-            {/* Tweet Preview */}
-            <AnimatePresence>
-              {selectedTopic && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
-                  <div className="p-3 border-b border-gray-700 bg-yellow-400/10">
-                    <span className="font-medium text-yellow-400">{trendingTopics.find(t => t.id === selectedTopic)?.title}</span>
-                  </div>
-                  {trendingTopics.find(t => t.id === selectedTopic)?.tweets.map((tweet, idx) => (
-                    <div key={idx} className="p-4 border-b border-gray-700 last:border-0">
-                      <p className="text-sm text-gray-300 mb-3">{tweet.text}</p>
-                      <div className="flex items-center gap-3">
-                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet.text)}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
-                          <Twitter className="w-3 h-3" /> Post
-                        </a>
-                        <span className="text-gray-500 text-xs">{tweet.text.length}/280</span>
-                      </div>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        )}
-
-        {/* Products Tab */}
-        {activeTab === 'products' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Package className="w-6 h-6 text-yellow-400" />
-              My Products
-            </h2>
-
-            {/* Mdify */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6 mb-6">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="text-xl font-bold text-yellow-400">Mdify</h3>
-                  <p className="text-gray-400 text-sm">Chrome Extension</p>
-                </div>
-                <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">View</a>
-              </div>
-              <p className="text-gray-300 mb-4">One click away from turning any X Article into a clean knowledge base for your @openclaw agent.</p>
-              <div className="border-t border-gray-700 pt-4">
-                <p className="text-gray-500 text-xs mb-2">Sample Tweet:</p>
-                <div className="bg-gray-900 rounded p-3 text-sm text-gray-300 mb-3">
-                  Stop pasting bloated links. Stop fighting bot protection. Stop wasting tokens on engagement fluff. Convert the post to clean .md with #Mdify → feed it directly to your agent → done. No scraping issues. No JS rendering failures. Just structured signal your agent can actually use.
-                </div>
-                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Stop%20fighting%20bot%20protection.%20Stop%20wasting%20tokens%20on%20engagement%20fluff.%20Convert%20the%20post%20to%20clean%20.md%20with%20%23Mdify%20%E2%86%92%20feed%20it%20directly%20to%20your%20agent%20%E2%86%92%20done.%20No%20scraping%20issues.%20No%20JS%20rendering%20failures.%20Just%20structured%20signal%20your%20agent%20can%20actually%20use." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
-                  <Twitter className="w-3 h-3" /> Post Tweet
-                </a>
-              </div>
-            </div>
-
-            {/* Guardskills */}
-            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="text-xl font-bold text-yellow-400">Guardskills</h3>
-                  <p className="text-gray-400 text-sm">NPM Package</p>
-                </div>
-                <a href="https://www.npmjs.com/package/guardskills" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">View</a>
-              </div>
-              <p className="text-gray-300 mb-4">Safeguard your system environment by scanning AI skills for malicious code.</p>
-              <div className="border-t border-gray-700 pt-4">
-                <p className="text-gray-500 text-xs mb-2">Sample Tweet:</p>
-                <div className="bg-gray-900 rounded p-3 text-sm text-gray-300 mb-3">
-                  Why risk your keys and credentials for installing malicious and unknow skills. Just use @guardskills_ and safeguard your system environment. It supports scanning skills.sh, GitHub, Clawhub, and local skills. Security and Privacy - @guardskills_ 🔒 #OpenClaw #Skills #AI #OpenSource
-                </div>
-                <a href="https://twitter.com/intent/tweet?text=Why%20risk%20your%20keys%20and%20credentials%20for%20installing%20malicious%20and%20unknow%20skills.%20Just%20use%20%40guardskills_%20and%20safeguard%20your%20system%20environment.%20It%20supports%20scanning%20skills.sh%2C%20GitHub%2C%20Clawhub%2C%20and%20local%20skills.%20Security%20and%20Privacy%20-%20%40guardskills_%20%F0%9F%94%92%20%23OpenClaw%20%23Skills%20%23AI%20%23OpenSource" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500 hover:bg-blue-600 rounded text-sm">
-                  <Twitter className="w-3 h-3" /> Post Tweet
-                </a>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Software Team Tab */}
-        {activeTab === 'software-team' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Users className="w-6 h-6 text-yellow-400" />
-              Software Team
-            </h2>
-            
-            {/* Desks Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {displayTeam.slice(1).map((member) => (
+          {/* TEAM TAB */}
+          {activeTab === 'software-team' && (
+            <motion.div
+              key="team"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="grid grid-cols-2 md:grid-cols-3 gap-3"
+            >
+              {teamMembers.map(member => (
                 <div
                   key={member.id}
-                  className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden relative"
+                  className="bg-[#111] border border-amber-900/30 p-4"
                 >
-                  {/* Desk Top */}
-                  <div className="bg-gray-700 h-3 flex items-center justify-center">
-                    <div className="w-20 h-2 bg-gray-600 rounded-b-lg" />
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'done' ? 'bg-blue-500' : 'bg-amber-800'}`} />
+                    <member.icon className="w-4 h-4 text-amber-500" />
                   </div>
-                  
-                  {/* Person Area */}
-                  <div className="p-6 flex flex-col items-center">
-                    {/* Avatar */}
-                    <div className={`w-20 h-20 rounded-full ${statusColors[member.status]} bg-opacity-20 flex items-center justify-center mb-4 ring-4 ring-gray-700`}>
-                      <member.icon className={`w-10 h-10 ${statusColors[member.status].replace('bg-', 'text-')}`} />
-                    </div>
-                    
-                    {/* Name & Role */}
-                    <h3 className="font-bold text-lg">{member.name}</h3>
-                    <p className="text-gray-400 text-sm">{member.role}</p>
-                    
-                    {/* Status Indicator */}
-                    <div className="flex items-center gap-2 mt-3">
-                      <span className={`w-3 h-3 rounded-full ${statusColors[member.status]} animate-pulse`} />
-                      <span className="text-xs text-gray-400 capitalize">{member.status}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Speech Bubble */}
-                  <div className="px-4 pb-4">
-                    <div className="bg-gray-700 rounded-lg p-3 relative">
-                      {/* Bubble arrow */}
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-b-8 border-l-transparent border-r-transparent border-b-gray-700" />
-                      <p className="text-sm text-gray-300 text-center">
-                        {member.currentTask || `Ready for ${member.role.toLowerCase()} tasks`}
-                      </p>
-                    </div>
-                  </div>
+                  <p className="text-amber-400 font-bold">{member.name}</p>
+                  <p className="text-amber-800 text-xs">{member.role}</p>
                 </div>
               ))}
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
 
-        {/* Products Tab */}
-        {activeTab === 'products' && (
-          <div>
-            <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <Package className="w-6 h-6 text-yellow-400" />
-              Products
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {products.map((product) => (
-                <a
-                  key={product.id}
-                  href={product.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-yellow-400/50 transition-colors block"
-                >
-                  <div className="flex items-start justify-between mb-3">
-                    <h3 className="text-lg font-bold">{product.name}</h3>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      product.platform === 'npm' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
-                    }`}>
-                      {product.platform === 'npm' ? 'NPM' : 'Chrome'}
-                    </span>
+          {/* PRODUCTS TAB */}
+          {activeTab === 'products' && (
+            <motion.div
+              key="products"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-4"
+            >
+              <div className="bg-[#111] border border-amber-900/30 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl text-amber-400 font-bold">MDIFY</h3>
+                    <p className="text-amber-700 text-sm">Chrome Extension</p>
                   </div>
-                  <p className="text-gray-400 text-sm mb-4">{product.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-yellow-400">{product.installs}</span>
-                    <span className="text-gray-500 text-sm">installs</span>
-                  </div>
+                  <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" className="px-3 py-1 bg-amber-500 text-black text-sm font-bold">VIEW</a>
+                </div>
+                <p className="text-amber-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
+                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-amber-500 text-amber-500 text-sm hover:bg-amber-500/10">
+                  <Twitter className="w-3 h-3" /> TWEET
                 </a>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+
+              <div className="bg-[#111] border border-amber-900/30 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-xl text-amber-400 font-bold">GUARDSKILLS</h3>
+                    <p className="text-amber-700 text-sm">NPM Package</p>
+                  </div>
+                  <a href="https://www.npmjs.com/package/guardskills" target="_blank" className="px-3 py-1 bg-amber-500 text-black text-sm font-bold">VIEW</a>
+                </div>
+                <p className="text-amber-300 text-sm mb-4">Scan AI skills for malicious code before installing.</p>
+                <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-amber-500 text-amber-500 text-sm hover:bg-amber-500/10">
+                  <Twitter className="w-3 h-3" /> TWEET
+                </a>
+              </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
       </main>
+
+      {/* Grid Overlay */}
+      <div className="fixed inset-0 pointer-events-none z-0 opacity-5" style={{
+        backgroundImage: 'linear-gradient(amber 1px, transparent 1px), linear-gradient(90deg, amber 1px, transparent 1px)',
+        backgroundSize: '40px 40px'
+      }} />
     </div>
+  )
+}
+
+export default function MissionControl() {
+  return (
+    <Suspense fallback={<div className='min-h-screen bg-[#0a0a0a] text-amber-50 font-mono p-6'>LOADING...</div>}>
+      <MissionControlContent />
+    </Suspense>
   )
 }
