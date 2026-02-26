@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, Menu, Users, Package, Target, Home as HomeIcon, X } from 'lucide-react'
+import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, Menu, Users, Package, Target, Home as HomeIcon, X, MessageCircle } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
@@ -324,23 +324,86 @@ function MissionControlContent() {
 
           {/* XMAX WORK */}
           {activeTab === 'xmax-work' && (
-            <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {trendingTopics.map(topic => (
-                  <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left ${selectedTopic === topic.id ? 'border-gray-300' : 'border-gray-700/30 hover:border-gray-500'}`}>
-                    <p className="text-gray-200 text-sm font-bold">{topic.title}</p>
-                    <p className="text-gray-600 text-xs mt-1">{topic.tweets.length} READY</p>
+            <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-8">
+              {/* Section 1: X Growth Strategy */}
+              <section>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-gray-200 tracking-wider border-l-4 border-gray-300 pl-3">X GROWTH STRATEGY</h2>
+                  <button onClick={refreshTopics} disabled={isRefreshing} className="px-3 py-1 text-xs bg-[#111] border border-gray-700/30 text-gray-400 hover:text-gray-200 hover:border-gray-300 transition-colors">
+                    {isRefreshing ? 'REFRESHING...' : 'REFRESH'}
                   </button>
-                ))}
-              </div>
-              <AnimatePresence>
-                {selectedTopic && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-[#111] border border-gray-300 p-4">
-                    <p className="text-gray-300 text-sm mb-3">{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
-                    <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-black text-sm font-bold tracking-wider hover:bg-gray-200"><Twitter className="w-4 h-4" /> POST</a>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                  {trendingTopics.map(topic => (
+                    <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left transition-all ${selectedTopic === topic.id ? 'border-gray-300 bg-gray-900/50' : 'border-gray-700/30 hover:border-gray-500'}`}>
+                      <p className="text-gray-200 text-sm font-bold">{topic.title}</p>
+                      <p className="text-gray-600 text-xs mt-1">{topic.source}</p>
+                    </button>
+                  ))}
+                </div>
+                <AnimatePresence>
+                  {selectedTopic && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-[#111] border border-gray-300 p-4">
+                      <p className="text-gray-300 text-sm mb-4">{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
+                      <div className="flex gap-3">
+                        <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-black text-sm font-bold tracking-wider hover:bg-gray-200"><Twitter className="w-4 h-4" /> POST TO X</a>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </section>
+
+              {/* Section 2: Marketing */}
+              <section>
+                <h2 className="text-lg font-bold text-gray-200 tracking-wider border-l-4 border-gray-300 pl-3 mb-4">MARKETING</h2>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Mdify */}
+                  <div className="bg-[#111] border border-gray-700/30 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="text-lg text-gray-200 font-bold">MDIFY</h3>
+                        <p className="text-gray-500 text-xs">Chrome Extension</p>
+                      </div>
+                      <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-gray-300 text-black text-xs font-bold">VIEW</a>
+                    </div>
+                    <p className="text-gray-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
+                    <div className="space-y-3">
+                      <div className="border border-gray-700/30 p-3">
+                        <p className="text-gray-500 text-xs mb-2">X POST</p>
+                        <p className="text-gray-300 text-sm">"Stop pasting bloated links. Use #Mdify to convert posts to clean .md for your AI agent."</p>
+                        <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-3 py-1 border border-gray-300 text-gray-300 text-xs hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> POST</a>
+                      </div>
+                      <div className="border border-gray-700/30 p-3">
+                        <p className="text-gray-500 text-xs mb-2">REDDIT POST</p>
+                        <p className="text-gray-300 text-xs">"I've been using this Chrome extension and it's been a game changer for my AI workflows. No more messy copy-paste, just clean .md files ready for any AI agent to process."</p>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Guardskills */}
+                  <div className="bg-[#111] border border-gray-700/30 p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <h3 className="text-lg text-gray-200 font-bold">GUARDSKILLS</h3>
+                        <p className="text-gray-500 text-xs">NPM Package</p>
+                      </div>
+                      <a href="https://www.npmjs.com/package/guardskills" target="_blank" rel="noopener noreferrer" className="px-3 py-1 bg-gray-300 text-black text-xs font-bold">VIEW</a>
+                    </div>
+                    <p className="text-gray-300 text-sm mb-4">Scan AI skills for malicious code before installing.</p>
+                    <div className="space-y-3">
+                      <div className="border border-gray-700/30 p-3">
+                        <p className="text-gray-500 text-xs mb-2">X POST</p>
+                        <p className="text-gray-300 text-sm">"Stop risking your keys. Use @guardskills_ to scan AI skills for malicious code. Security matters."</p>
+                        <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 mt-2 px-3 py-1 border border-gray-300 text-gray-300 text-xs hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> POST</a>
+                      </div>
+                      <div className="border border-gray-700/30 p-3">
+                        <p className="text-gray-500 text-xs mb-2">REDDIT POST</p>
+                        <p className="text-gray-300 text-xs">"Worried about malicious AI skills? This NPM package scans AI skills for malicious code before you install them. Protect your API keys and your AI workflows."</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-gray-600 text-xs mt-4 text-center">SCHEDULE: 2 posts/day per product (rotating)</p>
+              </section>
             </motion.div>
           )}
 

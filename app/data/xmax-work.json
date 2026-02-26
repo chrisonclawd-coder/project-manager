@@ -1,0 +1,82 @@
+{
+  "xGrowthStrategy": {
+    "trendingTopics": [
+      {
+        "id": 1,
+        "title": "AI Breakthroughs 2026",
+        "source": "MIT Tech Review",
+        "tweets": [
+          { "text": "MIT's 10 Breakthrough Technologies 2026 is out. AI agents are leading the charge. 🚀 #AI #Tech", "hashtags": ["AI", "Tech", "Innovation"] }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Gartner Tech Trends",
+        "source": "Gartner",
+        "tweets": [
+          { "text": "Gartner's Top 10 Tech Trends 2026: Agentic AI is THE trend. Are you ready?", "hashtags": ["Gartner", "TechTrends"] }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "AI Voice Agents",
+        "source": "RingCentral",
+        "tweets": [
+          { "text": "AI voice agents are HERE and better than most humans at customer service. The future is now.", "hashtags": ["AI", "VoiceAgents"] }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Hyperscale AI Data Centers",
+        "source": "MIT Tech Review",
+        "tweets": [
+          { "text": "AI data centers consuming insane energy. Sustainability is the next big challenge. ⚡", "hashtags": ["AI", "DataCenters", "GreenTech"] }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Intelligent Apps",
+        "source": "Capgemini",
+        "tweets": [
+          { "text": "Every app without AI is obsolete. The intelligent app era is here. 🚀", "hashtags": ["AI", "IntelligentApps"] }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "AI Coding Trends",
+        "source": "GitHub",
+        "tweets": [
+          { "text": "AI coding isn't future - it's PRESENT. #AICoding #DevLife", "hashtags": ["AICoding", "DevLife"] }
+        ]
+      }
+    ]
+  },
+  "marketing": {
+    "products": [
+      {
+        "id": "mdify",
+        "name": "Mdify",
+        "description": "Convert any article to clean .md for AI agents",
+        "url": "https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+        "sampleTweet": "Stop pasting bloated links. Use #Mdify to convert posts to clean .md for your AI agent.",
+        "redditPost": "Mdify - Convert any article to clean Markdown for AI agents\n\nI've been using this Chrome extension and it's been a game changer for my AI workflows. No more messy copy-paste, just clean .md files ready for any AI agent to process.\n\nAnyone else using tools like this?",
+        "postsPerDay": 2,
+        "lastPosted": null
+      },
+      {
+        "id": "guardskills",
+        "name": "Guardskills",
+        "description": "Scan AI skills for malicious code before installing",
+        "url": "https://www.npmjs.com/package/guardskills",
+        "sampleTweet": "Stop risking your keys. Use @guardskills_ to scan AI skills for malicious code. Security matters.",
+        "redditPost": "Guardskills - Security scanner for AI skills\n\nWorried about malicious AI skills? This NPM package scans AI skills for malicious code before you install them. Protect your API keys and your AI workflows.\n\nHas anyone tried this yet?",
+        "postsPerDay": 2,
+        "lastPosted": null
+      }
+    ],
+    "schedule": {
+      "x": ["10:00", "18:00"],
+      "reddit": ["12:00", "20:00"]
+    }
+  }
+}
