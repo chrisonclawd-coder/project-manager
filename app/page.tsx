@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package, Target } from 'lucide-react'
+import { ChevronDown, Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, RefreshCw, Menu, X, User, Beaker, Rocket, Eye, Bot, Users, Package, Target, Home as HomeIcon } from 'lucide-react'
 
 // Viral tweets - 280 characters max
 const defaultTopics = [
@@ -192,7 +192,7 @@ const statusColors = {
 
 export default function Home() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<'projects' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('projects')
+  const [activeTab, setActiveTab] = useState<'home' | 'projects' | 'xmax-work' | 'bookmarks' | 'software-team' | 'products'>('home')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
@@ -271,6 +271,7 @@ export default function Home() {
   )
 
   const menuItems: { id: string; label: string; icon: any; badge?: string }[] = [
+    { id: 'home', label: 'Home', icon: HomeIcon },
     { id: 'projects', label: 'Projects', icon: BookOpen },
     { id: 'xmax-work', label: 'xMax Work', icon: Target },
     { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
@@ -404,6 +405,19 @@ export default function Home() {
             />
           </div>
         </div>
+
+        {/* Home Tab - Redirect to /home */}
+        {activeTab === 'home' && (
+          <div>
+            <div className="text-center py-12">
+              <h2 className="text-2xl font-bold mb-4">Mission Control Home</h2>
+              <a href="/home" className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-400 text-black rounded-lg font-medium hover:bg-yellow-300 transition-colors">
+                <HomeIcon className="w-5 h-5" />
+                Enter Mission Control
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Projects Tab */}
         {activeTab === 'projects' && (
