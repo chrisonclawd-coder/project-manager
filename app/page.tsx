@@ -76,6 +76,53 @@ function MissionControlContent() {
   const [teamData, setTeamData] = useState(teamMembers)
   const [teamDrawerOpen, setTeamDrawerOpen] = useState(false)
 
+  // Home page data
+  const verseOfTheDay = {
+    book: 'Proverbs',
+    chapter: 3,
+    verse: 5,
+    text: 'Trust in the LORD with all your heart and lean not on your own understanding.',
+    translation: 'NIV'
+  }
+
+  const wordOfTheDay = {
+    word: 'Sempervirent',
+    pronunciation: '/ˌsempərˈvīrənt/',
+    definition: 'Remaining green and lush throughout the year; evergreen. Metaphorically, enduring or permanent.',
+    example: 'The sempervirent principles of integrity guided his decisions through every season of business.'
+  }
+
+  const calendarEvents = [
+    { id: 1, title: 'xMax Session 1', time: '10:30 AM', type: 'automation' },
+    { id: 2, title: 'xMax Session 2', time: '3:30 PM', type: 'automation' },
+    { id: 3, title: 'xMax Session 3', time: '6:30 PM', type: 'automation' },
+    { id: 4, title: 'xMax Session 4', time: '9:30 PM', type: 'automation' },
+  ]
+
+  const weather = { temp: 26, high: 29, low: 21, condition: 'Mist' }
+
+  const motivationalLines = {
+    morning: 'EXECUTE THE PLAN. TRUST THE PROCESS.',
+    afternoon: 'KEEP PUSHING. THE MARKET WAITS FOR NO ONE.',
+    evening: 'REVIEW. REFINE. PREPARE FOR TOMORROW.',
+    night: 'REST WELL. TOMORROW IS ANOTHER OPPORTUNITY.'
+  }
+
+  function getGreeting() {
+    const now = new Date()
+    const hours = now.getHours()
+    
+    if (hours >= 5 && hours < 12) return { greeting: 'GOOD MORNING', motivational: motivationalLines.morning }
+    if (hours >= 12 && hours < 17) return { greeting: 'GOOD AFTERNOON', motivational: motivationalLines.afternoon }
+    return { greeting: 'GOOD EVENING', motivational: motivationalLines.evening }
+  }
+
+  function formatDate(date: Date): string {
+    const days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']
+    const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']
+    return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`
+  }
+
   useEffect(() => {
     fetch('/data/team-status.json')
       .then(res => res.json())
@@ -192,10 +239,76 @@ function MissionControlContent() {
 
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
-            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center py-20">
-              <Zap className="w-16 h-16 text-amber-500 mx-auto mb-4" />
-              <h2 className="text-2xl text-amber-400 mb-2">MISSION CONTROL</h2>
-              <p className="text-amber-700 text-sm tracking-wider">SELECT A MODULE FROM NAVIGATION</p>
+            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-3xl mx-auto">
+              {/* Greeting */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-amber-400 tracking-tight">
+                  {getGreeting().greeting} <span className="text-amber-500">CHRIS</span>
+                </h1>
+                <p className="text-amber-700 text-sm tracking-widest mt-1">{formatDate(new Date())}</p>
+                <p className="text-amber-600 text-xs mt-3 border-l-2 border-amber-500 pl-3 tracking-wider">
+                  {getGreeting().motivational}
+                </p>
+              </motion.div>
+
+              {/* Weather */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+                <h2 className="text-xs text-amber-700 tracking-widest mb-3">WEATHER - CHENNAI</h2>
+                <div className="flex items-baseline gap-4">
+                  <span className="text-4xl font-bold text-amber-400">{weather.temp}°C</span>
+                  <div className="space-y-1">
+                    <p className="text-amber-600 text-sm">H: {weather.high}° / L: {weather.low}°</p>
+                    <p className="text-amber-800 text-xs">{weather.condition}</p>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Verse */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+                <h2 className="text-xs text-amber-700 tracking-widest mb-3">VERSE OF THE DAY</h2>
+                <blockquote className="text-amber-300 text-sm leading-relaxed italic">
+                  "{verseOfTheDay.text}"
+                </blockquote>
+                <p className="text-amber-700 text-xs mt-3">
+                  {verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}
+                </p>
+              </motion.div>
+
+              {/* Calendar */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-[#111] border border-amber-900/30 p-4 mb-4">
+                <h2 className="text-xs text-amber-700 tracking-widest mb-3">TODAY'S SCHEDULE</h2>
+                <div className="space-y-2">
+                  {calendarEvents.map(event => (
+                    <div key={event.id} className="flex items-center justify-between py-2 border-b border-amber-900/20 last:border-0">
+                      <span className="text-amber-400 text-sm">{event.title}</span>
+                      <span className="text-amber-500 text-xs font-mono">{event.time}</span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Word */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-[#111] border border-amber-900/30 p-4">
+                <h2 className="text-xs text-amber-700 tracking-widest mb-3">WORD OF THE DAY</h2>
+                <div className="space-y-2">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-xl text-amber-400 font-bold">{wordOfTheDay.word}</span>
+                    <span className="text-amber-700 text-xs font-mono">{wordOfTheDay.pronunciation}</span>
+                  </div>
+                  <p className="text-amber-500 text-sm leading-relaxed">{wordOfTheDay.definition}</p>
+                  <p className="text-amber-800 text-xs italic mt-2">"{wordOfTheDay.example}"</p>
+                </div>
+              </motion.div>
+
+              {/* Enter Button */}
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="text-center mt-6">
+                <button 
+                  onClick={() => setActiveTab('projects')}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-amber-500 text-black font-bold tracking-wider hover:bg-amber-400 transition-colors"
+                >
+                  ENTER MISSION CONTROL
+                </button>
+              </motion.div>
             </motion.div>
           )}
 
