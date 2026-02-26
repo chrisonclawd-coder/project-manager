@@ -120,6 +120,9 @@ function MissionControlContent() {
     <div className="min-h-screen bg-[#0a0a0a] text-amber-50 font-mono">
       <nav className="fixed top-0 left-0 right-0 h-14 bg-[#111] border-b border-amber-900/30 z-50 flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
+          <button onClick={() => setTeamDrawerOpen(true)} className="p-1 hover:bg-amber-900/20 rounded">
+            <Menu className="w-5 h-5 text-amber-500" />
+          </button>
           <Zap className="w-5 h-5 text-amber-500" />
           <span className="text-amber-500 font-bold tracking-wider">MISSION CONTROL</span>
         </div>
@@ -281,33 +284,49 @@ function MissionControlContent() {
         </AnimatePresence>
       </main>
 
-      {/* Team Drawer */}
+      {/* Navigation Drawer */}
       {teamDrawerOpen && (
         <div className="fixed inset-0 z-50 flex">
           <div className="flex-1 bg-black/50" onClick={() => setTeamDrawerOpen(false)} />
           <div className="w-full max-w-sm bg-[#0a0a0a] border-l border-amber-900/30 p-4 overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-amber-400 font-bold">MY TEAM</p>
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-amber-400 font-bold tracking-wider">MENU</p>
               <button onClick={() => setTeamDrawerOpen(false)}><X className="w-5 h-5 text-amber-700" /></button>
             </div>
             <div className="space-y-2">
-              {teamData.map(member => (
-                <div key={member.id} className="bg-[#111] border border-amber-900/30 p-3">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500' : member.status === 'blocked' ? 'bg-red-500' : 'bg-amber-800'}`} />
-                    <span className="text-amber-400 font-bold text-sm">{member.name}</span>
-                    <span className="text-amber-700 text-xs">({member.role})</span>
-                  </div>
-                  {member.status === 'idle' || !member.currentTask ? (
-                    <p className="text-amber-600 text-xs">Idle</p>
-                  ) : (
-                    <div>
-                      <p className="text-amber-400 text-xs">{member.currentTask}</p>
-                      <p className="text-amber-600 text-xs capitalize">{member.status}</p>
-                    </div>
-                  )}
-                </div>
+              {menuItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => { router.push('/?tab=' + item.id); setTeamDrawerOpen(false); }}
+                  className={`w-full p-3 flex items-center gap-3 transition-colors ${
+                    activeTab === item.id 
+                      ? 'bg-amber-500/10 border border-amber-500' 
+                      : 'bg-[#111] border border-amber-900/30 hover:border-amber-700'
+                  }`}
+                >
+                  <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-amber-500' : 'text-amber-700'}`} />
+                  <span className={`text-sm font-bold ${activeTab === item.id ? 'text-amber-400' : 'text-amber-50'}`}>{item.label}</span>
+                </button>
               ))}
+            </div>
+            
+            {/* Team Status Section */}
+            <div className="mt-6 pt-4 border-t border-amber-900/30">
+              <p className="text-amber-700 text-xs tracking-wider mb-3">TEAM STATUS</p>
+              <div className="space-y-2">
+                {teamData.filter(m => m.status === 'working').map(member => (
+                  <div key={member.id} className="bg-[#111] border border-green-900/30 p-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 bg-green-500 animate-pulse" />
+                      <span className="text-amber-400 text-xs">{member.name}</span>
+                    </div>
+                    <p className="text-amber-600 text-xs ml-4">{member.currentTask}</p>
+                  </div>
+                ))}
+                {teamData.filter(m => m.status !== 'working').length > 0 && (
+                  <p className="text-amber-800 text-xs">{teamData.filter(m => m.status !== 'working').length} idle</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
