@@ -1,8 +1,50 @@
 {
-  "manager": { "name": "Chrisly", "status": "idle", "currentTask": "" },
-  "xmax": { "name": "xMax", "status": "working", "currentTask": "Running X Strategy - creating tweets" },
-  "developer": { "name": "Developer", "status": "idle", "currentTask": "" },
-  "qa": { "name": "QA", "status": "idle", "currentTask": "" },
-  "devops": { "name": "DevOps", "status": "idle", "currentTask": "" },
-  "tester": { "name": "Manual Test", "status": "idle", "currentTask": "" }
+  "manager": {
+    "name": "Chrisly",
+    "role": "Manager",
+    "status": "idle",
+    "currentTask": "",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "xmax": {
+    "name": "xMax",
+    "role": "X Strategy Lead",
+    "status": "working",
+    "currentTask": "Running X Strategy - creating tweets",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "developer": {
+    "name": "Developer",
+    "role": "Developer",
+    "status": "idle",
+    "currentTask": "",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "qa": {
+    "name": "QA",
+    "role": "QA Engineer",
+    "status": "idle",
+    "currentTask": "",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "devops": {
+    "name": "DevOps",
+    "role": "DevOps Engineer",
+    "status": "idle",
+    "currentTask": "",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  },
+  "tester": {
+    "name": "Manual Test",
+    "role": "Manual Tester",
+    "status": "idle",
+    "currentTask": "",
+    "blocker": "",
+    "updatedAt": "2026-02-26T00:00:00.000Z"
+  }
 }

@@ -52,10 +52,32 @@ interface TeamMember {
 }
 
 interface TeamStatusEntry {
+  name?: string
+  role?: string
   status?: string
   currentTask?: string
   blocker?: string
   updatedAt?: string
+}
+
+interface StatusApiResponse {
+  team?: Record<string, TeamStatusEntry>
+  lastUpdated?: string | null
+}
+
+interface NpmMetrics {
+  available: boolean
+  pkg: string
+  lastDay: number
+  lastWeek: number
+  fetchedAt?: string
+}
+
+interface ChromeMetrics {
+  available: boolean
+  installs?: number | null
+  note?: string
+  fetchedAt?: string
 }
 
 const teamMembers: TeamMember[] = [
@@ -72,8 +94,8 @@ const defaultTasks: Task[] = [
   { id: 2, title: 'Build Mission Control Dashboard', status: 'done', priority: 'high' },
   { id: 3, title: 'Setup X Strategy automation', status: 'done', priority: 'high' },
   { id: 4, title: 'Deploy to Vercel', status: 'done', priority: 'high' },
-  { id: 5, title: 'Mdify - Chrome Extension', status: 'done', priority: 'high' },
-  { id: 6, title: 'Guardskills - NPM Package', status: 'done', priority: 'high' },
+  { id: 5, title: 'Mdify - Chrome Extension (Completed)', status: 'done', priority: 'high' },
+  { id: 6, title: 'GuardSkills - NPM Package (Completed)', status: 'done', priority: 'high' },
 ]
 
 const defaultBookmarks: BookmarkItem[] = [
@@ -138,6 +160,9 @@ function MissionControlContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
+  const [teamLastUpdated, setTeamLastUpdated] = useState<string>('')
+  const [npmMetrics, setNpmMetrics] = useState<NpmMetrics | null>(null)
+  const [chromeMetrics, setChromeMetrics] = useState<ChromeMetrics | null>(null)
 
   const shell = darkMode
     ? {
@@ -204,19 +229,57 @@ function MissionControlContent() {
   }
 
   useEffect(() => {
-    fetch('/data/team-status.json')
-      .then(res => res.json())
-      .then((data: Record<string, TeamStatusEntry>) => {
+    const loadTeamStatus = async () => {
+      try {
+        const res = await fetch('/api/status', { cache: 'no-store' })
+        const payload = (await res.json()) as StatusApiResponse
+        const data = payload.team || {}
+
         const merged = teamMembers.map(m => ({
           ...m,
+          name: data[m.id]?.name || m.name,
+          role: data[m.id]?.role || m.role,
           status: data[m.id]?.status || m.status,
           currentTask: data[m.id]?.currentTask || m.currentTask,
-          blocker: data[m.id]?.blocker || m.blocker || '',
-          updatedAt: data[m.id]?.updatedAt || m.updatedAt || '',
+          blocker: data[m.id]?.blocker || '',
+          updatedAt: data[m.id]?.updatedAt || '',
         }))
+
         setTeamData(merged)
-      })
-      .catch(() => {})
+        setTeamLastUpdated(payload.lastUpdated || '')
+      } catch {
+        setTeamData(teamMembers)
+        setTeamLastUpdated('')
+      }
+    }
+
+    loadTeamStatus()
+    const interval = setInterval(loadTeamStatus, 10000)
+    return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const loadProductMetrics = async () => {
+      try {
+        const [npmRes, chromeRes] = await Promise.all([
+          fetch('/api/metrics/npm?pkg=guardskills', { cache: 'no-store' }),
+          fetch('/api/metrics/chrome', { cache: 'no-store' }),
+        ])
+
+        const npmData = (await npmRes.json()) as NpmMetrics
+        const chromeData = (await chromeRes.json()) as ChromeMetrics
+
+        setNpmMetrics(npmData)
+        setChromeMetrics(chromeData)
+      } catch {
+        setNpmMetrics(null)
+        setChromeMetrics(null)
+      }
+    }
+
+    loadProductMetrics()
+    const interval = setInterval(loadProductMetrics, 60000)
+    return () => clearInterval(interval)
   }, [])
 
   const menuItems = [
@@ -277,6 +340,18 @@ function MissionControlContent() {
     const parsed = new Date(value)
     if (Number.isNaN(parsed.getTime())) return value
     return parsed.toLocaleString()
+  }
+
+  const isStale = (value?: string) => {
+    if (!value) return true
+    const parsed = new Date(value)
+    if (Number.isNaN(parsed.getTime())) return true
+    return Date.now() - parsed.getTime() > 30000
+  }
+
+  const formatNumber = (value?: number) => {
+    if (typeof value !== 'number') return '--'
+    return new Intl.NumberFormat('en-US').format(value)
   }
 
   return (
@@ -634,91 +709,96 @@ function MissionControlContent() {
               <div className={`border p-4 ${shell.panel}`}>
                 <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">TEAM OPERATIONS</h2>
                 <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  LIVE DELIVERY STATUS · MEMBER · TASK · BLOCKERS · LAST UPDATE
+                  LIVE DELIVERY STATUS · MEMBER · ROLE · STATUS · TASK · BLOCKERS · LAST UPDATE
+                </p>
+                <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
+                  FEED UPDATED: {formatUpdatedTime(teamLastUpdated)}
                 </p>
               </div>
 
+              <div className={`border p-3 ${shell.panelMuted}`}>
+                <div className="hidden md:grid md:grid-cols-[1.2fr_1fr_0.8fr_1.8fr_1.3fr_1.3fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
+                  <span>Member</span>
+                  <span>Role</span>
+                  <span>Status</span>
+                  <span>Current Task</span>
+                  <span>Blocker</span>
+                  <span>Updated At</span>
+                </div>
+              </div>
+
               <div className="space-y-2">
-                {teamData.map(member => (
-                  <div key={member.id} className={`border p-4 ${shell.panel}`}>
-                    <div className="grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1.8fr_0.8fr_1.3fr_1fr] gap-3 items-start">
-                      <div>
-                        <p className="text-sm font-semibold">{member.name}</p>
-                        <p className={`text-[11px] ${shell.textSoft}`}>ID: {member.id}</p>
-                      </div>
-                      <div>
-                        <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>ROLE</p>
-                        <p className="text-sm">{member.role}</p>
-                      </div>
-                      <div>
-                        <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>CURRENT TASK</p>
-                        <p className="text-sm">{member.currentTask || 'No task assigned'}</p>
-                      </div>
-                      <div>
-                        <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>STATUS</p>
-                        <p
-                          className={`text-xs inline-flex items-center gap-2 capitalize ${
-                            member.status === 'working'
-                              ? 'text-emerald-400'
-                              : member.status === 'blocked'
-                                ? 'text-rose-400'
-                                : shell.textMuted
-                          }`}
-                        >
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              member.status === 'working' ? 'bg-emerald-500 animate-pulse' : member.status === 'blocked' ? 'bg-rose-500' : 'bg-zinc-500'
+                {teamData.map(member => {
+                  const stale = isStale(member.updatedAt)
+                  return (
+                    <div key={member.id} className={`border p-4 ${shell.panel}`}>
+                      <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_0.8fr_1.8fr_1.3fr_1.3fr] gap-3 items-start">
+                        <div>
+                          <p className="text-sm font-semibold">{member.name}</p>
+                          <p className={`text-[11px] ${shell.textSoft}`}>ID: {member.id}</p>
+                        </div>
+                        <div className="text-sm">{member.role}</div>
+                        <div>
+                          <p
+                            className={`text-xs inline-flex items-center gap-2 capitalize ${
+                              member.status === 'working' ? 'text-emerald-400' : member.status === 'blocked' ? 'text-rose-400' : shell.textMuted
                             }`}
-                          />
-                          {member.status}
-                        </p>
-                      </div>
-                      <div>
-                        <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>BLOCKER</p>
-                        <p className={`text-sm ${member.blocker ? 'text-amber-400' : shell.textMuted}`}>{member.blocker || 'None'}</p>
-                      </div>
-                      <div>
-                        <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>UPDATED</p>
-                        <p className={`text-xs ${shell.textMuted}`}>{formatUpdatedTime(member.updatedAt)}</p>
+                          >
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                member.status === 'working' ? 'bg-emerald-500 animate-pulse' : member.status === 'blocked' ? 'bg-rose-500' : 'bg-zinc-500'
+                              }`}
+                            />
+                            {member.status}
+                          </p>
+                        </div>
+                        <div className="text-sm">{member.currentTask || 'No task assigned'}</div>
+                        <div className={`text-sm ${member.blocker ? 'text-amber-400' : shell.textMuted}`}>{member.blocker || 'None'}</div>
+                        <div className="space-y-1">
+                          <p className={`text-xs ${shell.textMuted}`}>{formatUpdatedTime(member.updatedAt)}</p>
+                          {stale && <span className="inline-block text-[10px] px-2 py-0.5 border border-amber-500/40 text-amber-400">STALE</span>}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </motion.div>
           )}
 
           {activeTab === 'products' && (
             <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className={`border p-6 ${shell.panel}`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold">MDIFY</h3>
-                    <p className={`text-sm ${shell.textSoft}`}>Chrome Extension</p>
-                  </div>
-                  <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" rel="noreferrer" className="px-3 py-1 bg-zinc-200 text-black text-sm font-semibold">
-                    VIEW
-                  </a>
-                </div>
-                <p className={`text-sm mb-4 ${shell.textMuted}`}>Convert any article to clean .md for AI agents.</p>
-                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1 border border-zinc-300 text-sm hover:bg-zinc-300/10">
-                  <Twitter className="w-3 h-3" /> TWEET
-                </a>
+              <div className={`border p-4 ${shell.panel}`}>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">PRODUCT KPI SNAPSHOT</h2>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>LIVE METRICS · GUARDSKILLS (NPM) · MDIFY (CHROME)</p>
               </div>
-              <div className={`border p-6 ${shell.panel}`}>
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold">GUARDSKILLS</h3>
-                    <p className={`text-sm ${shell.textSoft}`}>NPM Package</p>
-                  </div>
-                  <a href="https://www.npmjs.com/package/guardskills" target="_blank" rel="noreferrer" className="px-3 py-1 bg-zinc-200 text-black text-sm font-semibold">
-                    VIEW
-                  </a>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · LAST DAY</p>
+                  <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.lastDay) : '--'}</p>
                 </div>
-                <p className={`text-sm mb-4 ${shell.textMuted}`}>Scan AI skills for malicious code before installing.</p>
-                <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-3 py-1 border border-zinc-300 text-sm hover:bg-zinc-300/10">
-                  <Twitter className="w-3 h-3" /> TWEET
-                </a>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · LAST WEEK</p>
+                  <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.lastWeek) : '--'}</p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>MDIFY · CHROME METRIC</p>
+                  <p className={`text-sm font-semibold mt-3 ${chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {chromeMetrics?.available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                  </p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>LAST METRICS REFRESH</p>
+                  <p className={`text-sm mt-3 ${shell.textMuted}`}>{formatUpdatedTime(npmMetrics?.fetchedAt || chromeMetrics?.fetchedAt)}</p>
+                </div>
+              </div>
+
+              <div className={`border p-4 ${shell.panelMuted}`}>
+                <p className={`text-xs ${shell.textMuted}`}>
+                  Chrome install counts are best-effort and currently {chromeMetrics?.available ? 'connected.' : 'not available from a public source/API in this environment.'}
+                </p>
+                {chromeMetrics?.note && <p className={`text-xs mt-2 ${shell.textSoft}`}>{chromeMetrics.note}</p>}
               </div>
             </motion.div>
           )}
