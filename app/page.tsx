@@ -165,12 +165,12 @@ function MissionControlContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-violet-50 font-mono">
+    <div className="min-h-screen bg-[#0a0a0a] text-gray-50 font-mono">
       {/* Sidebar - Left */}
-      <aside className={`fixed top-0 left-0 w-64 h-full bg-[#111] border-r border-violet-900/30 z-50 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        <div className="h-14 flex items-center px-4 border-b border-violet-900/30">
-          <Zap className="w-6 h-6 text-violet-500" />
-          <span className="text-violet-500 font-bold tracking-wider ml-2">MISSION</span>
+      <aside className={`fixed top-0 left-0 w-64 h-full bg-[#111] border-r border-gray-700/30 z-50 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className="h-14 flex items-center px-4 border-b border-gray-700/30">
+          <Zap className="w-6 h-6 text-gray-300" />
+          <span className="text-gray-300 font-bold tracking-wider ml-2">MISSION</span>
         </div>
         
         <div className="p-2 space-y-1">
@@ -180,26 +180,26 @@ function MissionControlContent() {
               onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
               className={`w-full p-3 flex items-center gap-3 transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-violet-500/10 border-l-2 border-violet-500' 
-                  : 'hover:bg-violet-900/20'
+                  ? 'bg-gray-300/10 border-l-2 border-gray-300' 
+                  : 'hover:bg-gray-700/20'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-violet-500' : 'text-violet-700'}`} />
-              <span className={`text-sm font-bold ${activeTab === item.id ? 'text-violet-400' : 'text-violet-50'}`}>{item.label}</span>
+              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-gray-300' : 'text-gray-500'}`} />
+              <span className={`text-sm font-bold ${activeTab === item.id ? 'text-gray-200' : 'text-gray-50'}`}>{item.label}</span>
             </button>
           ))}
         </div>
         
-        <div className="absolute bottom-0 w-full p-4 border-t border-violet-900/30">
-          <p className="text-violet-700 text-xs tracking-wider mb-2">TEAM STATUS</p>
+        <div className="absolute bottom-0 w-full p-4 border-t border-gray-700/30">
+          <p className="text-gray-500 text-xs tracking-wider mb-2">TEAM STATUS</p>
           <div className="space-y-2">
             {teamData.filter(m => m.status === 'working').map(member => (
-              <div key={member.id} className="bg-violet-900/20 p-2 rounded">
+              <div key={member.id} className="bg-gray-700/20 p-2 rounded">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full" />
-                  <span className="text-violet-400 text-xs">{member.name}</span>
+                  <span className="text-gray-200 text-xs">{member.name}</span>
                 </div>
-                <p className="text-violet-600 text-xs ml-4 truncate">{member.currentTask}</p>
+                <p className="text-gray-400 text-xs ml-4 truncate">{member.currentTask}</p>
               </div>
             ))}
           </div>
@@ -207,8 +207,8 @@ function MissionControlContent() {
       </aside>
 
       {/* Mobile menu button */}
-      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#111] rounded border border-violet-900/30">
-        {sidebarOpen ? <X className="w-5 h-5 text-violet-500" /> : <Menu className="w-5 h-5 text-violet-500" />}
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#111] rounded border border-gray-700/30">
+        {sidebarOpen ? <X className="w-5 h-5 text-gray-300" /> : <Menu className="w-5 h-5 text-gray-300" />}
       </button>
 
       {/* Overlay for mobile */}
@@ -218,33 +218,33 @@ function MissionControlContent() {
       <main className="lg:ml-64 min-h-screen p-4 md:p-6 pt-16 lg:pt-6">
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2 mb-6">
-          <div className="bg-[#111] border border-violet-900/30 p-3">
-            <p className="text-violet-600 text-xs tracking-wider mb-1">TOTAL</p>
-            <p className="text-2xl font-bold text-violet-400">{stats.total}</p>
+          <div className="bg-[#111] border border-gray-700/30 p-3">
+            <p className="text-gray-400 text-xs tracking-wider mb-1">TOTAL</p>
+            <p className="text-2xl font-bold text-gray-200">{stats.total}</p>
           </div>
-          <div className="bg-[#111] border border-violet-900/30 p-3">
-            <p className="text-violet-600 text-xs tracking-wider mb-1">DONE</p>
+          <div className="bg-[#111] border border-gray-700/30 p-3">
+            <p className="text-gray-400 text-xs tracking-wider mb-1">DONE</p>
             <p className="text-2xl font-bold text-green-500">{stats.done}</p>
           </div>
-          <div className="bg-[#111] border border-violet-900/30 p-3">
-            <p className="text-violet-600 text-xs tracking-wider mb-1">IN PROG</p>
+          <div className="bg-[#111] border border-gray-700/30 p-3">
+            <p className="text-gray-400 text-xs tracking-wider mb-1">IN PROG</p>
             <p className="text-2xl font-bold text-blue-500">{stats.inProgress}</p>
           </div>
-          <div className="bg-[#111] border border-violet-900/30 p-3">
-            <p className="text-violet-600 text-xs tracking-wider mb-1">TODO</p>
-            <p className="text-2xl font-bold text-violet-500">{stats.todo}</p>
+          <div className="bg-[#111] border border-gray-700/30 p-3">
+            <p className="text-gray-400 text-xs tracking-wider mb-1">TODO</p>
+            <p className="text-2xl font-bold text-gray-300">{stats.todo}</p>
           </div>
         </div>
 
         {/* Search */}
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-violet-700" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
           <input
             type="text"
             placeholder="SEARCH..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#111] border border-violet-900/30 pl-10 pr-4 py-2 text-violet-50 placeholder-violet-800 focus:outline-none focus:border-violet-500 text-sm tracking-wider"
+            className="w-full bg-[#111] border border-gray-700/30 pl-10 pr-4 py-2 text-gray-50 placeholder-gray-600 focus:outline-none focus:border-gray-300 text-sm tracking-wider"
           />
         </div>
 
@@ -256,8 +256,8 @@ function MissionControlContent() {
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-2 text-xs tracking-wider transition-colors ${
                 filterStatus === status 
-                  ? 'bg-violet-500 text-black font-bold' 
-                  : 'bg-[#111] text-violet-700 hover:text-violet-400'
+                  ? 'bg-gray-300 text-black font-bold' 
+                  : 'bg-[#111] text-gray-500 hover:text-gray-200'
               }`}
             >
               {status.toUpperCase().replace('-', ' ')}
@@ -270,39 +270,39 @@ function MissionControlContent() {
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-3xl mx-auto">
               <div className="mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-violet-400 tracking-tight">{getGreeting().greeting} <span className="text-violet-500">CHRIS</span></h1>
-                <p className="text-violet-700 text-sm tracking-widest mt-1">{formatDate(new Date())}</p>
-                <p className="text-violet-600 text-xs mt-3 border-l-2 border-violet-500 pl-3 tracking-wider">{getGreeting().motivational}</p>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-200 tracking-tight">{getGreeting().greeting} <span className="text-gray-300">CHRIS</span></h1>
+                <p className="text-gray-500 text-sm tracking-widest mt-1">{formatDate(new Date())}</p>
+                <p className="text-gray-400 text-xs mt-3 border-l-2 border-gray-300 pl-3 tracking-wider">{getGreeting().motivational}</p>
               </div>
 
-              <div className="bg-[#111] border border-violet-900/30 p-4 mb-4">
-                <h2 className="text-xs text-violet-700 tracking-widest mb-3">WEATHER - CHENNAI</h2>
+              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
+                <h2 className="text-xs text-gray-500 tracking-widest mb-3">WEATHER - CHENNAI</h2>
                 <div className="flex items-baseline gap-4">
-                  <span className="text-4xl font-bold text-violet-400">{weather.temp}°C</span>
-                  <div><p className="text-violet-600 text-sm">H: {weather.high}° / L: {weather.low}°</p><p className="text-violet-800 text-xs">{weather.condition}</p></div>
+                  <span className="text-4xl font-bold text-gray-200">{weather.temp}°C</span>
+                  <div><p className="text-gray-400 text-sm">H: {weather.high}° / L: {weather.low}°</p><p className="text-gray-600 text-xs">{weather.condition}</p></div>
                 </div>
               </div>
 
-              <div className="bg-[#111] border border-violet-900/30 p-4 mb-4">
-                <h2 className="text-xs text-violet-700 tracking-widest mb-3">VERSE OF THE DAY</h2>
-                <p className="text-violet-300 text-sm leading-relaxed italic">"{verseOfTheDay.text}"</p>
-                <p className="text-violet-700 text-xs mt-3">{verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}</p>
+              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
+                <h2 className="text-xs text-gray-500 tracking-widest mb-3">VERSE OF THE DAY</h2>
+                <p className="text-gray-300 text-sm leading-relaxed italic">"{verseOfTheDay.text}"</p>
+                <p className="text-gray-500 text-xs mt-3">{verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}</p>
               </div>
 
-              <div className="bg-[#111] border border-violet-900/30 p-4 mb-4">
-                <h2 className="text-xs text-violet-700 tracking-widest mb-3">TODAY'S SCHEDULE</h2>
+              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
+                <h2 className="text-xs text-gray-500 tracking-widest mb-3">TODAY'S SCHEDULE</h2>
                 {calendarEvents.map(e => (
-                  <div key={e.id} className="flex justify-between py-2 border-b border-violet-900/20 last:border-0">
-                    <span className="text-violet-400 text-sm">{e.title}</span>
-                    <span className="text-violet-500 text-xs font-mono">{e.time}</span>
+                  <div key={e.id} className="flex justify-between py-2 border-b border-gray-700/20 last:border-0">
+                    <span className="text-gray-200 text-sm">{e.title}</span>
+                    <span className="text-gray-300 text-xs font-mono">{e.time}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-[#111] border border-violet-900/30 p-4">
-                <h2 className="text-xs text-violet-700 tracking-widest mb-3">WORD OF THE DAY</h2>
-                <div className="flex items-baseline gap-3"><span className="text-xl text-violet-400 font-bold">{wordOfTheDay.word}</span><span className="text-violet-700 text-xs font-mono">{wordOfTheDay.pronunciation}</span></div>
-                <p className="text-violet-500 text-sm mt-2">{wordOfTheDay.definition}</p>
+              <div className="bg-[#111] border border-gray-700/30 p-4">
+                <h2 className="text-xs text-gray-500 tracking-widest mb-3">WORD OF THE DAY</h2>
+                <div className="flex items-baseline gap-3"><span className="text-xl text-gray-200 font-bold">{wordOfTheDay.word}</span><span className="text-gray-500 text-xs font-mono">{wordOfTheDay.pronunciation}</span></div>
+                <p className="text-gray-300 text-sm mt-2">{wordOfTheDay.definition}</p>
               </div>
             </motion.div>
           )}
@@ -311,12 +311,12 @@ function MissionControlContent() {
           {activeTab === 'projects' && (
             <motion.div key="projects" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               {filteredTasks.map(task => (
-                <div key={task.id} className={`bg-[#111] border p-4 flex items-center justify-between ${task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-violet-900/30'}`}>
+                <div key={task.id} className={`bg-[#111] border p-4 flex items-center justify-between ${task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-gray-700/30'}`}>
                   <div className="flex items-center gap-3">
-                    {task.status === 'done' ? <CheckCircle className="w-5 h-5 text-green-500" /> : task.status === 'in-progress' ? <Clock className="w-5 h-5 text-blue-500" /> : <Circle className="w-5 h-5 text-violet-700" />}
-                    <span className={task.status === 'done' ? 'line-through text-violet-800' : ''}>{task.title}</span>
+                    {task.status === 'done' ? <CheckCircle className="w-5 h-5 text-green-500" /> : task.status === 'in-progress' ? <Clock className="w-5 h-5 text-blue-500" /> : <Circle className="w-5 h-5 text-gray-500" />}
+                    <span className={task.status === 'done' ? 'line-through text-gray-600' : ''}>{task.title}</span>
                   </div>
-                  <span className={`text-xs px-2 py-1 ${task.priority === 'high' ? 'bg-red-900/30 text-red-500' : task.priority === 'medium' ? 'bg-violet-900/30 text-violet-500' : 'bg-violet-900/10 text-violet-700'}`}>{task.priority.toUpperCase()}</span>
+                  <span className={`text-xs px-2 py-1 ${task.priority === 'high' ? 'bg-red-900/30 text-red-500' : task.priority === 'medium' ? 'bg-gray-700/30 text-gray-300' : 'bg-gray-700/10 text-gray-500'}`}>{task.priority.toUpperCase()}</span>
                 </div>
               ))}
             </motion.div>
@@ -327,17 +327,17 @@ function MissionControlContent() {
             <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                 {trendingTopics.map(topic => (
-                  <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left ${selectedTopic === topic.id ? 'border-violet-500' : 'border-violet-900/30 hover:border-violet-700'}`}>
-                    <p className="text-violet-400 text-sm font-bold">{topic.title}</p>
-                    <p className="text-violet-800 text-xs mt-1">{topic.tweets.length} READY</p>
+                  <button key={topic.id} onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)} className={`bg-[#111] border p-3 text-left ${selectedTopic === topic.id ? 'border-gray-300' : 'border-gray-700/30 hover:border-gray-500'}`}>
+                    <p className="text-gray-200 text-sm font-bold">{topic.title}</p>
+                    <p className="text-gray-600 text-xs mt-1">{topic.tweets.length} READY</p>
                   </button>
                 ))}
               </div>
               <AnimatePresence>
                 {selectedTopic && (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-[#111] border border-violet-500 p-4">
-                    <p className="text-violet-300 text-sm mb-3">{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
-                    <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500 text-black text-sm font-bold tracking-wider hover:bg-violet-400"><Twitter className="w-4 h-4" /> POST</a>
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="bg-[#111] border border-gray-300 p-4">
+                    <p className="text-gray-300 text-sm mb-3">{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
+                    <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 bg-gray-300 text-black text-sm font-bold tracking-wider hover:bg-gray-200"><Twitter className="w-4 h-4" /> POST</a>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -348,9 +348,9 @@ function MissionControlContent() {
           {activeTab === 'bookmarks' && (
             <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               {bookmarks.map(b => (
-                <a key={b.id} href={b.url} target="_blank" rel="noopener noreferrer" className="bg-[#111] border border-violet-900/30 p-4 flex items-center justify-between hover:border-violet-500 transition-colors">
-                  <div><p className="text-violet-400">{b.title}</p><p className="text-violet-800 text-xs">{b.url}</p></div>
-                  <Bookmark className="w-5 h-5 text-violet-700" />
+                <a key={b.id} href={b.url} target="_blank" rel="noopener noreferrer" className="bg-[#111] border border-gray-700/30 p-4 flex items-center justify-between hover:border-gray-300 transition-colors">
+                  <div><p className="text-gray-200">{b.title}</p><p className="text-gray-600 text-xs">{b.url}</p></div>
+                  <Bookmark className="w-5 h-5 text-gray-500" />
                 </a>
               ))}
             </motion.div>
@@ -359,23 +359,23 @@ function MissionControlContent() {
           {/* TEAM */}
           {activeTab === 'software-team' && (
             <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              <p className="text-violet-700 text-xs tracking-wider mb-2">TEAM STATUS</p>
+              <p className="text-gray-500 text-xs tracking-wider mb-2">TEAM STATUS</p>
               {teamData.map(member => (
-                <div key={member.id} className="bg-[#111] border border-violet-900/30 p-3 flex items-center justify-between">
+                <div key={member.id} className="bg-[#111] border border-gray-700/30 p-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'blocked' ? 'bg-red-500' : 'bg-violet-800'}`} />
+                    <div className={`w-2 h-2 ${member.status === 'working' ? 'bg-green-500 animate-pulse' : member.status === 'blocked' ? 'bg-red-500' : 'bg-gray-600'}`} />
                     <div>
-                      <p className="text-violet-400 font-bold text-sm">{member.name}</p>
-                      <p className="text-violet-700 text-xs">{member.role}</p>
+                      <p className="text-gray-200 font-bold text-sm">{member.name}</p>
+                      <p className="text-gray-500 text-xs">{member.role}</p>
                     </div>
                   </div>
                   <div className="text-right">
                     {member.status === 'idle' || !member.currentTask ? (
-                      <span className="text-violet-600 text-xs">Idle</span>
+                      <span className="text-gray-400 text-xs">Idle</span>
                     ) : (
                       <div>
-                        <p className="text-violet-400 text-xs">{member.currentTask}</p>
-                        <p className="text-violet-600 text-xs capitalize">{member.status}</p>
+                        <p className="text-gray-200 text-xs">{member.currentTask}</p>
+                        <p className="text-gray-400 text-xs capitalize">{member.status}</p>
                       </div>
                     )}
                   </div>
@@ -387,21 +387,21 @@ function MissionControlContent() {
           {/* PRODUCTS */}
           {activeTab === 'products' && (
             <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className="bg-[#111] border border-violet-900/30 p-6">
+              <div className="bg-[#111] border border-gray-700/30 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div><h3 className="text-xl text-violet-400 font-bold">MDIFY</h3><p className="text-violet-700 text-sm">Chrome Extension</p></div>
-                  <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" className="px-3 py-1 bg-violet-500 text-black text-sm font-bold">VIEW</a>
+                  <div><h3 className="text-xl text-gray-200 font-bold">MDIFY</h3><p className="text-gray-500 text-sm">Chrome Extension</p></div>
+                  <a href="https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" target="_blank" className="px-3 py-1 bg-gray-300 text-black text-sm font-bold">VIEW</a>
                 </div>
-                <p className="text-violet-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
-                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-violet-500 text-violet-500 text-sm hover:bg-violet-500/10"><Twitter className="w-3 h-3" /> TWEET</a>
+                <p className="text-gray-300 text-sm mb-4">Convert any article to clean .md for AI agents.</p>
+                <a href="https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Use%20%23Mdify%20to%20convert%20posts%20to%20clean%20.md%20for%20your%20AI%20agent." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-gray-300 text-gray-300 text-sm hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> TWEET</a>
               </div>
-              <div className="bg-[#111] border border-violet-900/30 p-6">
+              <div className="bg-[#111] border border-gray-700/30 p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <div><h3 className="text-xl text-violet-400 font-bold">GUARDSKILLS</h3><p className="text-violet-700 text-sm">NPM Package</p></div>
-                  <a href="https://www.npmjs.com/package/guardskills" target="_blank" className="px-3 py-1 bg-violet-500 text-black text-sm font-bold">VIEW</a>
+                  <div><h3 className="text-xl text-gray-200 font-bold">GUARDSKILLS</h3><p className="text-gray-500 text-sm">NPM Package</p></div>
+                  <a href="https://www.npmjs.com/package/guardskills" target="_blank" className="px-3 py-1 bg-gray-300 text-black text-sm font-bold">VIEW</a>
                 </div>
-                <p className="text-violet-300 text-sm mb-4">Scan AI skills for malicious code before installing.</p>
-                <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-violet-500 text-violet-500 text-sm hover:bg-violet-500/10"><Twitter className="w-3 h-3" /> TWEET</a>
+                <p className="text-gray-300 text-sm mb-4">Scan AI skills for malicious code before installing.</p>
+                <a href="https://twitter.com/intent/tweet?text=Stop%20risking%20your%20keys.%20Use%20%40guardskills_%20to%20scan%20AI%20skills%20for%20malicious%20code.%20Security%20matters." target="_blank" className="inline-flex items-center gap-2 px-3 py-1 border border-gray-300 text-gray-300 text-sm hover:bg-gray-300/10"><Twitter className="w-3 h-3" /> TWEET</a>
               </div>
             </motion.div>
           )}
@@ -415,7 +415,7 @@ function MissionControlContent() {
 
 export default function MissionControl() {
   return (
-    <Suspense fallback={<div className='min-h-screen bg-[#0a0a0a] text-violet-50 font-mono p-6'>LOADING...</div>}>
+    <Suspense fallback={<div className='min-h-screen bg-[#0a0a0a] text-gray-50 font-mono p-6'>LOADING...</div>}>
       <MissionControlContent />
     </Suspense>
   )
