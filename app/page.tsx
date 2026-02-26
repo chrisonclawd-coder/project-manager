@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, Menu, Users, Package, Target, Home as HomeIcon, X, MessageCircle } from 'lucide-react'
+import { Search, BookOpen, Twitter, Bookmark, CheckCircle, Circle, Clock, Zap, Menu, Users, Package, Target, Home as HomeIcon, X, MessageCircle, Sun, Moon } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
@@ -77,6 +77,7 @@ function MissionControlContent() {
   const [trendingTopics] = useState(defaultTopics)
   const [teamData, setTeamData] = useState(teamMembers)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [darkMode, setDarkMode] = useState(true)
 
   // Home page data
   const verseOfTheDay = {
@@ -165,12 +166,49 @@ function MissionControlContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-gray-50 font-mono">
+    <div className={`min-h-screen font-mono transition-colors duration-200 ${
+      darkMode 
+        ? 'bg-[#0a0a0a] text-gray-50' 
+        : 'bg-white text-gray-900'
+    }`}>
       {/* Sidebar - Left */}
-      <aside className={`fixed top-0 left-0 w-64 h-full bg-[#111] border-r border-gray-700/30 z-50 transform transition-transform duration-200 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
-        <div className="h-14 flex items-center px-4 border-b border-gray-700/30">
-          <Zap className="w-6 h-6 text-gray-300" />
-          <span className="text-gray-300 font-bold tracking-wider ml-2">MISSION</span>
+      <aside className={`fixed top-0 left-0 w-64 h-full z-50 transform transition-colors duration-200 ${
+        darkMode 
+          ? 'bg-[#111] border-gray-700/30' 
+          : 'bg-gray-100 border-gray-200'
+      } ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+        <div className={`h-14 flex items-center justify-between px-4 border-b transition-colors duration-200 ${
+          darkMode ? 'border-gray-700/30' : 'border-gray-200'
+        }`}>
+          <div className="flex items-center">
+            <Zap className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`} />
+            <span className={`font-bold tracking-wider ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>MISSION</span>
+          </div>
+          <button 
+            onClick={() => setDarkMode(!darkMode)} 
+            className={`p-2 rounded-lg transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}
+          >
+            {darkMode ? <Sun className="w-5 h-5 text-gray-300" /> : <Moon className="w-5 h-5 text-gray-700" />}
+          </button>
+        </div>
+        
+        {/* Theme Toggle */}
+        <div className={`p-4 border-b transition-colors duration-200 ${
+          darkMode ? 'border-gray-700/30' : 'border-gray-200'
+        }`}>
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className={`w-full p-2 flex items-center justify-center gap-2 transition-colors ${
+              darkMode 
+                ? 'bg-gray-700/30 text-yellow-400 hover:bg-gray-700/50' 
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            <span className="text-xs font-bold tracking-wider">
+              {darkMode ? 'LIGHT MODE' : 'DARK MODE'}
+            </span>
+          </button>
         </div>
         
         <div className="p-2 space-y-1">
@@ -180,26 +218,28 @@ function MissionControlContent() {
               onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
               className={`w-full p-3 flex items-center gap-3 transition-colors ${
                 activeTab === item.id 
-                  ? 'bg-gray-300/10 border-l-2 border-gray-300' 
-                  : 'hover:bg-gray-700/20'
+                  ? darkMode ? 'bg-gray-300/10 border-l-2 border-gray-300' : 'bg-gray-800/10 border-l-2 border-gray-800' 
+                  : darkMode ? 'hover:bg-gray-700/20' : 'hover:bg-gray-200'
               }`}
             >
-              <item.icon className={`w-5 h-5 ${activeTab === item.id ? 'text-gray-300' : 'text-gray-500'}`} />
-              <span className={`text-sm font-bold ${activeTab === item.id ? 'text-gray-200' : 'text-gray-50'}`}>{item.label}</span>
+              <item.icon className={`w-5 h-5 ${activeTab === item.id ? (darkMode ? 'text-gray-300' : 'text-gray-800') : (darkMode ? 'text-gray-500' : 'text-gray-400')}`} />
+              <span className={`text-sm font-bold ${activeTab === item.id ? (darkMode ? 'text-gray-200' : 'text-gray-800') : (darkMode ? 'text-gray-50' : 'text-gray-700')}`}>{item.label}</span>
             </button>
           ))}
         </div>
         
-        <div className="absolute bottom-0 w-full p-4 border-t border-gray-700/30">
-          <p className="text-gray-500 text-xs tracking-wider mb-2">TEAM STATUS</p>
+        <div className={`absolute bottom-0 w-full p-4 border-t transition-colors duration-200 ${
+          darkMode ? 'border-gray-700/30' : 'border-gray-200'
+        }`}>
+          <p className={`text-xs tracking-wider mb-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>TEAM STATUS</p>
           <div className="space-y-2">
             {teamData.filter(m => m.status === 'working').map(member => (
-              <div key={member.id} className="bg-gray-700/20 p-2 rounded">
+              <div key={member.id} className={darkMode ? 'bg-gray-700/20 p-2 rounded' : 'bg-gray-200 p-2 rounded'}>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full" />
-                  <span className="text-gray-200 text-xs">{member.name}</span>
+                  <span className={darkMode ? 'text-gray-200 text-xs' : 'text-gray-800 text-xs'}>{member.name}</span>
                 </div>
-                <p className="text-gray-400 text-xs ml-4 truncate">{member.currentTask}</p>
+                <p className={`text-xs ml-4 truncate ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{member.currentTask}</p>
               </div>
             ))}
           </div>
@@ -207,8 +247,10 @@ function MissionControlContent() {
       </aside>
 
       {/* Mobile menu button */}
-      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[#111] rounded border border-gray-700/30">
-        {sidebarOpen ? <X className="w-5 h-5 text-gray-300" /> : <Menu className="w-5 h-5 text-gray-300" />}
+      <button onClick={() => setSidebarOpen(!sidebarOpen)} className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded border transition-colors duration-200 ${
+        darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-100 border-gray-200'
+      }`}>
+        {sidebarOpen ? <X className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-800'}`} /> : <Menu className={`w-5 h-5 ${darkMode ? 'text-gray-300' : 'text-gray-800'}`} />}
       </button>
 
       {/* Overlay for mobile */}
@@ -218,33 +260,45 @@ function MissionControlContent() {
       <main className="lg:ml-64 min-h-screen p-4 md:p-6 pt-16 lg:pt-6">
         {/* Stats */}
         <div className="grid grid-cols-4 gap-2 mb-6">
-          <div className="bg-[#111] border border-gray-700/30 p-3">
-            <p className="text-gray-400 text-xs tracking-wider mb-1">TOTAL</p>
-            <p className="text-2xl font-bold text-gray-200">{stats.total}</p>
+          <div className={`border p-3 transition-colors duration-200 ${
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+          }`}>
+            <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TOTAL</p>
+            <p className={`text-2xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{stats.total}</p>
           </div>
-          <div className="bg-[#111] border border-gray-700/30 p-3">
-            <p className="text-gray-400 text-xs tracking-wider mb-1">DONE</p>
-            <p className="text-2xl font-bold text-green-500">{stats.done}</p>
+          <div className={`border p-3 transition-colors duration-200 ${
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+          }`}>
+            <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>DONE</p>
+            <p className={`text-2xl font-bold ${darkMode ? 'text-green-500' : 'text-green-600'}`}>{stats.done}</p>
           </div>
-          <div className="bg-[#111] border border-gray-700/30 p-3">
-            <p className="text-gray-400 text-xs tracking-wider mb-1">IN PROG</p>
-            <p className="text-2xl font-bold text-blue-500">{stats.inProgress}</p>
+          <div className={`border p-3 transition-colors duration-200 ${
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+          }`}>
+            <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>IN PROG</p>
+            <p className={`text-2xl font-bold ${darkMode ? 'text-blue-500' : 'text-blue-600'}`}>{stats.inProgress}</p>
           </div>
-          <div className="bg-[#111] border border-gray-700/30 p-3">
-            <p className="text-gray-400 text-xs tracking-wider mb-1">TODO</p>
-            <p className="text-2xl font-bold text-gray-300">{stats.todo}</p>
+          <div className={`border p-3 transition-colors duration-200 ${
+            darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+          }`}>
+            <p className={`text-xs tracking-wider mb-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>TODO</p>
+            <p className={`text-2xl font-bold ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{stats.todo}</p>
           </div>
         </div>
 
         {/* Search */}
         <div className="relative mb-6">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
           <input
             type="text"
             placeholder="SEARCH..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#111] border border-gray-700/30 pl-10 pr-4 py-2 text-gray-50 placeholder-gray-600 focus:outline-none focus:border-gray-300 text-sm tracking-wider"
+            className={`w-full border pl-10 pr-4 py-2 transition-colors duration-200 placeholder-gray-600 focus:outline-none text-sm tracking-wider ${
+              darkMode 
+                ? 'bg-[#111] border-gray-700/30 text-gray-50' 
+                : 'bg-gray-50 border-gray-200 text-gray-900'
+            }`}
           />
         </div>
 
@@ -256,8 +310,10 @@ function MissionControlContent() {
               onClick={() => setFilterStatus(status)}
               className={`px-4 py-2 text-xs tracking-wider transition-colors ${
                 filterStatus === status 
-                  ? 'bg-gray-300 text-black font-bold' 
-                  : 'bg-[#111] text-gray-500 hover:text-gray-200'
+                  ? darkMode ? 'bg-gray-300 text-black font-bold' : 'bg-gray-800 text-white font-bold'
+                  : darkMode 
+                    ? 'bg-[#111] text-gray-500 hover:text-gray-200' 
+                    : 'bg-gray-50 text-gray-500 hover:text-gray-800'
               }`}
             >
               {status.toUpperCase().replace('-', ' ')}
@@ -270,39 +326,47 @@ function MissionControlContent() {
           {activeTab === 'home' && (
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-3xl mx-auto">
               <div className="mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-200 tracking-tight">{getGreeting().greeting} <span className="text-gray-300">CHRIS</span></h1>
-                <p className="text-gray-500 text-sm tracking-widest mt-1">{formatDate(new Date())}</p>
-                <p className="text-gray-400 text-xs mt-3 border-l-2 border-gray-300 pl-3 tracking-wider">{getGreeting().motivational}</p>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{getGreeting().greeting} <span className={darkMode ? 'text-gray-300' : 'text-gray-700'}>CHRIS</span></h1>
+                <p className={`text-sm tracking-widest mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{formatDate(new Date())}</p>
+                <p className={`text-xs mt-3 border-l-2 pl-3 tracking-wider ${darkMode ? 'text-gray-400 border-gray-300' : 'text-gray-600 border-gray-600'}`}>{getGreeting().motivational}</p>
               </div>
 
-              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
-                <h2 className="text-xs text-gray-500 tracking-widest mb-3">WEATHER - CHENNAI</h2>
+              <div className={`border p-4 mb-4 transition-colors duration-200 ${
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>WEATHER - CHENNAI</h2>
                 <div className="flex items-baseline gap-4">
-                  <span className="text-4xl font-bold text-gray-200">{weather.temp}°C</span>
-                  <div><p className="text-gray-400 text-sm">H: {weather.high}° / L: {weather.low}°</p><p className="text-gray-600 text-xs">{weather.condition}</p></div>
+                  <span className={`text-4xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{weather.temp}°C</span>
+                  <div><p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>H: {weather.high}° / L: {weather.low}°</p><p className={`text-xs ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>{weather.condition}</p></div>
                 </div>
               </div>
 
-              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
-                <h2 className="text-xs text-gray-500 tracking-widest mb-3">VERSE OF THE DAY</h2>
-                <p className="text-gray-300 text-sm leading-relaxed italic">"{verseOfTheDay.text}"</p>
-                <p className="text-gray-500 text-xs mt-3">{verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}</p>
+              <div className={`border p-4 mb-4 transition-colors duration-200 ${
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>VERSE OF THE DAY</h2>
+                <p className={`text-sm leading-relaxed italic ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>"{verseOfTheDay.text}"</p>
+                <p className={`text-xs mt-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}</p>
               </div>
 
-              <div className="bg-[#111] border border-gray-700/30 p-4 mb-4">
-                <h2 className="text-xs text-gray-500 tracking-widest mb-3">TODAY'S SCHEDULE</h2>
+              <div className={`border p-4 mb-4 transition-colors duration-200 ${
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>TODAY'S SCHEDULE</h2>
                 {calendarEvents.map(e => (
-                  <div key={e.id} className="flex justify-between py-2 border-b border-gray-700/20 last:border-0">
-                    <span className="text-gray-200 text-sm">{e.title}</span>
-                    <span className="text-gray-300 text-xs font-mono">{e.time}</span>
+                  <div key={e.id} className={`flex justify-between py-2 ${darkMode ? 'border-gray-700/20' : 'border-gray-200'} last:border-0 border-b`}>
+                    <span className={`text-sm ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{e.title}</span>
+                    <span className={`text-xs font-mono ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{e.time}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="bg-[#111] border border-gray-700/30 p-4">
-                <h2 className="text-xs text-gray-500 tracking-widest mb-3">WORD OF THE DAY</h2>
-                <div className="flex items-baseline gap-3"><span className="text-xl text-gray-200 font-bold">{wordOfTheDay.word}</span><span className="text-gray-500 text-xs font-mono">{wordOfTheDay.pronunciation}</span></div>
-                <p className="text-gray-300 text-sm mt-2">{wordOfTheDay.definition}</p>
+              <div className={`border p-4 transition-colors duration-200 ${
+                darkMode ? 'bg-[#111] border-gray-700/30' : 'bg-gray-50 border-gray-200'
+              }`}>
+                <h2 className={`text-xs tracking-widest mb-3 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>WORD OF THE DAY</h2>
+                <div className="flex items-baseline gap-3"><span className={`text-xl font-bold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{wordOfTheDay.word}</span><span className={`text-xs font-mono ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>{wordOfTheDay.pronunciation}</span></div>
+                <p className={`text-sm mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>{wordOfTheDay.definition}</p>
               </div>
             </motion.div>
           )}
@@ -311,12 +375,22 @@ function MissionControlContent() {
           {activeTab === 'projects' && (
             <motion.div key="projects" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
               {filteredTasks.map(task => (
-                <div key={task.id} className={`bg-[#111] border p-4 flex items-center justify-between ${task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-gray-700/30'}`}>
+                <div key={task.id} className={`border p-4 flex items-center justify-between transition-colors duration-200 ${
+                  darkMode 
+                    ? task.status === 'done' ? 'border-green-900/30 opacity-60' : task.status === 'in-progress' ? 'border-blue-900/30' : 'border-gray-700/30'
+                    : task.status === 'done' ? 'border-green-200 opacity-60' : task.status === 'in-progress' ? 'border-blue-200' : 'border-gray-200'
+                } ${darkMode ? 'bg-[#111]' : 'bg-gray-50'}`}>
                   <div className="flex items-center gap-3">
-                    {task.status === 'done' ? <CheckCircle className="w-5 h-5 text-green-500" /> : task.status === 'in-progress' ? <Clock className="w-5 h-5 text-blue-500" /> : <Circle className="w-5 h-5 text-gray-500" />}
-                    <span className={task.status === 'done' ? 'line-through text-gray-600' : ''}>{task.title}</span>
+                    {task.status === 'done' ? <CheckCircle className={`w-5 h-5 ${darkMode ? 'text-green-500' : 'text-green-600'}`} /> : task.status === 'in-progress' ? <Clock className={`w-5 h-5 ${darkMode ? 'text-blue-500' : 'text-blue-600'}`} /> : <Circle className={`w-5 h-5 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />}
+                    <span className={task.status === 'done' ? (darkMode ? 'line-through text-gray-600' : 'line-through text-gray-400') : (darkMode ? 'text-gray-200' : 'text-gray-800')}>{task.title}</span>
                   </div>
-                  <span className={`text-xs px-2 py-1 ${task.priority === 'high' ? 'bg-red-900/30 text-red-500' : task.priority === 'medium' ? 'bg-gray-700/30 text-gray-300' : 'bg-gray-700/10 text-gray-500'}`}>{task.priority.toUpperCase()}</span>
+                  <span className={`text-xs px-2 py-1 ${
+                    task.priority === 'high' 
+                      ? darkMode ? 'bg-red-900/30 text-red-500' : 'bg-red-100 text-red-600'
+                      : task.priority === 'medium'
+                        ? darkMode ? 'bg-gray-700/30 text-gray-300' : 'bg-gray-200 text-gray-600'
+                        : darkMode ? 'bg-gray-700/10 text-gray-500' : 'bg-gray-100 text-gray-400'
+                  }`}>{task.priority.toUpperCase()}</span>
                 </div>
               ))}
             </motion.div>
