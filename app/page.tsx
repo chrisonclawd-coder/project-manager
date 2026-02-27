@@ -20,6 +20,12 @@ import {
   Sun,
   Moon,
   Copy,
+  TrendingUp,
+  BarChart3,
+  Plus,
+  Trash2,
+  RefreshCw,
+  AlertCircle,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
@@ -200,6 +206,25 @@ function MissionControlContent() {
   const [researchLoading, setResearchLoading] = useState(false)
   const [researchError, setResearchError] = useState('')
 
+  // Trading Center state
+  const [tradingTicker, setTradingTicker] = useState('')
+  const [stockData, setStockData] = useState<any>(null)
+  const [optionsData, setOptionsData] = useState<any>(null)
+  const [selectedExpiration, setSelectedExpiration] = useState<string | null>(null)
+  const [watchlist, setWatchlist] = useState<string[]>([])
+  const [journalEntries, setJournalEntries] = useState<any[]>([])
+  const [newEntry, setNewEntry] = useState({
+    date: new Date().toISOString().split('T')[0],
+    stock: '',
+    action: 'BUY',
+    entryPrice: '',
+    exitPrice: '',
+    quantity: '',
+    notes: '',
+  })
+  const [loadingStock, setLoadingStock] = useState(false)
+  const [loadingOptions, setLoadingOptions] = useState(false)
+
   const shell = darkMode
     ? {
         page: 'bg-[#090909] text-zinc-100',
@@ -364,6 +389,7 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
+    { id: 'trading-center', label: 'TRADING CENTER', icon: TrendingUp },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
     { id: 'software-team', label: 'TEAM', icon: Users },
@@ -512,6 +538,195 @@ function MissionControlContent() {
     if (typeof value !== 'number') return '--'
     return new Intl.NumberFormat('en-US').format(value)
   }
+
+  // Technical indicator calculations
+  const calculateRSI = (prices: number[], period: number = 14): number | null => {
+    if (prices.length < period + 1) return null
+
+    let gains = 0
+    let losses = 0
+
+    // Calculate initial average gain and loss
+    for (let i = prices.length - period; i < prices.length; i++) {
+      const change = prices[i] - prices[i - 1]
+      if (change >= 0) {
+        gains += change
+      } else {
+        losses += Math.abs(change)
+      }
+    }
+
+    const avgGain = gains / period
+    const avgLoss = losses / period
+
+    if (avgLoss === 0) return 100
+
+    const rs = avgGain / avgLoss
+    const rsi = 100 - (100 / (1 + rs))
+
+    return Math.round(rsi * 100) / 100
+  }
+
+  const calculateSMA = (prices: number[], period: number): number | null => {
+    if (prices.length < period) return null
+    const sum = prices.slice(-period).reduce((a, b) => a + b, 0)
+    return Math.round((sum / period) * 100) / 100
+  }
+
+  const calculateMACD = (prices: number[]): { macd: number; signal: number; histogram: number } | null => {
+    if (prices.length < 26) return null
+
+    const ema = (data: number[], period: number) => {
+      const k = 2 / (period + 1)
+      let emaArray = [data[0]]
+      for (let i = 1; i < data.length; i++) {
+        emaArray.push(data[i] * k + emaArray[i - 1] * (1 - k))
+      }
+      return emaArray
+    }
+
+    const ema12 = ema(prices, 12)
+    const ema26 = ema(prices, 26)
+    const macdLine = ema12.slice(-ema26.length).map((v, i) => v - ema26[i])
+    const signalLine = ema(macdLine, 9)
+    const histogram = macdLine.slice(-signalLine.length).map((v, i) => v - signalLine[i])
+
+    const macd = macdLine[macdLine.length - 1]
+    const signal = signalLine[signalLine.length - 1]
+    const hist = histogram[histogram.length - 1]
+
+    return {
+      macd: Math.round(macd * 10000) / 10000,
+      signal: Math.round(signal * 10000) / 10000,
+      histogram: Math.round(hist * 10000) / 10000,
+    }
+  }
+
+  // Trading utility functions
+  const calculatePandL = (entry: any) => {
+    if (!entry.exitPrice) return { profit: 0, percent: 0 }
+
+    const quantity = entry.quantity
+    const profit =
+      entry.action === 'BUY' || entry.action === 'COVER'
+        ? (entry.exitPrice - entry.entryPrice) * quantity
+        : (entry.entryPrice - entry.exitPrice) * quantity
+
+    const costBasis = entry.entryPrice * quantity
+    const percent = (profit / costBasis) * 100
+
+    return {
+      profit: Math.round(profit * 100) / 100,
+      percent: Math.round(percent * 100) / 100,
+    }
+  }
+
+  const loadWatchlist = async () => {
+    try {
+      const res = await fetch('/data/watchlist.json', { cache: 'no-store' })
+      if (res.ok) {
+        const data = await res.json()
+        setWatchlist(Array.isArray(data) ? data : [])
+      }
+    } catch (error) {
+      setWatchlist(['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA'])
+    }
+  }
+
+  const loadJournal = async () => {
+    try {
+      const res = await fetch('/api/trading/journal', { cache: 'no-store' })
+      if (res.ok) {
+        const data = await res.json()
+        setJournalEntries(data)
+      }
+    } catch (error) {
+      setJournalEntries([])
+    }
+  }
+
+  const fetchStockQuote = async (ticker: string) => {
+    setLoadingStock(true)
+    try {
+      const res = await fetch(`/api/stock/quote?ticker=${ticker}`, { cache: 'no-store' })
+      const data = await res.json()
+
+      if (res.ok) {
+        setStockData(data)
+      } else {
+        alert(data.error || 'Failed to fetch stock quote')
+      }
+    } catch (error) {
+      alert('Failed to fetch stock quote')
+    } finally {
+      setLoadingStock(false)
+    }
+  }
+
+  const fetchOptions = async (ticker: string) => {
+    setLoadingOptions(true)
+    try {
+      const res = await fetch(`/api/stock/options?ticker=${ticker}`, { cache: 'no-store' })
+      const data = await res.json()
+
+      if (res.ok) {
+        setOptionsData(data)
+        setSelectedExpiration(data.expirations[0] || null)
+      } else {
+        alert(data.error || 'Failed to fetch options data')
+      }
+    } catch (error) {
+      alert('Failed to fetch options data')
+    } finally {
+      setLoadingOptions(false)
+    }
+  }
+
+  const saveJournalEntry = async () => {
+    if (!newEntry.stock || !newEntry.entryPrice || !newEntry.quantity) {
+      alert('Please fill in all required fields')
+      return
+    }
+
+    try {
+      const res = await fetch('/api/trading/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newEntry),
+      })
+
+      if (res.ok) {
+        setNewEntry({
+          date: new Date().toISOString().split('T')[0],
+          stock: '',
+          action: 'BUY',
+          entryPrice: '',
+          exitPrice: '',
+          quantity: '',
+          notes: '',
+        })
+        await loadJournal()
+      } else {
+        const data = await res.json()
+        alert(data.error || 'Failed to save journal entry')
+      }
+    } catch (error) {
+      alert('Failed to save journal entry')
+    }
+  }
+
+  const deleteJournalEntry = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this entry?')) return
+
+    // This would need to be implemented server-side
+    alert('Delete functionality needs server-side implementation')
+  }
+
+  // Initialize trading data
+  useEffect(() => {
+    loadWatchlist()
+    loadJournal()
+  }, [])
 
   const utcDayIndex = Math.floor(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 86400000)
   const verseOfTheDay = verseRotation[utcDayIndex % verseRotation.length]
@@ -1140,6 +1355,592 @@ function MissionControlContent() {
                   <Bookmark className={`w-5 h-5 ${shell.textSoft}`} />
                 </a>
               ))}
+            </motion.div>
+          )}
+
+          {activeTab === 'trading-center' && (
+            <motion.div key="trading-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              {/* Stock Quote Board */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">STOCK QUOTE BOARD</h2>
+                </div>
+
+                <div className={`border p-4 ${shell.panel}`}>
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      placeholder="Enter ticker (e.g., AAPL)"
+                      value={tradingTicker}
+                      onChange={(e) => setTradingTicker(e.target.value.toUpperCase())}
+                      className="flex-1 px-3 py-2 border bg-transparent text-sm focus:outline-none focus:border-zinc-500"
+                      onKeyPress={(e) => e.key === 'Enter' && fetchStockQuote(tradingTicker)}
+                    />
+                    <button
+                      onClick={() => fetchStockQuote(tradingTicker)}
+                      disabled={loadingStock || !tradingTicker}
+                      className="px-4 py-2 border text-xs tracking-wider hover:bg-zinc-800/40 disabled:opacity-50"
+                    >
+                      {loadingStock ? 'LOADING...' : 'FETCH'}
+                    </button>
+                  </div>
+
+                  {/* Watchlist */}
+                  <div className="mb-4">
+                    <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>WATCHLIST</p>
+                    <div className="flex flex-wrap gap-2">
+                      {watchlist.map(ticker => (
+                        <button
+                          key={ticker}
+                          onClick={() => {
+                            setTradingTicker(ticker)
+                            fetchStockQuote(ticker)
+                          }}
+                          className={`px-3 py-1.5 border text-xs tracking-wider hover:border-zinc-500 transition-colors ${
+                            tradingTicker === ticker ? 'border-zinc-300 bg-zinc-800/40' : ''
+                          }`}
+                        >
+                          {ticker}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Stock Data Display */}
+                  {stockData && (
+                    <div className={`border p-4 ${shell.panelMuted}`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="text-2xl font-semibold">{stockData.symbol}</p>
+                          <p className={`text-xs ${shell.textSoft}`}>Last updated: {new Date().toLocaleTimeString()}</p>
+                        </div>
+                        <button
+                          onClick={() => fetchStockQuote(stockData.symbol)}
+                          className="p-2 border hover:bg-zinc-800/40"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                        <div>
+                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>PRICE</p>
+                          <p className="text-xl font-semibold">${stockData.price.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>CHANGE</p>
+                          <p className={`text-xl font-semibold ${stockData.change >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {stockData.change >= 0 ? '+' : ''}{stockData.change.toFixed(2)} ({stockData.changePercent.toFixed(2)}%)
+                          </p>
+                        </div>
+                        <div>
+                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>VOLUME</p>
+                          <p className="text-xl font-semibold">{formatNumber(stockData.volume)}</p>
+                        </div>
+                        <div>
+                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>MARKET CAP</p>
+                          <p className="text-xl font-semibold">{stockData.marketCap ? stockData.marketCap : '--'}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2 text-sm">
+                        <div>
+                          <p className={shell.textSoft}>Open:</p>
+                          <p className="text-zinc-200">${stockData.open.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className={shell.textSoft}>High:</p>
+                          <p className="text-zinc-200">${stockData.high.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className={shell.textSoft}>Low:</p>
+                          <p className="text-zinc-200">${stockData.low.toFixed(2)}</p>
+                        </div>
+                        <div>
+                          <p className={shell.textSoft}>Prev Close:</p>
+                          <p className="text-zinc-200">${stockData.previousClose.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              {/* Options Chain Viewer */}
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">OPTIONS CHAIN</h2>
+
+                {stockData && (
+                  <div className={`border p-4 ${shell.panel}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <p className={`text-sm ${shell.textSoft}`}>
+                        Options for <span className="text-zinc-200">{stockData.symbol}</span>
+                      </p>
+                      <button
+                        onClick={() => fetchOptions(stockData.symbol)}
+                        disabled={loadingOptions}
+                        className="px-3 py-1.5 border text-xs tracking-wider hover:bg-zinc-800/40 disabled:opacity-50"
+                      >
+                        {loadingOptions ? 'LOADING...' : 'FETCH OPTIONS'}
+                      </button>
+                    </div>
+
+                    {optionsData && optionsData.expirations.length > 0 && (
+                      <div className="mb-4">
+                        <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>EXPIRATION DATE</p>
+                        <div className="flex flex-wrap gap-2">
+                          {optionsData.expirations.map((exp: string) => (
+                            <button
+                              key={exp}
+                              onClick={() => setSelectedExpiration(exp)}
+                              className={`px-3 py-1.5 border text-xs tracking-wider hover:border-zinc-500 transition-colors ${
+                                selectedExpiration === exp ? 'border-zinc-300 bg-zinc-800/40' : ''
+                              }`}
+                            >
+                              {exp}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {optionsData && selectedExpiration && (
+                      <div className="space-y-4">
+                        {/* Calls */}
+                        <div>
+                          <p className={`text-xs tracking-[0.16em] mb-2 text-emerald-400`}>CALLS</p>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                              <thead>
+                                <tr className={`border-b ${shell.textSoft}`}>
+                                  <th className="px-2 py-2 text-left">STRIKE</th>
+                                  <th className="px-2 py-2 text-left">LAST</th>
+                                  <th className="px-2 py-2 text-left">BID</th>
+                                  <th className="px-2 py-2 text-left">ASK</th>
+                                  <th className="px-2 py-2 text-left">IV</th>
+                                  <th className="px-2 py-2 text-left">VOL</th>
+                                  <th className="px-2 py-2 text-left">OI</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {optionsData.calls
+                                  .filter((c: any) => c.expiration === selectedExpiration)
+                                  .slice(0, 10)
+                                  .map((call: any, idx: number) => (
+                                    <tr key={`call-${idx}`} className={`border-b ${shell.panelMuted}`}>
+                                      <td className="px-2 py-2">${call.strike.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{call.lastPrice.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{call.bid.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{call.ask.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{call.iv ? call.iv.toFixed(2) + '%' : '--'}</td>
+                                      <td className="px-2 py-2">{formatNumber(call.volume)}</td>
+                                      <td className="px-2 py-2">{formatNumber(call.openInterest)}</td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        {/* Puts */}
+                        <div>
+                          <p className={`text-xs tracking-[0.16em] mb-2 text-rose-400`}>PUTS</p>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-xs">
+                              <thead>
+                                <tr className={`border-b ${shell.textSoft}`}>
+                                  <th className="px-2 py-2 text-left">STRIKE</th>
+                                  <th className="px-2 py-2 text-left">LAST</th>
+                                  <th className="px-2 py-2 text-left">BID</th>
+                                  <th className="px-2 py-2 text-left">ASK</th>
+                                  <th className="px-2 py-2 text-left">IV</th>
+                                  <th className="px-2 py-2 text-left">VOL</th>
+                                  <th className="px-2 py-2 text-left">OI</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {optionsData.puts
+                                  .filter((p: any) => p.expiration === selectedExpiration)
+                                  .slice(0, 10)
+                                  .map((put: any, idx: number) => (
+                                    <tr key={`put-${idx}`} className={`border-b ${shell.panelMuted}`}>
+                                      <td className="px-2 py-2">${put.strike.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{put.lastPrice.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{put.bid.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{put.ask.toFixed(2)}</td>
+                                      <td className="px-2 py-2">{put.iv ? put.iv.toFixed(2) + '%' : '--'}</td>
+                                      <td className="px-2 py-2">{formatNumber(put.volume)}</td>
+                                      <td className="px-2 py-2">{formatNumber(put.openInterest)}</td>
+                                    </tr>
+                                  ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {optionsData && optionsData.expirations.length === 0 && (
+                      <p className={`text-sm ${shell.textMuted}`}>No options data available for this symbol.</p>
+                    )}
+
+                    {!optionsData && (
+                      <p className={`text-sm ${shell.textMuted}`}>Click "FETCH OPTIONS" to view the options chain.</p>
+                    )}
+                  </div>
+                )}
+
+                {!stockData && (
+                  <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote first to view options.</p>
+                )}
+              </section>
+
+              {/* Trading Journal */}
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">TRADING JOURNAL</h2>
+
+                <div className={`border p-4 ${shell.panel}`}>
+                  <h3 className="text-sm font-semibold mb-4">ADD NEW ENTRY</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>DATE</label>
+                      <input
+                        type="date"
+                        value={newEntry.date}
+                        onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>STOCK</label>
+                      <input
+                        type="text"
+                        placeholder="AAPL"
+                        value={newEntry.stock}
+                        onChange={(e) => setNewEntry({ ...newEntry, stock: e.target.value.toUpperCase() })}
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>ACTION</label>
+                      <select
+                        value={newEntry.action}
+                        onChange={(e) => setNewEntry({ ...newEntry, action: e.target.value })}
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      >
+                        <option value="BUY">BUY</option>
+                        <option value="SELL">SELL</option>
+                        <option value="SHORT">SHORT</option>
+                        <option value="COVER">COVER</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>ENTRY PRICE</label>
+                      <input
+                        type="number"
+                        placeholder="150.00"
+                        value={newEntry.entryPrice}
+                        onChange={(e) => setNewEntry({ ...newEntry, entryPrice: e.target.value })}
+                        step="0.01"
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>EXIT PRICE (Optional)</label>
+                      <input
+                        type="number"
+                        placeholder="160.00"
+                        value={newEntry.exitPrice}
+                        onChange={(e) => setNewEntry({ ...newEntry, exitPrice: e.target.value })}
+                        step="0.01"
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>QUANTITY</label>
+                      <input
+                        type="number"
+                        placeholder="100"
+                        value={newEntry.quantity}
+                        onChange={(e) => setNewEntry({ ...newEntry, quantity: e.target.value })}
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                    <div className="md:col-span-2 lg:col-span-3">
+                      <label className={`block text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>NOTES</label>
+                      <textarea
+                        placeholder="Trade notes, strategy, reasoning..."
+                        value={newEntry.notes}
+                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
+                        rows={3}
+                        className="w-full px-3 py-2 border bg-transparent text-sm focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    onClick={saveJournalEntry}
+                    className="px-4 py-2 bg-zinc-200 text-black text-xs tracking-wider font-semibold hover:bg-zinc-300"
+                  >
+                    SAVE ENTRY
+                  </button>
+                </div>
+
+                {/* Journal Entries List */}
+                {journalEntries.length > 0 && (
+                  <div className={`border p-4 ${shell.panel}`}>
+                    <h3 className="text-sm font-semibold mb-4">JOURNAL ENTRIES</h3>
+                    <div className="space-y-3">
+                      {journalEntries.map((entry) => {
+                        const pnl = calculatePandL(entry)
+                        return (
+                          <div key={entry.id} className={`border p-3 ${shell.panelMuted}`}>
+                            <div className="flex items-start justify-between mb-2">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <p className="text-sm font-semibold">{entry.stock}</p>
+                                  <span
+                                    className={`text-[10px] px-2 py-0.5 border ${
+                                      entry.action === 'BUY' || entry.action === 'COVER'
+                                        ? 'border-emerald-500/30 text-emerald-400'
+                                        : 'border-rose-500/30 text-rose-400'
+                                    }`}
+                                  >
+                                    {entry.action}
+                                  </span>
+                                </div>
+                                <p className={`text-xs ${shell.textMuted}`}>{entry.date}</p>
+                              </div>
+                              <div className="text-right">
+                                {entry.exitPrice ? (
+                                  <div>
+                                    <p className={`text-sm font-semibold ${pnl.profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                      {pnl.profit >= 0 ? '+' : ''}${pnl.profit.toFixed(2)}
+                                    </p>
+                                    <p className={`text-[10px] ${pnl.profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                      ({pnl.percent >= 0 ? '+' : ''}{pnl.percent.toFixed(2)}%)
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <p className={`text-xs ${shell.textMuted}`}>OPEN</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 text-xs mb-2">
+                              <div>
+                                <p className={shell.textSoft}>Entry:</p>
+                                <p className="text-zinc-200">${entry.entryPrice.toFixed(2)}</p>
+                              </div>
+                              <div>
+                                <p className={shell.textSoft}>Exit:</p>
+                                <p className="text-zinc-200">{entry.exitPrice ? '$' + entry.exitPrice.toFixed(2) : '--'}</p>
+                              </div>
+                              <div>
+                                <p className={shell.textSoft}>Qty:</p>
+                                <p className="text-zinc-200">{entry.quantity}</p>
+                              </div>
+                            </div>
+                            {entry.notes && (
+                              <p className={`text-xs mt-2 italic ${shell.textMuted}`}>"{entry.notes}"</p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {journalEntries.length === 0 && (
+                  <p className={`text-sm ${shell.textMuted}`}>No journal entries yet. Add your first trade above.</p>
+                )}
+              </section>
+
+              {/* Portfolio Tracker */}
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">PORTFOLIO TRACKER</h2>
+
+                {journalEntries.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Total P&L */}
+                    <div className={`border p-4 ${shell.panel}`}>
+                      <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>TOTAL P&L</p>
+                      <p className={`text-3xl font-semibold`}>
+                        {journalEntries
+                          .filter(e => e.exitPrice)
+                          .reduce((total, entry) => total + calculatePandL(entry).profit, 0) >= 0
+                          ? '+'
+                          : ''}
+                        {journalEntries
+                          .filter(e => e.exitPrice)
+                          .reduce((total, entry) => total + calculatePandL(entry).profit, 0)
+                          .toFixed(2)}
+                      </p>
+                    </div>
+
+                    {/* Open Positions */}
+                    <div className={`border p-4 ${shell.panel}`}>
+                      <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>OPEN POSITIONS</p>
+                      <p className="text-3xl font-semibold">
+                        {journalEntries.filter(e => !e.exitPrice).length}
+                      </p>
+                    </div>
+
+                    {/* Closed Trades */}
+                    <div className={`border p-4 ${shell.panel}`}>
+                      <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>CLOSED TRADES</p>
+                      <p className="text-3xl font-semibold">
+                        {journalEntries.filter(e => e.exitPrice).length}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Exposure by Stock */}
+                {journalEntries.filter(e => !e.exitPrice).length > 0 && (
+                  <div className={`border p-4 ${shell.panel}`}>
+                    <h3 className="text-sm font-semibold mb-4">EXPOSURE BY STOCK</h3>
+                    <div className="space-y-2">
+                      {Array.from(
+                        new Set(
+                          journalEntries
+                            .filter(e => !e.exitPrice)
+                            .map(e => e.stock)
+                        )
+                      ).map(stock => {
+                        const positions = journalEntries.filter(e => !e.exitPrice && e.stock === stock)
+                        const exposure = positions.reduce(
+                          (total, pos) => total + pos.entryPrice * pos.quantity,
+                          0
+                        )
+                        return (
+                          <div key={stock} className={`border p-3 ${shell.panelMuted}`}>
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-sm font-semibold">{stock}</p>
+                                <p className={`text-xs ${shell.textMuted}`}>{positions.length} position(s)</p>
+                              </div>
+                              <p className="text-sm font-semibold">${exposure.toFixed(2)}</p>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {journalEntries.filter(e => !e.exitPrice).length === 0 && (
+                  <p className={`text-sm ${shell.textMuted}`}>No open positions.</p>
+                )}
+              </section>
+
+              {/* Technical Indicators */}
+              <section className="space-y-4">
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">TECHNICAL INDICATORS</h2>
+
+                {stockData && (
+                  <div className={`border p-4 ${shell.panel}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Moving Averages */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <BarChart3 className="w-4 h-4" />
+                          MOVING AVERAGES
+                        </h3>
+                        <div className="space-y-2">
+                          <div className={`border p-3 ${shell.panelMuted}`}>
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>SMA 20</p>
+                            <p className="text-lg font-semibold">
+                              {calculateSMA([stockData.price], 20) ? calculateSMA([stockData.price], 20)!.toFixed(2) : 'N/A (Need more data)'}
+                            </p>
+                          </div>
+                          <div className={`border p-3 ${shell.panelMuted}`}>
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>SMA 50</p>
+                            <p className="text-lg font-semibold">
+                              {calculateSMA([stockData.price], 50) ? calculateSMA([stockData.price], 50)!.toFixed(2) : 'N/A (Need more data)'}
+                            </p>
+                          </div>
+                          <div className={`border p-3 ${shell.panelMuted}`}>
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>SMA 200</p>
+                            <p className="text-lg font-semibold">
+                              {calculateSMA([stockData.price], 200) ? calculateSMA([stockData.price], 200)!.toFixed(2) : 'N/A (Need more data)'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* RSI and MACD */}
+                      <div>
+                        <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
+                          <TrendingUp className="w-4 h-4" />
+                          MOMENTUM INDICATORS
+                        </h3>
+                        <div className="space-y-2">
+                          <div className={`border p-3 ${shell.panelMuted}`}>
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>RSI (14)</p>
+                            <p className="text-lg font-semibold">
+                              {calculateRSI([stockData.price, stockData.previousClose]) ? calculateRSI([stockData.price, stockData.previousClose])!.toFixed(2) : 'N/A (Need more data)'}
+                            </p>
+                            {calculateRSI([stockData.price, stockData.previousClose]) && (
+                              <p className={`text-xs mt-1 ${
+                                calculateRSI([stockData.price, stockData.previousClose])! > 70
+                                  ? 'text-rose-400'
+                                  : calculateRSI([stockData.price, stockData.previousClose])! < 30
+                                    ? 'text-emerald-400'
+                                    : shell.textMuted
+                              }`}>
+                                {calculateRSI([stockData.price, stockData.previousClose])! > 70 ? 'Overbought' : calculateRSI([stockData.price, stockData.previousClose])! < 30 ? 'Oversold' : 'Neutral'}
+                              </p>
+                            )}
+                          </div>
+                          <div className={`border p-3 ${shell.panelMuted}`}>
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>MACD</p>
+                            <div className="space-y-1">
+                              <p className="text-xs">
+                                <span className={shell.textSoft}>MACD:</span>{' '}
+                                <span className="text-zinc-200">
+                                  {calculateMACD([stockData.price, stockData.previousClose]) ? calculateMACD([stockData.price, stockData.previousClose])!.macd.toFixed(4) : 'N/A'}
+                                </span>
+                              </p>
+                              <p className="text-xs">
+                                <span className={shell.textSoft}>Signal:</span>{' '}
+                                <span className="text-zinc-200">
+                                  {calculateMACD([stockData.price, stockData.previousClose]) ? calculateMACD([stockData.price, stockData.previousClose])!.signal.toFixed(4) : 'N/A'}
+                                </span>
+                              </p>
+                              <p className="text-xs">
+                                <span className={shell.textSoft}>Hist:</span>{' '}
+                                <span className={`${
+                                  calculateMACD([stockData.price, stockData.previousClose])
+                                    ? calculateMACD([stockData.price, stockData.previousClose])!.histogram >= 0
+                                      ? 'text-emerald-400'
+                                      : 'text-rose-400'
+                                    : shell.textMuted
+                                }`}>
+                                  {calculateMACD([stockData.price, stockData.previousClose])
+                                    ? (calculateMACD([stockData.price, stockData.previousClose])!.histogram >= 0 ? '+' : '') +
+                                        calculateMACD([stockData.price, stockData.previousClose])!.histogram.toFixed(4)
+                                    : 'N/A'}
+                                </span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={`mt-4 p-3 border ${shell.panelMuted}`}>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>NOTE</p>
+                      <p className={`text-xs ${shell.textMuted}`}>
+                        Technical indicators require historical price data. This section shows placeholder calculations based on current and previous close price. 
+                        For accurate indicators, integrate with a historical price API (e.g., TwelveData time series endpoint).
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {!stockData && (
+                  <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote to view technical indicators.</p>
+                )}
+              </section>
             </motion.div>
           )}
 
