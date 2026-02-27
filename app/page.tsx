@@ -219,28 +219,71 @@ function MissionControlContent() {
       }
 
   // Home page data
-  const verseOfTheDay = {
-    book: 'Proverbs',
-    chapter: 3,
-    verse: 5,
-    text: 'Trust in the LORD with all your heart and lean not on your own understanding.',
-    translation: 'NIV',
-  }
-
-  const wordOfTheDay = {
-    word: 'Sempervirent',
-    pronunciation: '/ˌsempərˈvīrənt/',
-    definition: 'Remaining green and lush throughout the year; evergreen.',
-  }
-
-  const calendarEvents = [
-    { id: 1, title: 'xMax Session 1', time: '10:30 AM', type: 'automation' },
-    { id: 2, title: 'xMax Session 2', time: '3:30 PM', type: 'automation' },
-    { id: 3, title: 'xMax Session 3', time: '6:30 PM', type: 'automation' },
-    { id: 4, title: 'xMax Session 4', time: '9:30 PM', type: 'automation' },
+  const verseRotation = [
+    {
+      book: 'Proverbs',
+      chapter: 3,
+      verse: 5,
+      text: 'Trust in the LORD with all your heart and lean not on your own understanding.',
+      translation: 'NIV',
+    },
+    {
+      book: 'Micah',
+      chapter: 6,
+      verse: 8,
+      text: 'Act justly and to love mercy and to walk humbly with your God.',
+      translation: 'NIV',
+    },
+    {
+      book: 'Psalm',
+      chapter: 90,
+      verse: 12,
+      text: 'Teach us to number our days, that we may gain a heart of wisdom.',
+      translation: 'NIV',
+    },
+    {
+      book: 'Isaiah',
+      chapter: 41,
+      verse: 10,
+      text: 'Do not fear, for I am with you; do not be dismayed, for I am your God.',
+      translation: 'NIV',
+    },
+    {
+      book: 'Philippians',
+      chapter: 4,
+      verse: 13,
+      text: 'I can do all things through Christ who strengthens me.',
+      translation: 'NKJV',
+    },
   ]
 
-  const weather = { temp: 26, high: 29, low: 21, condition: 'Mist' }
+  const wordRotation = [
+    {
+      word: 'Sempervirent',
+      pronunciation: '/ˌsempərˈvīrənt/',
+      definition: 'Remaining green and lush throughout the year; evergreen.',
+    },
+    {
+      word: 'Perspicacious',
+      pronunciation: '/ˌpərspɪˈkeɪʃəs/',
+      definition: 'Having a ready insight into and understanding of things.',
+    },
+    {
+      word: 'Tenacious',
+      pronunciation: '/təˈneɪʃəs/',
+      definition: 'Tending to keep a firm hold of something; persistent and determined.',
+    },
+    {
+      word: 'Aplomb',
+      pronunciation: '/əˈplɑːm/',
+      definition: 'Self-confidence or assurance, especially in demanding situations.',
+    },
+    {
+      word: 'Veracity',
+      pronunciation: '/vəˈræsɪti/',
+      definition: 'Conformity to facts; accuracy and truthfulness.',
+    },
+  ]
 
   const motivationalLines = {
     morning: 'EXECUTE THE PLAN. TRUST THE PROCESS.',
@@ -457,6 +500,37 @@ function MissionControlContent() {
     return new Intl.NumberFormat('en-US').format(value)
   }
 
+  const utcDayIndex = Math.floor(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 86400000)
+  const verseOfTheDay = verseRotation[utcDayIndex % verseRotation.length]
+  const wordOfTheDay = wordRotation[utcDayIndex % wordRotation.length]
+
+  const topPriorities = tasks.filter(task => task.status !== 'done').slice(0, 3)
+  const blockedWorkers = teamData.filter(member => member.status === 'blocked' || Boolean(member.blocker)).length
+  const workingMembers = teamData.filter(member => member.status === 'working')
+  const activeRole = workingMembers[0]?.role || 'No active role'
+  const teamFeedStale = isStale(teamLastUpdated)
+
+  const xmaxLastRunCandidates = [
+    ...(xmaxWork?.topics?.map(topic => topic.lastWorked).filter(Boolean) || []),
+    ...(xmaxWork?.recentTweets
+      ?.map(tweet => (typeof tweet === 'string' ? undefined : tweet.createdAt))
+      .filter(Boolean) || []),
+  ] as string[]
+
+  const xmaxLastRun = xmaxLastRunCandidates
+    .map(value => new Date(value))
+    .filter(date => !Number.isNaN(date.getTime()))
+    .sort((a, b) => b.getTime() - a.getTime())[0]
+
+  const xmaxReady = researchAvailable && !researchError && blockedWorkers === 0
+  const alerts = [
+    !researchAvailable && (researchReason.toUpperCase().includes('TAVILY') || researchReason.toUpperCase().includes('KEY'))
+      ? 'TAVILY_API_KEY missing. Research feed unavailable.'
+      : null,
+    teamFeedStale ? 'Team feed is stale (>30s).' : null,
+    blockedWorkers > 0 ? `${blockedWorkers} worker${blockedWorkers > 1 ? 's' : ''} blocked.` : null,
+  ].filter(Boolean) as string[]
+
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
       <aside
@@ -537,44 +611,110 @@ function MissionControlContent() {
                 </p>
               </div>
 
-              <div className={`border p-5 ${shell.panel}`}>
-                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>WEATHER · CHENNAI</h2>
-                <div className="flex items-baseline gap-4">
-                  <span className="text-4xl font-semibold">{weather.temp}°C</span>
-                  <div>
-                    <p className={`text-sm ${shell.textMuted}`}>
-                      H: {weather.high}° / L: {weather.low}°
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>TOP PRIORITIES</h2>
+                  {topPriorities.length > 0 ? (
+                    <div className="space-y-2">
+                      {topPriorities.map((task, idx) => (
+                        <div key={task.id} className={`border p-3 ${shell.panelMuted}`}>
+                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>P{idx + 1} · {task.priority.toUpperCase()}</p>
+                          <p className="text-sm mt-1">{task.title}</p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className={`text-sm ${shell.textMuted}`}>No active priorities. All tracked tasks are complete.</p>
+                  )}
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>XMAX OPS SNAPSHOT</h2>
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <span className={shell.textSoft}>Last Run:</span>{' '}
+                      <span className={shell.textMuted}>{xmaxLastRun ? formatUpdatedTimeIST(xmaxLastRun.toISOString()) : 'Not reported'}</span>
                     </p>
-                    <p className={`text-xs ${shell.textSoft}`}>{weather.condition}</p>
+                    <p>
+                      <span className={shell.textSoft}>Next Runs (IST):</span>{' '}
+                      <span className={shell.textMuted}>10:30 AM · 3:30 PM · 6:30 PM · 9:30 PM</span>
+                    </p>
+                    <p>
+                      <span className={shell.textSoft}>Ops State:</span>{' '}
+                      <span className={xmaxReady ? 'text-emerald-400' : 'text-amber-400'}>{xmaxReady ? 'READY' : 'BLOCKED'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>PIPELINE LIVE SNAPSHOT</h2>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className={`border p-3 ${shell.panelMuted}`}>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>ACTIVE ROLE</p>
+                      <p className="text-sm mt-1">{activeRole}</p>
+                    </div>
+                    <div className={`border p-3 ${shell.panelMuted}`}>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL WORKING</p>
+                      <p className="text-sm mt-1">{workingMembers.length}</p>
+                    </div>
+                    <div className={`border p-3 ${shell.panelMuted}`}>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>BLOCKERS</p>
+                      <p className={`text-sm mt-1 ${blockedWorkers > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>{blockedWorkers}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>PRODUCT METRICS SNAPSHOT</h2>
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <span className={shell.textSoft}>GuardSkills Last Day:</span>{' '}
+                      <span className={shell.textMuted}>{npmMetrics?.available ? formatNumber(npmMetrics.lastDay) : '--'}</span>
+                    </p>
+                    <p>
+                      <span className={shell.textSoft}>GuardSkills Last Week:</span>{' '}
+                      <span className={shell.textMuted}>{npmMetrics?.available ? formatNumber(npmMetrics.lastWeek) : '--'}</span>
+                    </p>
+                    <p>
+                      <span className={shell.textSoft}>Chrome Metric:</span>{' '}
+                      <span className={chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}>
+                        {chromeMetrics?.available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                      </span>
+                    </p>
                   </div>
                 </div>
               </div>
 
               <div className={`border p-5 ${shell.panel}`}>
-                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>VERSE OF THE DAY</h2>
-                <p className="text-sm leading-relaxed italic text-zinc-300">"{verseOfTheDay.text}"</p>
-                <p className={`text-xs mt-3 ${shell.textSoft}`}>
-                  {verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}
-                </p>
-              </div>
-
-              <div className={`border p-5 ${shell.panel}`}>
-                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>TODAY'S SCHEDULE</h2>
-                {calendarEvents.map(e => (
-                  <div key={e.id} className={`flex justify-between py-2 border-b last:border-0 ${darkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
-                    <span className="text-sm">{e.title}</span>
-                    <span className={`text-xs ${shell.textMuted}`}>{e.time}</span>
+                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>ALERTS</h2>
+                {alerts.length > 0 ? (
+                  <div className="space-y-2">
+                    {alerts.map(alert => (
+                      <p key={alert} className="text-sm text-amber-400">• {alert}</p>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  <p className={`text-sm text-emerald-400`}>No critical alerts. Systems nominal.</p>
+                )}
               </div>
 
-              <div className={`border p-5 ${shell.panel}`}>
-                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>WORD OF THE DAY</h2>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-xl font-semibold">{wordOfTheDay.word}</span>
-                  <span className={`text-xs ${shell.textSoft}`}>{wordOfTheDay.pronunciation}</span>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>VERSE OF THE DAY</h2>
+                  <p className="text-sm leading-relaxed italic text-zinc-300">"{verseOfTheDay.text}"</p>
+                  <p className={`text-xs mt-3 ${shell.textSoft}`}>
+                    {verseOfTheDay.book} {verseOfTheDay.chapter}:{verseOfTheDay.verse} — {verseOfTheDay.translation}
+                  </p>
                 </div>
-                <p className={`text-sm mt-2 ${shell.textMuted}`}>{wordOfTheDay.definition}</p>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>WORD OF THE DAY</h2>
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-xl font-semibold">{wordOfTheDay.word}</span>
+                    <span className={`text-xs ${shell.textSoft}`}>{wordOfTheDay.pronunciation}</span>
+                  </div>
+                  <p className={`text-sm mt-2 ${shell.textMuted}`}>{wordOfTheDay.definition}</p>
+                </div>
               </div>
             </motion.div>
           )}
