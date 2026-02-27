@@ -29,3 +29,18 @@ The XMAX WORK tab includes a **Research Feed** panel that pulls fresh Tavily res
 - 3pm IST - Engage + Post
 - 6pm IST - Engage + Post
 - 9pm IST - Engage + Growth Insights
+
+## Team Live Status Helper
+
+Use this helper to drive real-time software pipeline statuses in Mission Control:
+
+```bash
+# Set single member status
+node scripts/update-status.js developer working "Implementing feature"
+
+# Move pipeline stage (auto-sets developer/qa/devops/tester)
+node scripts/update-status.js --stage developer "Implementing fix"
+node scripts/update-status.js --stage qa "Running validation"
+node scripts/update-status.js --stage devops "Deploying to production"
+node scripts/update-status.js --stage tester "Manual verification"
+```
