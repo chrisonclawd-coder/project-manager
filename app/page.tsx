@@ -95,6 +95,19 @@ interface ResearchResponse {
   results: ResearchItem[]
 }
 
+
+interface XmaxRecentTweet {
+  text?: string
+  type?: string
+  product?: string
+  createdAt?: string
+}
+
+interface XmaxWorkData {
+  topics?: Array<{ id?: number; name?: string; source?: string; lastWorked?: string }>
+  recentTweets?: Array<XmaxRecentTweet | string>
+}
+
 const teamMembers: TeamMember[] = [
   { id: 'manager', name: 'Chrisly', role: 'Manager', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
   { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', status: 'working', currentTask: 'Running X Strategy - creating tweets', blocker: '', updatedAt: '' },
@@ -171,6 +184,7 @@ function MissionControlContent() {
   const [tasks] = useState<Task[]>(defaultTasks)
   const [bookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
   const [trendingTopics] = useState(defaultTopics)
+  const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
   const [teamData, setTeamData] = useState(teamMembers)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
@@ -322,6 +336,18 @@ function MissionControlContent() {
     todo: tasks.filter(t => t.status === 'todo').length,
   }
 
+
+  const loadXmaxWork = useCallback(async () => {
+    try {
+      const res = await fetch('/api/xmax', { cache: 'no-store' })
+      if (!res.ok) return
+      const payload = (await res.json()) as XmaxWorkData
+      setXmaxWork(payload)
+    } catch {
+      // ignore silently; UI will show fallback data
+    }
+  }, [])
+
   const loadResearchFeed = useCallback(async () => {
     setResearchLoading(true)
     setResearchError('')
@@ -345,11 +371,12 @@ function MissionControlContent() {
 
   useEffect(() => {
     loadResearchFeed()
-  }, [loadResearchFeed])
+    loadXmaxWork()
+  }, [loadResearchFeed, loadXmaxWork])
 
   const refreshTopics = async () => {
     setIsRefreshing(true)
-    await loadResearchFeed()
+    await Promise.all([loadResearchFeed(), loadXmaxWork()])
     setTimeout(() => setIsRefreshing(false), 500)
   }
 
@@ -671,6 +698,37 @@ function MissionControlContent() {
                     </div>
                   )}
                 </div>
+
+
+                <div className={`border p-4 ${shell.panelMuted}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold tracking-[0.12em]">LATEST XMAX OUTPUTS</h3>
+                    <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>FROM /api/xmax</span>
+                  </div>
+
+                  {(!xmaxWork?.recentTweets || xmaxWork.recentTweets.length === 0) && (
+                    <p className={`text-xs ${shell.textMuted}`}>No recent tweets found in xMax data yet. Run xMax or refresh.</p>
+                  )}
+
+                  {xmaxWork?.recentTweets && xmaxWork.recentTweets.length > 0 && (
+                    <div className="space-y-2">
+                      {xmaxWork.recentTweets.slice(0, 6).map((tweet, idx) => {
+                        const text = typeof tweet === 'string' ? tweet : (tweet.text || '')
+                        const label = typeof tweet === 'string' ? 'POST' : (tweet.type || tweet.product || 'POST')
+                        return (
+                          <div key={`${idx}-${text.slice(0,20)}`} className={`border p-3 ${shell.panel}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>{label.toUpperCase()}</p>
+                              <p className={`text-[10px] ${shell.textSoft}`}>{text.length} chars</p>
+                            </div>
+                            <p className={`text-sm ${shell.textMuted}`}>{text || 'No text available'}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+
 
                 <AnimatePresence>
                   {selectedTopic && (
