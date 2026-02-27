@@ -1,6 +1,13 @@
 {
   "bookmarks": [
     {
+      "title": "Project Manager Latest Commit",
+      "url": "https://github.com/chrisonclawd-coder/project-manager/commit/8ef206f",
+      "category": "Checkpoint",
+      "description": "Auto-reset pipeline status feature - checkpoint commit",
+      "notes": "Commit: 8ef206f - Add --complete auto-reset command for pipeline completion"
+    },
+    {
       "title": "OpenClaw 50 Days Workflows",
       "url": "https://gist.github.com/velvet-shark/b4c6724c391f612c4de4e9a07b0a74b6",
       "category": "Learning",
