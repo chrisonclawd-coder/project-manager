@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const statusFile = path.join(__dirname, '..', 'data', 'team-status.json');
-const PIPELINE_MEMBERS = ['developer', 'qa', 'devops', 'tester'];
+const PIPELINE_MEMBERS = ['developer', 'qa', 'devops', 'tester', 'xmax'];
 
 function readData() {
   return JSON.parse(fs.readFileSync(statusFile, 'utf-8'));
@@ -71,16 +71,47 @@ function setPipelineStage(stage, task = '') {
   console.log(`Pipeline stage set: ${stage} | task="${task}"`);
 }
 
+function autoReset(task = '') {
+  const data = readData();
+
+  // Reset all pipeline members to idle
+  for (const member of PIPELINE_MEMBERS) {
+    if (!data[member]) continue;
+    data[member].status = 'idle';
+    data[member].currentTask = '';
+    data[member].blocker = '';
+    touchMember(data, member);
+  }
+
+  // Reset manager to idle with generic message
+  if (data.manager) {
+    data.manager.status = 'idle';
+    data.manager.currentTask = task || 'Pipeline completed';
+    data.manager.blocker = '';
+    touchMember(data, 'manager');
+  }
+
+  writeData(data);
+  console.log(`Pipeline auto-reset complete. ${task ? `Reason: "${task}"` : ''}`);
+}
+
 // CLI:
 // 1) node update-status.js <member> <status> [task] [--blocker "text"]
-// 2) node update-status.js --stage <developer|qa|devops|tester> [task]
+// 2) node update-status.js --stage <developer|qa|devops|tester|xmax> [task]
+// 3) node update-status.js --complete [reason]
 const args = process.argv.slice(2);
+
+if (args[0] === '--complete') {
+  const reason = args.slice(1).join(' ').trim();
+  autoReset(reason);
+  process.exit(0);
+}
 
 if (args[0] === '--stage') {
   const stage = args[1];
   const task = args.slice(2).join(' ').trim();
   if (!stage) {
-    console.error('Usage: node update-status.js --stage <developer|qa|devops|tester> [task]');
+    console.error('Usage: node update-status.js --stage <developer|qa|devops|tester|xmax> [task]');
     process.exit(1);
   }
   setPipelineStage(stage, task);
@@ -99,7 +130,8 @@ const task = taskParts.join(' ').trim();
 
 if (!member || !status) {
   console.error('Usage: node update-status.js <member> <status> [task] [--blocker "text"]');
-  console.error('   or: node update-status.js --stage <developer|qa|devops|tester> [task]');
+  console.error('   or: node update-status.js --stage <developer|qa|devops|tester|xmax> [task]');
+  console.error('   or: node update-status.js --complete [reason]');
   process.exit(1);
 }
 
