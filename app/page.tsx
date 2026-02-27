@@ -415,6 +415,36 @@ function MissionControlContent() {
     return parsed.toLocaleString()
   }
 
+  const formatUpdatedTimeIST = (value?: string) => {
+    if (!value) return 'Not reported'
+    const parsed = new Date(value)
+    if (Number.isNaN(parsed.getTime())) return value
+
+    const formatted = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true,
+    }).format(parsed)
+
+    return `${formatted} IST`
+  }
+
+  const getResearchUnavailableMessage = () => {
+    const fallback = researchReason || 'Research feed is currently unavailable.'
+    const reasonUpper = (researchReason || '').toUpperCase()
+
+    if (reasonUpper.includes('TAVILY') && reasonUpper.includes('KEY')) {
+      return `${fallback} Set TAVILY_API_KEY in VPS env and restart PM2 with --update-env`
+    }
+
+    return fallback
+  }
+
   const isStale = (value?: string) => {
     if (!value) return true
     const parsed = new Date(value)
@@ -673,7 +703,7 @@ function MissionControlContent() {
                   {!researchLoading && researchError && <p className="text-xs text-rose-400">{researchError}</p>}
 
                   {!researchLoading && !researchError && !researchAvailable && (
-                    <p className={`text-xs ${shell.textMuted}`}>{researchReason || 'Research feed is currently unavailable.'}</p>
+                    <p className={`text-xs ${shell.textMuted}`}>{getResearchUnavailableMessage()}</p>
                   )}
 
                   {!researchLoading && !researchError && researchAvailable && researchFeed.length === 0 && (
@@ -853,10 +883,37 @@ function MissionControlContent() {
                   LIVE DELIVERY STATUS · MEMBER · ROLE · STATUS · TASK · BLOCKERS · LAST UPDATE
                 </p>
                 <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
-                  FEED UPDATED: {formatUpdatedTime(teamLastUpdated)}
+                  FEED UPDATED: {formatUpdatedTimeIST(teamLastUpdated)}
                 </p>
               </div>
 
+
+              <div className={`border p-4 ${shell.panel}`}>
+                <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-3">SOFTWARE PIPELINE FLOW</h3>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <div className={`border p-3 ${shell.panelMuted}`}>
+                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 1</p>
+                    <p className="text-sm font-semibold mt-1">Developer</p>
+                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Implements feature/fix and hands off to QA.</p>
+                  </div>
+                  <div className={`border p-3 ${shell.panelMuted}`}>
+                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 2</p>
+                    <p className="text-sm font-semibold mt-1">QA</p>
+                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Tests and validates. If failed, loops back to Developer.</p>
+                  </div>
+                  <div className={`border p-3 ${shell.panelMuted}`}>
+                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 3</p>
+                    <p className="text-sm font-semibold mt-1">DevOps</p>
+                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Build + deployment after QA approval.</p>
+                  </div>
+                  <div className={`border p-3 ${shell.panelMuted}`}>
+                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 4</p>
+                    <p className="text-sm font-semibold mt-1">Manual Tester</p>
+                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Production validation. Issues loop to QA → Developer.</p>
+                  </div>
+                </div>
+                <p className={`text-xs tracking-[0.12em] mt-3 ${shell.textSoft}`}>FLOW: Developer → QA → DevOps → Manual Tester · Loop back on failures</p>
+              </div>
               <div className={`border p-3 ${shell.panelMuted}`}>
                 <div className="hidden md:grid md:grid-cols-[1.2fr_1fr_0.8fr_1.8fr_1.3fr_1.3fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
                   <span>Member</span>
@@ -896,7 +953,7 @@ function MissionControlContent() {
                         <div className="text-sm">{member.currentTask || 'No task assigned'}</div>
                         <div className={`text-sm ${member.blocker ? 'text-amber-400' : shell.textMuted}`}>{member.blocker || 'None'}</div>
                         <div className="space-y-1">
-                          <p className={`text-xs ${shell.textMuted}`}>{formatUpdatedTime(member.updatedAt)}</p>
+                          <p className={`text-xs ${shell.textMuted}`}>{formatUpdatedTimeIST(member.updatedAt)}</p>
                           {stale && <span className="inline-block text-[10px] px-2 py-0.5 border border-amber-500/40 text-amber-400">STALE</span>}
                         </div>
                       </div>
