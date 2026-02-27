@@ -920,6 +920,49 @@ function MissionControlContent() {
                 <div className={`border p-4 ${shell.panelMuted}`}>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-semibold tracking-[0.12em]">RESEARCH FEED</h3>
+
+                <div className={`border p-4 ${shell.panel}`}>
+                  <h3 className="text-sm font-semibold tracking-[0.12em] border-l-2 border-zinc-300 pl-3 mb-3">VIRAL TWEET DRAFTS FROM RESEARCH</h3>
+                  {researchLoading && <p className={`text-xs ${shell.textMuted}`}>Generating tweet drafts...</p>}
+                  {!researchLoading && researchFeed.length > 0 && (
+                    <div className="space-y-3">
+                      {researchFeed.slice(0, 3).map((item, idx) => {
+                        const tweet = item.snippet ? item.snippet.slice(0, 250) + (item.snippet.length > 250 ? '...' : '') : ''
+                        return (
+                          <div key={`tweet-${idx}`} className={`border p-3 ${shell.panelMuted}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <p className="text-[10px] tracking-[0.14em] text-zinc-400">DRAFT {idx + 1}</p>
+                              <p className="text-[10px] text-zinc-500">{tweet.length}/280</p>
+                            </div>
+                            <p className={`text-sm ${shell.textMuted}`}>{tweet}</p>
+                            <div className="flex items-center gap-2 mt-2">
+                              <button
+                                onClick={() => handleCopyPost(`tweet-${idx}`, tweet)}
+                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                              >
+                                <Copy className="w-3.5 h-3.5" /> {copiedPostId === `tweet-${idx}` ? 'COPIED' : 'COPY'}
+                              </button>
+                              {tweet.length <= 280 && (
+                                <a
+                                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
+                                >
+                                  <Twitter className="w-3.5 h-3.5" /> POST
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )}
+                  {(!researchFeed || researchFeed.length === 0) && !researchLoading && (
+                    <p className={`text-xs ${shell.textMuted}`}>No research data to generate tweets from.</p>
+                  )}
+                </div>
+
                     <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TAVILY SIGNALS</span>
                   </div>
 
