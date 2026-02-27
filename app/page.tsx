@@ -14,7 +14,6 @@ import {
   Zap,
   Menu,
   Users,
-  Package,
   Target,
   Home as HomeIcon,
   X,
@@ -70,6 +69,9 @@ interface NpmMetrics {
   pkg: string
   lastDay: number
   lastWeek: number
+  lastMonth?: number
+  totalDownloads?: number
+  totalLabel?: string
   fetchedAt?: string
 }
 
@@ -365,7 +367,6 @@ function MissionControlContent() {
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
     { id: 'software-team', label: 'TEAM', icon: Users },
-    { id: 'products', label: 'PRODUCTS', icon: Package },
   ]
 
   const filteredTasks = tasks.filter(
@@ -504,7 +505,6 @@ function MissionControlContent() {
   const verseOfTheDay = verseRotation[utcDayIndex % verseRotation.length]
   const wordOfTheDay = wordRotation[utcDayIndex % wordRotation.length]
 
-  const topPriorities = tasks.filter(task => task.status !== 'done').slice(0, 3)
   const blockedWorkers = teamData.filter(member => member.status === 'blocked' || Boolean(member.blocker)).length
   const workingMembers = teamData.filter(member => member.status === 'working')
   const activeRole = workingMembers[0]?.role || 'No active role'
@@ -529,6 +529,35 @@ function MissionControlContent() {
       : null,
     teamFeedStale ? 'Team feed is stale (>30s).' : null,
     blockedWorkers > 0 ? `${blockedWorkers} worker${blockedWorkers > 1 ? 's' : ''} blocked.` : null,
+  ].filter(Boolean) as string[]
+
+  const guardskillsTotalLabel = npmMetrics?.totalLabel || 'Total (30d proxy)'
+  const growthSignals = [
+    npmMetrics?.available ? `GuardSkills ${guardskillsTotalLabel}: ${formatNumber(npmMetrics.totalDownloads)}` : 'GuardSkills metrics unavailable',
+    npmMetrics?.available ? `GuardSkills last week: ${formatNumber(npmMetrics.lastWeek)}` : 'Weekly trend unavailable',
+    chromeMetrics?.available ? 'Mdify Chrome metric source connected' : 'Mdify Chrome installs data unavailable',
+    researchFeed.length > 0 ? `${researchFeed.length} fresh research signal(s) ready for xMax` : 'No fresh research signals loaded',
+  ]
+
+  const bottleneck = blockedWorkers > 0
+    ? `${blockedWorkers} blocked worker${blockedWorkers > 1 ? 's' : ''} in pipeline`
+    : teamFeedStale
+      ? 'Team status feed stale (>30s)'
+      : !researchAvailable
+        ? 'Research feed unavailable'
+        : 'No immediate operational bottleneck'
+
+  const nextPostRecommendation =
+    researchFeed[0]?.title
+      ? `Post on: ${researchFeed[0].title}`
+      : selectedTopic
+        ? `Use prepared angle: ${trendingTopics.find(t => t.id === selectedTopic)?.title || 'Selected topic'}`
+        : `Use prepared angle: ${trendingTopics[0]?.title || 'AI Breakthroughs 2026'}`
+
+  const immediateActions = [
+    blockedWorkers > 0 ? 'Unblock blocked owner(s) before next deploy cycle.' : null,
+    !researchAvailable ? 'Restore Tavily key so xMax has live research input.' : null,
+    npmMetrics?.available ? 'Ship one GuardSkills growth post using latest download proof.' : 'Restore npm metrics endpoint before growth reporting.',
   ].filter(Boolean) as string[]
 
   return (
@@ -613,19 +642,36 @@ function MissionControlContent() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div className={`border p-5 ${shell.panel}`}>
-                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>TOP PRIORITIES</h2>
-                  {topPriorities.length > 0 ? (
-                    <div className="space-y-2">
-                      {topPriorities.map((task, idx) => (
-                        <div key={task.id} className={`border p-3 ${shell.panelMuted}`}>
-                          <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>P{idx + 1} · {task.priority.toUpperCase()}</p>
-                          <p className="text-sm mt-1">{task.title}</p>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>EXECUTIVE BRIEF</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>WHAT TO DO NOW</p>
+                      {immediateActions.length > 0 ? (
+                        <div className="space-y-1">
+                          {immediateActions.slice(0, 2).map(action => (
+                            <p key={action} className={`text-sm ${shell.textMuted}`}>• {action}</p>
+                          ))}
                         </div>
-                      ))}
+                      ) : (
+                        <p className={`text-sm ${shell.textMuted}`}>• Maintain posting cadence and monitor feed freshness.</p>
+                      )}
                     </div>
-                  ) : (
-                    <p className={`text-sm ${shell.textMuted}`}>No active priorities. All tracked tasks are complete.</p>
-                  )}
+
+                    <div>
+                      <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>GROWTH SIGNAL SUMMARY</p>
+                      <p className={`text-sm ${shell.textMuted}`}>{growthSignals[0]} · {growthSignals[1]}</p>
+                    </div>
+
+                    <div>
+                      <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>BOTTLENECK</p>
+                      <p className={`text-sm ${blockedWorkers > 0 || teamFeedStale || !researchAvailable ? 'text-amber-400' : 'text-emerald-400'}`}>{bottleneck}</p>
+                    </div>
+
+                    <div>
+                      <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>NEXT POST RECOMMENDATION</p>
+                      <p className={`text-sm ${shell.textMuted}`}>{nextPostRecommendation}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div className={`border p-5 ${shell.panel}`}>
@@ -668,8 +714,8 @@ function MissionControlContent() {
                   <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>PRODUCT METRICS SNAPSHOT</h2>
                   <div className="space-y-2 text-sm">
                     <p>
-                      <span className={shell.textSoft}>GuardSkills Last Day:</span>{' '}
-                      <span className={shell.textMuted}>{npmMetrics?.available ? formatNumber(npmMetrics.lastDay) : '--'}</span>
+                      <span className={shell.textSoft}>GuardSkills {npmMetrics?.totalLabel || 'Total (30d proxy)'}:</span>{' '}
+                      <span className={shell.textMuted}>{npmMetrics?.available ? formatNumber(npmMetrics.totalDownloads) : '--'}</span>
                     </p>
                     <p>
                       <span className={shell.textSoft}>GuardSkills Last Week:</span>{' '}
@@ -739,7 +785,7 @@ function MissionControlContent() {
                 <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${shell.textSoft}`} />
                 <input
                   type="text"
-                  placeholder="SEARCH PROJECTS..."
+                  placeholder="SEARCH PROJECTS + PRODUCTS..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                   className={`w-full border pl-10 pr-4 py-2.5 text-sm tracking-[0.08em] focus:outline-none ${shell.panel}`}
@@ -803,6 +849,33 @@ function MissionControlContent() {
                     </span>
                   </div>
                 ))}
+              </div>
+
+              <div className={`border p-4 ${shell.panel}`}>
+                <h3 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>PRODUCTS (MERGED INTO PROJECTS)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                  <div className={`border p-4 ${shell.panelMuted}`}>
+                    <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · {guardskillsTotalLabel.toUpperCase()}</p>
+                    <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.totalDownloads) : '--'}</p>
+                  </div>
+                  <div className={`border p-4 ${shell.panelMuted}`}>
+                    <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · LAST WEEK</p>
+                    <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.lastWeek) : '--'}</p>
+                  </div>
+                  <div className={`border p-4 ${shell.panelMuted}`}>
+                    <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>MDIFY · CHROME METRIC</p>
+                    <p className={`text-sm font-semibold mt-3 ${chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      {chromeMetrics?.available ? 'AVAILABLE' : 'UNAVAILABLE'}
+                    </p>
+                  </div>
+                  <div className={`border p-4 ${shell.panelMuted}`}>
+                    <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>LAST METRICS REFRESH</p>
+                    <p className={`text-sm mt-3 ${shell.textMuted}`}>{formatUpdatedTime(npmMetrics?.fetchedAt || chromeMetrics?.fetchedAt)}</p>
+                  </div>
+                </div>
+                <p className={`text-xs mt-3 ${shell.textMuted}`}>
+                  Product KPIs are now consolidated inside Projects to keep planning + distribution decisions in one view.
+                </p>
               </div>
             </motion.div>
           )}
@@ -1104,42 +1177,6 @@ function MissionControlContent() {
             </motion.div>
           )}
 
-          {activeTab === 'products' && (
-            <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">PRODUCT KPI SNAPSHOT</h2>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>LIVE METRICS · GUARDSKILLS (NPM) · MDIFY (CHROME)</p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · LAST DAY</p>
-                  <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.lastDay) : '--'}</p>
-                </div>
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>GUARDSKILLS · LAST WEEK</p>
-                  <p className="text-2xl font-semibold mt-2">{npmMetrics?.available ? formatNumber(npmMetrics.lastWeek) : '--'}</p>
-                </div>
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>MDIFY · CHROME METRIC</p>
-                  <p className={`text-sm font-semibold mt-3 ${chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}`}>
-                    {chromeMetrics?.available ? 'AVAILABLE' : 'UNAVAILABLE'}
-                  </p>
-                </div>
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>LAST METRICS REFRESH</p>
-                  <p className={`text-sm mt-3 ${shell.textMuted}`}>{formatUpdatedTime(npmMetrics?.fetchedAt || chromeMetrics?.fetchedAt)}</p>
-                </div>
-              </div>
-
-              <div className={`border p-4 ${shell.panelMuted}`}>
-                <p className={`text-xs ${shell.textMuted}`}>
-                  Chrome install counts are best-effort and currently {chromeMetrics?.available ? 'connected.' : 'not available from a public source/API in this environment.'}
-                </p>
-                {chromeMetrics?.note && <p className={`text-xs mt-2 ${shell.textSoft}`}>{chromeMetrics.note}</p>}
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
       </main>
 
