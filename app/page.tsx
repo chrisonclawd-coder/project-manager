@@ -103,6 +103,34 @@ interface ResearchResponse {
   results: ResearchItem[]
 }
 
+interface ScreenerStock {
+  symbol: string
+  name: string
+  sector: string
+  price: number
+  rsi: number
+  macdStatus: 'bullish' | 'bearish' | 'neutral'
+  volumeRatio: number
+  setupStrength: number
+  setupType: 'uptrend-continuation' | 'recovery-play' | 'none'
+  pricePosition: {
+    above20EMA: boolean
+    below50EMA: boolean
+    above200EMA: boolean
+  }
+}
+
+interface ScreenerResponse {
+  stocks: ScreenerStock[]
+  marketFilters: {
+    nifty50Above20EMA: boolean
+    vixLevel: number
+    marketTrendOK: boolean
+  }
+  timestamp: string
+  totalScanned: number
+  matchingSetups: number
+}
 
 interface XmaxRecentTweet {
   text?: string
@@ -224,6 +252,17 @@ function MissionControlContent() {
   })
   const [loadingStock, setLoadingStock] = useState(false)
   const [loadingOptions, setLoadingOptions] = useState(false)
+
+  // Swing Screener state
+  const [screenerStocks, setScreenerStocks] = useState<ScreenerStock[]>([])
+  const [screenerLoading, setScreenerLoading] = useState(false)
+  const [screenerLastUpdate, setScreenerLastUpdate] = useState<string>('')
+  const [screenerFilterSector, setScreenerFilterSector] = useState<string>('all')
+  const [screenerMarketFilters, setScreenerMarketFilters] = useState({
+    nifty50Above20EMA: false,
+    vixLevel: 0,
+    marketTrendOK: false,
+  })
 
   const shell = darkMode
     ? {
@@ -390,6 +429,7 @@ function MissionControlContent() {
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
     { id: 'trading-center', label: 'TRADING CENTER', icon: TrendingUp },
+    { id: 'swing-screener', label: 'SWING SCREENER', icon: BarChart3 },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
     { id: 'software-team', label: 'TEAM', icon: Users },
@@ -436,6 +476,27 @@ function MissionControlContent() {
       setResearchReason('')
     } finally {
       setResearchLoading(false)
+    }
+  }, [])
+
+  const loadSwingScreener = useCallback(async () => {
+    setScreenerLoading(true)
+    try {
+      const res = await fetch('/api/screener/swing-setup', { cache: 'no-store' })
+      const payload = (await res.json()) as ScreenerResponse
+
+      setScreenerStocks(payload.stocks || [])
+      setScreenerLastUpdate(payload.timestamp)
+      setScreenerMarketFilters(payload.marketFilters || {
+        nifty50Above20EMA: false,
+        vixLevel: 0,
+        marketTrendOK: false,
+      })
+    } catch (error) {
+      console.error('Failed to load swing screener:', error)
+      setScreenerStocks([])
+    } finally {
+      setScreenerLoading(false)
     }
   }, [])
 
@@ -1939,6 +2000,158 @@ function MissionControlContent() {
 
                 {!stockData && (
                   <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote to view technical indicators.</p>
+                )}
+              </section>
+            </motion.div>
+          )}
+
+          {activeTab === 'swing-screener' && (
+            <motion.div key="swing-screener" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              <section className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">NIFTY 100 SWING TRADE SCREENER</h2>
+                  <button
+                    onClick={() => loadSwingScreener()}
+                    disabled={screenerLoading}
+                    className="px-4 py-2 border text-xs tracking-wider hover:bg-zinc-800/40 disabled:opacity-50 flex items-center gap-2"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${screenerLoading ? 'animate-spin' : ''}`} />
+                    {screenerLoading ? 'SCANNING...' : 'REFRESH SCREENER'}
+                  </button>
+                </div>
+
+                {/* Market Filters Status */}
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>MARKET FILTERS</p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>NIFTY 50 TREND</p>
+                      <p className={`text-sm mt-1 ${screenerMarketFilters.nifty50Above20EMA ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {screenerMarketFilters.nifty50Above20EMA ? '✓ BULLISH' : '✗ BEARISH'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>VIX LEVEL</p>
+                      <p className={`text-sm mt-1 ${screenerMarketFilters.vixLevel < 20 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {screenerMarketFilters.vixLevel.toFixed(2)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>TRADE ENVIRONMENT</p>
+                      <p className={`text-sm mt-1 ${screenerMarketFilters.marketTrendOK ? 'text-emerald-400' : 'text-rose-400'}`}>
+                        {screenerMarketFilters.marketTrendOK ? '✓ FAVORABLE' : '✗ UNFAVORABLE'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sector Filter */}
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>FILTER BY SECTOR</p>
+                  <div className="flex flex-wrap gap-2">
+                    {['all', 'IT', 'Banking', 'FMCG', 'Energy', 'Automobiles', 'Pharma', 'Finance'].map(sector => (
+                      <button
+                        key={sector}
+                        onClick={() => setScreenerFilterSector(sector)}
+                        className={`px-3 py-1.5 border text-xs tracking-wider transition-colors ${
+                          screenerFilterSector === sector
+                            ? 'border-zinc-300 bg-zinc-800/40'
+                            : 'border-zinc-700 hover:border-zinc-500'
+                        }`}
+                      >
+                        {sector.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Screener Results Table */}
+                <div className={`border ${shell.panel} overflow-hidden`}>
+                  <div className="hidden md:grid md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.8fr_0.8fr_0.8fr_1fr_0.8fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-4 py-3 border-b border-zinc-700/40">
+                    <span>Symbol</span>
+                    <span>Name</span>
+                    <span>Sector</span>
+                    <span>Price</span>
+                    <span>RSI</span>
+                    <span>MACD</span>
+                    <span>Vol Ratio</span>
+                    <span>Setup</span>
+                    <span>Strength</span>
+                  </div>
+
+                  <div className="divide-y divide-zinc-700/40">
+                    {screenerLoading ? (
+                      <div className="p-8 text-center">
+                        <p className={`text-sm ${shell.textMuted}`}>Analyzing Nifty 100 stocks...</p>
+                      </div>
+                    ) : screenerStocks.length === 0 ? (
+                      <div className="p-8 text-center">
+                        <p className={`text-sm ${shell.textMuted}`}>No matching setups found. Click "Refresh Screener" to scan again.</p>
+                      </div>
+                    ) : (
+                      screenerStocks
+                        .filter(
+                          stock => screenerFilterSector === 'all' || stock.sector === screenerFilterSector
+                        )
+                        .map((stock, idx) => (
+                          <div key={idx} className={`p-4 hover:bg-zinc-800/20 transition-colors ${shell.panel}`}>
+                            <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.8fr_0.8fr_0.8fr_1fr_0.8fr] gap-3 items-center text-sm">
+                              <div className="font-semibold text-blue-400">{stock.symbol}</div>
+                              <div className="text-xs">{stock.name}</div>
+                              <div className={`text-xs ${shell.textMuted}`}>{stock.sector}</div>
+                              <div className="font-semibold">₹{stock.price.toFixed(2)}</div>
+                              <div className={stock.rsi >= 40 && stock.rsi <= 60 ? 'text-emerald-400' : 'text-rose-400'}>
+                                {stock.rsi.toFixed(1)}
+                              </div>
+                              <div className={stock.macdStatus === 'bullish' ? 'text-emerald-400' : stock.macdStatus === 'bearish' ? 'text-rose-400' : shell.textMuted}>
+                                {stock.macdStatus === 'bullish' ? '↗' : stock.macdStatus === 'bearish' ? '↘' : '→'}
+                              </div>
+                              <div className={stock.volumeRatio > 1.5 ? 'text-emerald-400' : shell.textMuted}>
+                                {stock.volumeRatio.toFixed(2)}x
+                              </div>
+                              <div className="text-xs capitalize">
+                                {stock.setupType === 'uptrend-continuation' ? '📈 Up' : stock.setupType === 'recovery-play' ? '🔄 Rec' : '-'}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <div className="w-20 bg-zinc-700/40 rounded h-6 flex items-center justify-center">
+                                  <span className={`text-xs font-bold ${
+                                    stock.setupStrength >= 8 ? 'text-emerald-400' :
+                                    stock.setupStrength >= 6 ? 'text-yellow-400' : 'text-zinc-400'
+                                  }`}>
+                                    {stock.setupStrength}/10
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Summary Stats */}
+                {screenerStocks.length > 0 && (
+                  <div className={`border p-4 ${shell.panel}`}>
+                    <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>SUMMARY</p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL SCANNED</p>
+                        <p className="text-lg font-semibold mt-1">100</p>
+                      </div>
+                      <div>
+                        <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>MATCHING SETUPS</p>
+                        <p className="text-lg font-semibold mt-1 text-emerald-400">{screenerStocks.length}</p>
+                      </div>
+                      <div>
+                        <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>HIGH STRENGTH (8+)</p>
+                        <p className="text-lg font-semibold mt-1">{screenerStocks.filter(s => s.setupStrength >= 8).length}</p>
+                      </div>
+                      <div>
+                        <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>LAST REFRESH</p>
+                        <p className={`text-xs mt-1 ${shell.textMuted}`}>{screenerLastUpdate ? new Date(screenerLastUpdate).toLocaleTimeString() : '--'}</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </section>
             </motion.div>
