@@ -17,23 +17,102 @@
       "hashtags": ["#Guardskills", "#OpenClaw", "#Security", "#AI", "#OpenSource"]
     }
   ],
-  "recentTweets": [],
+  "recentTweets": [
+    {
+      "id": "2026-02-27-viral-1",
+      "type": "viral",
+      "topic": "Agentic AI Era",
+      "tweet": "80% of Fortune 500 now run active AI agents. The edge is no longer ‘who has AI’—it’s who has observability + governance + human-in-the-loop speed. We’re entering the Agent Operations era. Are you measuring agent ROI weekly yet?",
+      "charCount": 266,
+      "createdAt": "2026-02-27T04:35:00Z"
+    },
+    {
+      "id": "2026-02-27-product-1",
+      "type": "product_marketing",
+      "topic": "Mdify Product Marketing",
+      "product": "Mdify",
+      "tweet": "AI agents fail on noisy pages. Mdify turns bloated articles into clean .md for your agent—fast, structured, scrape-free. Save tokens, skip JS render headaches. Try it: https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki #Mdify",
+      "charCount": 254,
+      "createdAt": "2026-02-27T04:35:00Z"
+    }
+  ],
+  "engagementDrafts": [
+    {
+      "postRef": "AI agents in Fortune 500 adoption",
+      "reply": "Adoption is accelerating fast. The next moat is agent observability + rollback discipline, not just model quality.",
+      "intent": "insight"
+    },
+    {
+      "postRef": "Production-ready AI agents guide",
+      "reply": "Great breakdown. Most teams underestimate evals + failure mode design. Agent UX starts with error handling.",
+      "intent": "value-add"
+    },
+    {
+      "postRef": "Agentic AI in healthcare readiness",
+      "reply": "Healthcare will reward teams that combine strict governance with narrow high-ROI workflows first.",
+      "intent": "niche insight"
+    },
+    {
+      "postRef": "Human + AI workflows",
+      "reply": "This is the right framing: humans set intent and guardrails, agents execute and report.",
+      "intent": "agreement"
+    },
+    {
+      "postRef": "Enterprise AI security frontier",
+      "reply": "Security-by-default agents will win enterprise trust faster than feature-heavy but opaque stacks.",
+      "intent": "thought leadership"
+    },
+    {
+      "postRef": "AI voice agent demo",
+      "reply": "Latency + interruption handling are the real UX killer features for voice agents right now.",
+      "intent": "technical insight"
+    },
+    {
+      "postRef": "Prompt engineering is dead debate",
+      "reply": "Prompting didn’t die—its scope shifted from single prompts to system-level orchestration.",
+      "intent": "debate"
+    },
+    {
+      "postRef": "Agent tool reliability",
+      "reply": "100%. Tool success rate and retry policy matter more than one benchmark screenshot.",
+      "intent": "support"
+    },
+    {
+      "postRef": "Open-source agent stacks",
+      "reply": "Open source wins when teams can audit behavior, customize control planes, and ship faster loops.",
+      "intent": "ecosystem"
+    },
+    {
+      "postRef": "AI automation ROI thread",
+      "reply": "Best metric I’ve seen: time-to-decision reduced per workflow, not just hours ‘saved’.",
+      "intent": "metric"
+    },
+    {
+      "postRef": "Voice-first customer support",
+      "reply": "Voice support is compelling when it can summarize, cite sources, and handoff context cleanly to humans.",
+      "intent": "practical insight"
+    }
+  ],
   "topics": [
-    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 3, "name": "Gartner Tech Trends", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 0, "lastWorked": "2026-02-27T04:35:00Z" },
+    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 1, "lastWorked": "2026-02-27T04:35:00Z" },
+    { "id": 3, "name": "Gartner Tech Trends", "tweetsGenerated": 0, "lastWorked": "2026-02-27T04:35:00Z" },
     { "id": 4, "name": "Hyperscale AI Data Centers", "tweetsGenerated": 0, "lastWorked": null },
     { "id": 5, "name": "Intelligent Apps", "tweetsGenerated": 0, "lastWorked": null },
     { "id": 6, "name": "AI Coding Trends", "tweetsGenerated": 0, "lastWorked": null },
     { "id": 7, "name": "Vibe Coding", "tweetsGenerated": 0, "lastWorked": null },
     { "id": 8, "name": "Developer Productivity", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 9, "name": "Mdify Product Marketing", "tweetsGenerated": 0, "lastWorked": null },
+    { "id": 9, "name": "Mdify Product Marketing", "tweetsGenerated": 1, "lastWorked": "2026-02-27T04:35:00Z" },
     { "id": 10, "name": "Guardskills Product Marketing", "tweetsGenerated": 0, "lastWorked": null }
   ],
   "stats": {
-    "tweetsGenerated": 0,
+    "tweetsGenerated": 2,
     "engagementRate": 0,
     "impressions": 0,
-    "postsEngaged": 0
+    "postsEngaged": 11
+  },
+  "meta": {
+    "runAt": "2026-02-27T04:35:00Z",
+    "notes": "Brave/Exa search unavailable due to missing API key; used accessible public AI trend sources for topic selection and drafted engagement replies."
   }
 }

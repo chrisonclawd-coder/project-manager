@@ -184,7 +184,7 @@ function MissionControlContent() {
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [tasks] = useState<Task[]>(defaultTasks)
-  const [bookmarks] = useState<BookmarkItem[]>(defaultBookmarks)
+  const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([])
   const [trendingTopics] = useState(defaultTopics)
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
   const [teamData, setTeamData] = useState(teamMembers)
@@ -417,6 +417,18 @@ function MissionControlContent() {
     loadResearchFeed()
     loadXmaxWork()
   }, [loadResearchFeed, loadXmaxWork])
+
+  useEffect(() => {
+    const loadBookmarks = async () => {
+      try {
+        const res = await fetch('/api/bookmarks', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = (await res.json()) as BookmarkItem[]
+        setBookmarks(data)
+      } catch { /* ignore */ }
+    }
+    loadBookmarks()
+  }, [])
 
   const refreshTopics = async () => {
     setIsRefreshing(true)
