@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, Suspense, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSearchParams } from 'next/navigation'
 import {
@@ -78,6 +78,21 @@ interface ChromeMetrics {
   installs?: number | null
   note?: string
   fetchedAt?: string
+}
+
+interface ResearchItem {
+  title: string
+  url: string
+  snippet: string
+  score: number
+  source: string
+  fetchedAt: string
+}
+
+interface ResearchResponse {
+  available: boolean
+  reason?: string
+  results: ResearchItem[]
 }
 
 const teamMembers: TeamMember[] = [
@@ -163,6 +178,11 @@ function MissionControlContent() {
   const [teamLastUpdated, setTeamLastUpdated] = useState<string>('')
   const [npmMetrics, setNpmMetrics] = useState<NpmMetrics | null>(null)
   const [chromeMetrics, setChromeMetrics] = useState<ChromeMetrics | null>(null)
+  const [researchFeed, setResearchFeed] = useState<ResearchItem[]>([])
+  const [researchAvailable, setResearchAvailable] = useState(true)
+  const [researchReason, setResearchReason] = useState('')
+  const [researchLoading, setResearchLoading] = useState(false)
+  const [researchError, setResearchError] = useState('')
 
   const shell = darkMode
     ? {
@@ -302,9 +322,35 @@ function MissionControlContent() {
     todo: tasks.filter(t => t.status === 'todo').length,
   }
 
-  const refreshTopics = () => {
+  const loadResearchFeed = useCallback(async () => {
+    setResearchLoading(true)
+    setResearchError('')
+
+    try {
+      const res = await fetch('/api/xmax/research', { cache: 'no-store' })
+      const payload = (await res.json()) as ResearchResponse
+
+      setResearchAvailable(payload.available)
+      setResearchReason(payload.reason || '')
+      setResearchFeed(payload.results || [])
+    } catch {
+      setResearchError('Unable to load research feed right now.')
+      setResearchFeed([])
+      setResearchAvailable(true)
+      setResearchReason('')
+    } finally {
+      setResearchLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    loadResearchFeed()
+  }, [loadResearchFeed])
+
+  const refreshTopics = async () => {
     setIsRefreshing(true)
-    setTimeout(() => setIsRefreshing(false), 1000)
+    await loadResearchFeed()
+    setTimeout(() => setIsRefreshing(false), 500)
   }
 
   const getPostBadge = (channel: string, text: string) => {
@@ -587,6 +633,43 @@ function MissionControlContent() {
                       <p className={`text-xs mt-1 ${shell.textSoft}`}>{topic.source}</p>
                     </button>
                   ))}
+                </div>
+
+                <div className={`border p-4 ${shell.panelMuted}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold tracking-[0.12em]">RESEARCH FEED</h3>
+                    <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TAVILY SIGNALS</span>
+                  </div>
+
+                  {researchLoading && <p className={`text-xs ${shell.textMuted}`}>Loading fresh research...</p>}
+
+                  {!researchLoading && researchError && <p className="text-xs text-rose-400">{researchError}</p>}
+
+                  {!researchLoading && !researchError && !researchAvailable && (
+                    <p className={`text-xs ${shell.textMuted}`}>{researchReason || 'Research feed is currently unavailable.'}</p>
+                  )}
+
+                  {!researchLoading && !researchError && researchAvailable && researchFeed.length === 0 && (
+                    <p className={`text-xs ${shell.textMuted}`}>No research results found. Try refresh.</p>
+                  )}
+
+                  {!researchLoading && !researchError && researchAvailable && researchFeed.length > 0 && (
+                    <div className="space-y-3">
+                      {researchFeed.slice(0, 5).map(item => (
+                        <a
+                          key={`${item.url}-${item.title}`}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`block border p-3 transition-colors ${shell.panel} hover:border-zinc-500`}
+                        >
+                          <p className="text-sm font-medium line-clamp-2">{item.title}</p>
+                          <p className={`text-xs mt-1 line-clamp-2 ${shell.textMuted}`}>{item.snippet}</p>
+                          <p className={`text-[10px] mt-2 tracking-[0.12em] ${shell.textSoft}`}>{item.source || 'Web'} · SCORE {item.score.toFixed(2)}</p>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <AnimatePresence>
