@@ -440,7 +440,7 @@ function MissionControlContent() {
     if (channel === 'X') {
       const valid = text.length <= 280
       return {
-        label: `${text.length}/280`,
+        label: '280 chars',
         state: valid ? 'VALID' : 'TOO LONG',
         tone: valid ? 'text-emerald-400 border-emerald-500/40' : 'text-rose-400 border-rose-500/40',
       }
@@ -448,7 +448,7 @@ function MissionControlContent() {
 
     const valid = text.length >= 500
     return {
-      label: `${text.length}/500+`,
+      label: '500+ chars',
       state: valid ? 'ON TARGET' : 'NEEDS EXPANSION',
       tone: valid ? 'text-emerald-400 border-emerald-500/40' : 'text-amber-400 border-amber-500/40',
     }
