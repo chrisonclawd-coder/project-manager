@@ -217,8 +217,8 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // Check RSI (40-60 neutral zone)
-    if (currRSI < 40 || currRSI > 60) {
+    // Check RSI (35-65 expanded range - relaxed from 40-60)
+    if (currRSI < 35 || currRSI > 65) {
       continue
     }
 
@@ -229,8 +229,8 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // Check volume (above 1.5x 20-day average)
-    if (currVolume < currVolumeMA * 1.5) {
+    // Check volume (above 1.2x 20-day average) - relaxed from 1.5x
+    if (currVolume < currVolumeMA * 1.2) {
       continue
     }
 
