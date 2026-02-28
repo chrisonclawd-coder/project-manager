@@ -217,32 +217,25 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // SWEET SPOT v2 - Balance
+    // SIMPLIFIED - Focus on just RSI + Volume (most reliable)
     
-    // RSI in optimal zone 40-60
-    if (currRSI < 40 || currRSI > 60) {
+    // RSI in sweet spot - oversold to neutral
+    if (currRSI < 35 || currRSI > 55) {
       continue
     }
 
-    // MACD bullish
-    const macdBullish = currMACDHist > 0.1
-    if (!macdBullish) {
+    // Strong volume spike
+    if (currVolume < currVolumeMA * 2.0) {
       continue
     }
 
-    // Volume spike - 1.5x average
-    if (currVolume < currVolumeMA * 1.5) {
-      continue
-    }
-
-    // Price above 20 EMA (at minimum)
+    // Price above 20 EMA (basic trend)
     if (price < currEMA20) {
       continue
     }
 
-    // EMA20 should be rising (above EMA50 or close to it)
-    const emaAligned = currEMA20 > currEMA50 * 0.99  // 20 EMA within 1% of 50 EMA or above
-    if (!emaAligned) {
+    // MACD turning positive (momentum shift)
+    if (currMACDHist <= 0) {
       continue
     }
 
