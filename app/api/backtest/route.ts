@@ -217,31 +217,31 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // VERY STRICT - Only best setups for 75% win rate
+    // SWEET SPOT - Find balance between too loose and too strict
     
-    // RSI must be in sweet spot 45-55
-    if (currRSI < 45 || currRSI > 55) {
+    // RSI in optimal zone 42-58
+    if (currRSI < 42 || currRSI > 58) {
       continue
     }
 
-    // MACD must be strongly bullish
-    const macdStrong = currMACDHist > 0.3
-    if (!macdStrong) {
+    // MACD must be bullish
+    const macdBullish = currMACDHist > 0.2
+    if (!macdBullish) {
       continue
     }
 
-    // Volume must spike - 2x average minimum
-    if (currVolume < currVolumeMA * 2.0) {
+    // Volume spike - 1.8x average
+    if (currVolume < currVolumeMA * 1.8) {
       continue
     }
 
-    // Price must be above BOTH 20 and 50 EMA - strong uptrend
+    // Price above both EMAs for strength
     const strongUptrend = price > currEMA20 && price > currEMA50
     if (!strongUptrend) {
       continue
     }
 
-    // Additional: price must be above previous close (confirming strength)
+    // Price above previous close
     const priceAboveClose = price > candles[i-1]?.close
     if (!priceAboveClose) {
       continue
