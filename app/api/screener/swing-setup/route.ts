@@ -15,6 +15,13 @@ interface StockAnalysis {
     below50EMA: boolean;
     above200EMA: boolean;
   };
+  // Trade levels
+  entryPrice: number;
+  stopLoss: number;
+  target1: number;
+  target2: number;
+  riskReward1: number;
+  riskReward2: number;
 }
 
 interface ScreenerResponse {
@@ -158,6 +165,19 @@ async function analyzeStock(symbol: string, name: string, sector: string): Promi
       return null;
     }
     
+    // Calculate trade levels based on swing criteria
+    // Entry: current price (or slightly below for better risk)
+    const entryPrice = Math.round(price * 100) / 100;
+    // Stop Loss: 2% below entry
+    const stopLoss = Math.round(price * 0.98 * 100) / 100;
+    // Target 1: 5% above entry (1:2.5 risk/reward)
+    const target1 = Math.round(price * 1.05 * 100) / 100;
+    // Target 2: 8% above entry (1:4 risk/reward)
+    const target2 = Math.round(price * 1.08 * 100) / 100;
+    // Risk/Reward ratios
+    const riskReward1 = 2.5; // 5% / 2%
+    const riskReward2 = 4; // 8% / 2%
+    
     return {
       symbol,
       name,
@@ -173,6 +193,12 @@ async function analyzeStock(symbol: string, name: string, sector: string): Promi
         below50EMA,
         above200EMA,
       },
+      entryPrice,
+      stopLoss,
+      target1,
+      target2,
+      riskReward1,
+      riskReward2,
     };
   } catch (error) {
     console.error(`Error analyzing ${symbol}:`, error);
@@ -228,6 +254,12 @@ function generateMockAnalysis(symbol: string, name: string, sector: string): Sto
   
   if (strength < 5) return null;
   
+  // Calculate trade levels
+  const entryPrice = Math.round(currentPrice * 100) / 100;
+  const stopLoss = Math.round(currentPrice * 0.98 * 100) / 100;
+  const target1 = Math.round(currentPrice * 1.05 * 100) / 100;
+  const target2 = Math.round(currentPrice * 1.08 * 100) / 100;
+  
   return {
     symbol,
     name,
@@ -239,6 +271,12 @@ function generateMockAnalysis(symbol: string, name: string, sector: string): Sto
     setupStrength: strength,
     setupType,
     pricePosition: { above20EMA, below50EMA, above200EMA },
+    entryPrice,
+    stopLoss,
+    target1,
+    target2,
+    riskReward1: 2.5,
+    riskReward2: 4,
   };
 }
 
