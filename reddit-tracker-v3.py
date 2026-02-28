@@ -1,0 +1,271 @@
+#!/usr/bin/env python3
+"""
+Reddit Digestion System v3 - Fixed syntax errors
+"""
+
+import json
+import http.client
+from datetime import datetime
+from urllib.parse import urlencode
+import os
+
+class RedditTrackerV3:
+    def __init__(self):
+        self.db_file = '/home/clawdonaws/.openclaw/workspace/.reddit-db.json'
+        self.subreddits = [
+            'ArtificialIntelligence',  # 2.5M+ members
+            'MachineLearning',         # 3.5M+ members
+            'technology',              # 32M+ members
+            'programming',             # 13M+ members
+            'compsci',                 # 2.5M+ members
+            'reuters',                 # Popular tech news
+            'worldnews',               # Major world events
+            'Nature'                   # Scientific research
+        ]
+        self.comments_file = '/home/clawdonaws/.openclaw/workspace/.reddit-comments.json'
+        self.load_db()
+
+    def load_db(self):
+        """Load Reddit database from file"""
+        if os.path.exists(self.db_file):
+            with open(self.db_file, 'r') as f:
+                self.db = json.load(f)
+        else:
+            self.db = {
+                'posts': {},
+                'preferences': {
+                    'preferred_types': ['text', 'image'],
+                    'excluded_types': ['meme', 'low-effort'],
+                    'preferred_topics': ['AI', 'tools', 'future'],
+                    'digest_length': 3
+                },
+                'digest_history': [],
+                'engagement_data': {}
+            }
+            self.save_db()
+
+    def save_db(self):
+        """Save Reddit database to file"""
+        with open(self.db_file, 'w') as f:
+            json.dump(self.db, f, indent=2)
+
+    def get_top_posts(self, subreddit, limit=100):
+        """Fetch top posts from a subreddit with proper headers"""
+        posts = []
+
+        try:
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1'
+            }
+
+            conn = http.client.HTTPSConnection("www.reddit.com")
+            params = {
+                'limit': limit,
+                'sort': 'hot',
+                't': 'week'
+            }
+            conn.request("GET", f"/r/{subreddit}/?{urlencode(params)}", headers=headers)
+            response = conn.getresponse()
+            html = response.read().decode('utf-8')
+
+            import re
+            script_pattern = r'({"data":\s*{[^}]*}})'
+            matches = re.findall(script_pattern, html, re.DOTALL)
+
+            if matches:
+                data = json.loads(matches[0])
+                children = data['data']['children']
+
+                for child in children:
+                    post_data = child.get('data', {})
+
+                    if not post_data.get('stickied', False) and post_data.get('over_18', False) == False:
+                        post_id = post_data.get('id')
+                        if post_id and post_id not in self.db['posts']:
+                            post_type = self.detect_post_type(post_data)
+
+                            posts.append({
+                                'id': post_id,
+                                'subreddit': subreddit,
+                                'title': post_data.get('title', 'No title'),
+                                'score': post_data.get('score', 0),
+                                'comments': post_data.get('num_comments', 0),
+                                'type': post_type,
+                                'engagement_score': post_data.get('score', 0) + post_data.get('num_comments', 0) * 0.1,
+                                'timestamp': datetime.now().isoformat()
+                            })
+
+            conn.close()
+
+        except Exception as e:
+            print(f"Error fetching {subreddit}: {e}")
+
+        return posts
+
+    def detect_post_type(self, post_data):
+        """Detect post type based on Reddit post data"""
+        if post_data.get('media', None):
+            media_type = post_data['media'].get('type', '')
+            if media_type == 'richVideo':
+                return 'video'
+            elif 'preview' in post_data:
+                return 'image'
+        elif post_data.get('url', '').startswith(('https://i.redd.it/', 'https://i.imgur.com/')):
+            return 'image'
+        elif post_data.get('url', '').endswith(('.jpg', '.png', '.gif', '.webp')):
+            return 'image'
+        elif post_data.get('url', '').endswith(('.mp4', '.webm')):
+            return 'video'
+        elif post_data.get('url', '').startswith('https://v.redd.it/'):
+            return 'video'
+        else:
+            if post_data.get('selftext', '') or not post_data.get('url'):
+                return 'text'
+            else:
+                return 'link'
+
+    def fetch_all_subreddits(self):
+        """Fetch top posts from all subreddits"""
+        all_posts = []
+
+        for subreddit in self.subreddits:
+            print(f"Fetching {subreddit}...")
+            posts = self.get_top_posts(subreddit, limit=100)
+            all_posts.extend(posts)
+            print(f"  Found {len(posts)} new posts")
+
+        unique_posts = {}
+        for post in all_posts:
+            unique_posts[post['id']] = post
+
+        return list(unique_posts.values())
+
+    def store_posts(self, posts):
+        """Store fetched posts in database"""
+        stored_count = 0
+
+        for post in posts:
+            if post['id'] not in self.db['posts']:
+                self.db['posts'][post['id']] = post
+                stored_count += 1
+
+        self.save_db()
+        return stored_count
+
+    def calculate_engagement(self, post_id):
+        """Calculate engagement score based on clicks, upvotes, comments"""
+        post = self.db['posts'].get(post_id, {})
+        score = post.get('engagement_score', 0)
+        return score
+
+    def rank_posts(self):
+        """Rank all stored posts by engagement score"""
+        posts = list(self.db['posts'].values())
+
+        preferred_types = self.db['preferences']['preferred_types']
+        excluded_types = self.db['preferences']['excluded_types']
+
+        filtered_posts = []
+        for post in posts:
+            if post['type'] in excluded_types:
+                continue
+            if post['type'] in preferred_types or not preferred_types:
+                filtered_posts.append(post)
+
+        sorted_posts = sorted(
+            filtered_posts,
+            key=lambda p: p['engagement_score'],
+            reverse=True
+        )
+
+        return sorted_posts
+
+    def generate_digest(self, posts):
+        """Generate daily digest with formatted posts"""
+        digest = {
+            'date': datetime.now().strftime('%Y-%m-%d'),
+            'digest_id': f"daily-{datetime.now().strftime('%Y%m%d')}",
+            'posts': [],
+            'total_posts': len(posts),
+            'total_engagement': sum(p['engagement_score'] for p in posts)
+        }
+
+        max_posts = self.db['preferences'].get('digest_length', 3)
+
+        for post in posts[:max_posts]:
+            digest['posts'].append({
+                'id': post['id'],
+                'subreddit': post['subreddit'],
+                'title': post['title'],
+                'score': post['score'],
+                'comments': post['comments'],
+                'type': post['type'],
+                'engagement_score': post['engagement_score']
+            })
+
+        return digest
+
+    def send_digest(self, digest):
+        """Send digest via Telegram (to be implemented)"""
+        message = f"📊 Reddit Digest - {digest['date']}\n\n"
+
+        for i, post in enumerate(digest['posts'], 1):
+            message += f"{i}. **{post['subreddit']}** - {post['title']}\n"
+            message += f"   🔥 Score: {post['score']} | 💬 Comments: {post['comments']}\n"
+            message += f"   Type: {post['type']}\n\n"
+
+        message += "Did you find this useful? Please respond with 👍 or 👎"
+
+        return message
+
+    def record_engagement(self, post_id, engagement_type):
+        """Record user engagement with a post"""
+        if post_id not in self.db['engagement_data']:
+            self.db['engagement_data'][post_id] = []
+
+        self.db['engagement_data'][post_id].append({
+            'type': engagement_type,
+            'timestamp': datetime.now().isoformat()
+        })
+
+        self.save_db()
+
+    def ask_feedback(self, digest_id):
+        """Ask user for feedback on digest"""
+        message = f"📊 Reddit Digest sent!\n\n{digest_id}\n\nDid you find this useful?"
+        return message
+
+# Main execution
+def main():
+    tracker = RedditTrackerV3()
+
+    # Fetch all posts
+    all_posts = tracker.fetch_all_subreddits()
+    print(f"\n✅ Fetched {len(all_posts)} total posts")
+
+    # Store posts
+    stored = tracker.store_posts(all_posts)
+    print(f"✅ Stored {stored} new posts")
+
+    # Rank posts
+    ranked_posts = tracker.rank_posts()
+    print(f"✅ Ranked {len(ranked_posts)} posts")
+
+    # Generate digest
+    digest = tracker.generate_digest(ranked_posts)
+    print(f"✅ Generated digest with {len(digest['posts'])} posts")
+
+    # Send digest
+    message = tracker.send_digest(digest)
+    print(f"\n📊 Digest message:\n{message}")
+
+    # Ask feedback
+    feedback_msg = tracker.ask_feedback(digest['digest_id'])
+    print(f"\n💬 Feedback message:\n{feedback_msg}")
+
+if __name__ == '__main__':
+    main()

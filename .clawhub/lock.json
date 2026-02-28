@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "skills": {
+    "frontend-design-3": {
+      "version": "0.1.0",
+      "installedAt": 1771305255451
+    },
+    "summarize": {
+      "version": "1.0.0",
+      "installedAt": 1771352565445
+    },
+    "youtube-watcher": {
+      "version": "1.0.0",
+      "installedAt": 1771355016318
+    },
+    "playwright-mcp": {
+      "version": "1.0.0",
+      "installedAt": 1771564888908
+    },
+    "tavily-search": {
+      "version": "1.0.0",
+      "installedAt": 1771581649648
+    }
+  }
+}

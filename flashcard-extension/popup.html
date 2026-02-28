@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article-to-Flashcards</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Flashcards</h1>
+            <p class="subtitle">Auto-generate flashcards from any article</p>
+        </div>
+
+        <div class="input-section">
+            <textarea id="articleUrl" placeholder="Paste article URL here..." rows="2"></textarea>
+            <button id="createFlashcards" class="btn-primary">Generate Flashcards</button>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Generating flashcards...</p>
+        </div>
+
+        <div id="error" class="error" style="display: none;">
+            <p id="errorMessage">Error</p>
+        </div>
+
+        <div id="flashcards" class="flashcards" style="display: none;">
+            <h2>Generated Flashcards</h2>
+            <div id="flashcardList"></div>
+
+            <div class="export-section">
+                <h3>Export Options</h3>
+                <div class="export-buttons">
+                    <button class="btn-export" id="exportAnki">Export to Anki</button>
+                    <button class="btn-export" id="exportCSV">Export to CSV</button>
+                    <button class="btn-export" id="exportQuizlet">Export to Quizlet</button>
+                </div>
+            </div>
+
+            <div class="export-section">
+                <h3>Templates</h3>
+                <div class="template-buttons">
+                    <button class="btn-template" data-template="simple">Simple Q&A</button>
+                    <button class="btn-template" data-template="multiple">Multiple Choice</button>
+                    <button class="btn-template" data-template="flashcard">Flashcard (Front/Back)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-value" id="totalFlashcards">0</span>
+                <span class="stat-label">Total Flashcards</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="studiedCount">0</span>
+                <span class="stat-label">Studied</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

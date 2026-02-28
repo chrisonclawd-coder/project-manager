@@ -1,0 +1,21 @@
+{
+  "posts": {},
+  "preferences": {
+    "preferred_types": [
+      "text",
+      "image"
+    ],
+    "excluded_types": [
+      "meme",
+      "low-effort"
+    ],
+    "preferred_topics": [
+      "AI",
+      "tools",
+      "future"
+    ],
+    "digest_length": 3
+  },
+  "digest_history": [],
+  "engagement_data": {}
+}

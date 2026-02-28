@@ -1,0 +1,81 @@
+{
+  "tasks": [
+    {
+      "id": "1",
+      "text": "Complete X strategy Day 1 morning routine",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T05:04:00.000Z"
+    },
+    {
+      "id": "2",
+      "text": "Analyze X profile and algorithm",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T05:10:00.000Z"
+    },
+    {
+      "id": "3",
+      "text": "Update cron jobs to 2am and 9am IST",
+      "completed": true,
+      "priority": "medium",
+      "createdAt": "2026-02-17T05:20:00.000Z"
+    },
+    {
+      "id": "4",
+      "text": "Create Reddit digestion system",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T05:30:00.000Z"
+    },
+    {
+      "id": "5",
+      "text": "Build Mission Control dashboard",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T06:20:00.000Z"
+    },
+    {
+      "id": "6",
+      "text": "Redesign dashboard to dark theme",
+      "completed": true,
+      "priority": "medium",
+      "createdAt": "2026-02-17T07:00:00.000Z"
+    },
+    {
+      "id": "7",
+      "text": "Add real activity data to dashboard",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T07:30:00.000Z"
+    },
+    {
+      "id": "8",
+      "text": "Deploy dashboard with Cloudflare Tunnel",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T07:35:00.000Z"
+    },
+    {
+      "id": "9",
+      "text": "Complete noon X strategy tasks",
+      "completed": true,
+      "priority": "high",
+      "createdAt": "2026-02-17T12:00:00.000Z"
+    },
+    {
+      "id": "10",
+      "text": "Post 1 tweet (6pm-10pm IST)",
+      "completed": false,
+      "priority": "high",
+      "createdAt": "2026-02-17T18:00:00.000Z"
+    },
+    {
+      "id": "11",
+      "text": "Engage with 5 more posts",
+      "completed": false,
+      "priority": "high",
+      "createdAt": "2026-02-17T18:00:00.000Z"
+    }
+  ]
+}

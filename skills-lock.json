@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "twitter-algorithm-optimizer": {
+      "source": "composiohq/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "4dacb151d9267f390a2a1aa5ff06ea984c2270f6a188315dcb8a65cd0d4bcf34"
+    },
+    "x-algo-post": {
+      "source": "felixondesk/agent-skills",
+      "sourceType": "github",
+      "computedHash": "7e81e081686caf325a1bc8e0c7824ce5fc01432df63b2344c424abbd664c16a5"
+    }
+  }
+}
