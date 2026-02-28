@@ -2570,13 +2570,13 @@ function MissionControlContent() {
                         <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.5fr] gap-2 items-center text-sm">
                           <div className="text-xs text-zinc-400">{expense.date}</div>
                           <div className="font-medium">{expense.description}</div>
-                          <div className={`font-semibold ${expense.amount >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                            {expense.amount >= 0 ? '+' : '-'}₹{Math.abs(expense.amount).toLocaleString()}
+                          <div className={`font-semibold ${expense.amount > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                            {expense.amount > 0 ? '-' : '+'}₹{Math.abs(expense.amount).toLocaleString()}
                           </div>
                           <div className={`text-xs px-2 py-1 rounded inline-block w-fit ${
-                            expense.amount >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                            expense.amount > 0 ? 'bg-rose-500/20 text-rose-400' : 'bg-emerald-500/20 text-emerald-400'
                           }`}>
-                            {expense.amount >= 0 ? 'INCOME' : 'EXPENSE'}
+                            {expense.amount > 0 ? 'EXPENSE' : 'INCOME'}
                           </div>
                           <button
                             onClick={() => deleteExpense(expense.id)}
