@@ -217,38 +217,37 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // Check RSI (30-70 expanded range)
-    if (currRSI < 30 || currRSI > 70) {
+    // VERY STRICT - Only best setups for 75% win rate
+    
+    // RSI must be in sweet spot 45-55
+    if (currRSI < 45 || currRSI > 55) {
       continue
     }
 
-    // Relaxed MACD - just check if MACD line is above signal (not crossover)
-    const macdAboveSignal = currMACDHist >= 0
-
-    if (!macdAboveSignal) {
+    // MACD must be strongly bullish
+    const macdStrong = currMACDHist > 0.3
+    if (!macdStrong) {
       continue
     }
 
-    // Check volume (above 1.2x 20-day average) - relaxed from 1.5x
-    if (currVolume < currVolumeMA * 1.2) {
+    // Volume must spike - 2x average minimum
+    if (currVolume < currVolumeMA * 2.0) {
       continue
     }
 
-    // Check uptrend continuation: Price above 20 EMA
-    const uptrendContinuation = price > currEMA20
-
-    // Recovery play: Price below 20 EMA but above 50 EMA
-    const recoveryPlay = price < currEMA20 && price > currEMA50
-
-    if (uptrendContinuation || recoveryPlay) {
-      signals.push(i)
+    // Price must be above BOTH 20 and 50 EMA - strong uptrend
+    const strongUptrend = price > currEMA20 && price > currEMA50
+    if (!strongUptrend) {
+      continue
     }
 
-    // Extra filter: Skip if no strong volume spike - reduces false signals
-    if (currVolume < currVolumeMA * 1.5) {
-      // Remove last signal if too weak
-      if (signals.length > 0) signals.pop()
+    // Additional: price must be above previous close (confirming strength)
+    const priceAboveClose = price > candles[i-1]?.close
+    if (!priceAboveClose) {
+      continue
     }
+
+    signals.push(i)
   }
 
   return signals
