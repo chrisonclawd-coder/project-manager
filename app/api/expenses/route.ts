@@ -154,12 +154,41 @@ export async function GET(request: Request): Promise<NextResponse> {
   });
 }
 
+// Auto-categorize expense based on description
+function categorizeExpense(description: string): string {
+  const desc = description.toLowerCase();
+  
+  const categories: Record<string, string[]> = {
+    'Food': ['fish', 'meat', 'chicken', 'vegetables', 'fruits', 'milk', 'bread', 'egg', 'rice', 'dal', 'oil', 'spices', 'salt', 'sugar', 'tea', 'coffee', 'breakfast', 'lunch', 'dinner', 'snack', 'zomato', 'swiggy', 'restaurant', 'hotel', 'food', 'grocery', 'kirana'],
+    'Transport': ['uber', 'ola', 'auto', 'taxi', 'bus', 'train', 'metro', 'petrol', 'diesel', 'fuel', 'parking', 'toll', 'flight', 'taxi', ' conveyance'],
+    'Shopping': ['clothes', 'shirt', 'pant', 'shoes', 'phone', 'mobile', 'laptop', 'electronics', 'amazon', 'flipkart', 'myntra', 'shopping', 'gift'],
+    'Bills': ['electricity', 'water', 'gas', 'internet', 'wifi', 'mobile', 'phone bill', 'rent', 'maintenance', 'society', 'insurance', 'emi'],
+    'Health': ['medicine', 'doctor', 'hospital', 'clinic', 'health', 'medical', 'pharmacy', 'dental', 'eye', 'vitamin'],
+    'Entertainment': ['movie', 'netflix', 'amazon prime', 'hotstar', 'spotify', 'music', 'game', 'concert', 'party', 'outing', 'travel', 'vacation'],
+    'Personal': [' Abi', 'raju', 'john', 'family', 'father', 'mother', 'sister', 'brother', 'son', 'daughter', 'wife', 'husband', 'gift', 'donation'],
+    'Education': ['school', 'fee', 'tuition', 'coaching', 'book', 'course', 'training', 'certificate'],
+    'Grooming': ['salon', 'barber', 'spa', 'beauty', 'haircut', 'massage'],
+    'Household': ['cleaning', 'detergent', 'soap', 'toothpaste', 'brush', 'utensil', 'furniture', 'repair', 'plumber', 'electrician'],
+  };
+  
+  for (const [category, keywords] of Object.entries(categories)) {
+    for (const keyword of keywords) {
+      if (desc.includes(keyword)) {
+        return category;
+      }
+    }
+  }
+  
+  return 'Misc';
+}
+
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     const body = await request.json();
     const { text, amount, description, date } = body;
     
     let newExpense: Expense;
+    let parsedDescription = description;
     
     if (text) {
       // Parse from Telegram-style message
@@ -170,6 +199,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           { status: 400 }
         );
       }
+      parsedDescription = parsed.description;
       newExpense = {
         id: Date.now().toString(),
         amount: parsed.amount,
@@ -185,6 +215,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         description,
         date: date || new Date().toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
+        category: categorizeExpense(description),
       };
     } else {
       return NextResponse.json(
@@ -192,6 +223,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         { status: 400 }
       );
     }
+    
+    // Auto-categorize based on description
+    newExpense.category = categorizeExpense(parsedDescription || newExpense.description);
     
     const expenses = readExpenses();
     expenses.push(newExpense);
