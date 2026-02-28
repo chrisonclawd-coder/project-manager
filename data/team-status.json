@@ -3,9 +3,9 @@
     "name": "Chrisly",
     "role": "Manager",
     "status": "idle",
-    "currentTask": "Trading Center fixes deployed",
+    "currentTask": "Backtest blocked - TwelveData doesn't support NSE on free plan",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   },
   "xmax": {
     "name": "xMax",
@@ -13,7 +13,7 @@
     "status": "idle",
     "currentTask": "",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   },
   "developer": {
     "name": "Developer",
@@ -21,7 +21,7 @@
     "status": "idle",
     "currentTask": "",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   },
   "qa": {
     "name": "QA",
@@ -29,7 +29,7 @@
     "status": "idle",
     "currentTask": "",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   },
   "devops": {
     "name": "DevOps",
@@ -37,7 +37,7 @@
     "status": "idle",
     "currentTask": "",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   },
   "tester": {
     "name": "Manual Test",
@@ -45,6 +45,6 @@
     "status": "idle",
     "currentTask": "",
     "blocker": "",
-    "updatedAt": "2026-02-28T13:26:22.222Z"
+    "updatedAt": "2026-02-28T19:34:23.764Z"
   }
 }
