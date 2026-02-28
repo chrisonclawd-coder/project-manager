@@ -205,11 +205,11 @@ function findEntrySignals(candles: Candle[]): number[] {
     const currVolume = volumes[i]
     const currVolumeMA = volumeMA[i]
 
-    // Skip if missing data
+    // Skip if missing data - reduced from 200 to 100 for EMA
     if (
       !currEMA20 ||
       !currEMA50 ||
-      !currEMA200 ||
+      // !currEMA200 ||  // Relaxed - don't require EMA200
       !prevEMA20 ||
       !currRSI ||
       !currVolumeMA
@@ -217,15 +217,15 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // Check RSI (35-65 expanded range - relaxed from 40-60)
-    if (currRSI < 35 || currRSI > 65) {
+    // Check RSI (30-70 expanded range)
+    if (currRSI < 30 || currRSI > 70) {
       continue
     }
 
-    // Check MACD bullish crossover
-    const macdCrossover = prevMACDHist <= 0 && currMACDHist > 0
+    // Relaxed MACD - just check if MACD line is above signal (not crossover)
+    const macdAboveSignal = currMACDHist >= 0
 
-    if (!macdCrossover) {
+    if (!macdAboveSignal) {
       continue
     }
 
@@ -234,11 +234,11 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // Check uptrend continuation: Price above 20 EMA and below 50 EMA
-    const uptrendContinuation = price > currEMA20 && price < currEMA50
+    // Check uptrend continuation: Price above 20 EMA
+    const uptrendContinuation = price > currEMA20
 
-    // Check recovery play: Price below 20 EMA and above 200 EMA
-    const recoveryPlay = price < currEMA20 && price > currEMA200
+    // Recovery play: Price below 20 EMA but above 50 EMA
+    const recoveryPlay = price < currEMA20 && price > currEMA50
 
     if (uptrendContinuation || recoveryPlay) {
       signals.push(i)
