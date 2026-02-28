@@ -119,6 +119,12 @@ interface ScreenerStock {
     below50EMA: boolean
     above200EMA: boolean
   }
+  entryPrice: number
+  stopLoss: number
+  target1: number
+  target2: number
+  riskReward1: number
+  riskReward2: number
 }
 
 interface ScreenerResponse {
@@ -2090,16 +2096,19 @@ function MissionControlContent() {
 
                 {/* Screener Results Table */}
                 <div className={`border ${shell.panel} overflow-hidden`}>
-                  <div className="hidden md:grid md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.8fr_0.8fr_0.8fr_1fr_0.8fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-4 py-3 border-b border-zinc-700/40">
+                  <div className="hidden md:grid md:grid-cols-[0.7fr_1.2fr_0.8fr_0.7fr_0.6fr_0.6fr_0.6fr_0.6fr_0.7fr_0.7fr_0.7fr_0.6fr] gap-2 text-[9px] tracking-[0.12em] text-zinc-400 uppercase px-3 py-2 border-b border-zinc-700/40">
                     <span>Symbol</span>
                     <span>Name</span>
                     <span>Sector</span>
                     <span>Price</span>
+                    <span>Entry</span>
+                    <span>SL</span>
+                    <span>T1</span>
+                    <span>T2</span>
                     <span>RSI</span>
                     <span>MACD</span>
-                    <span>Vol Ratio</span>
-                    <span>Setup</span>
-                    <span>Strength</span>
+                    <span>Vol</span>
+                    <span>Str</span>
                   </div>
 
                   <div className="divide-y divide-zinc-700/40">
@@ -2117,33 +2126,32 @@ function MissionControlContent() {
                           stock => screenerFilterSector === 'all' || stock.sector === screenerFilterSector
                         )
                         .map((stock, idx) => (
-                          <div key={idx} className={`p-4 hover:bg-zinc-800/20 transition-colors ${shell.panel}`}>
-                            <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.8fr_0.8fr_0.8fr_1fr_0.8fr] gap-3 items-center text-sm">
+                          <div key={idx} className={`p-3 hover:bg-zinc-800/20 transition-colors ${shell.panel}`}>
+                            <div className="grid grid-cols-2 md:grid-cols-[0.7fr_1.2fr_0.8fr_0.7fr_0.6fr_0.6fr_0.6fr_0.6fr_0.7fr_0.7fr_0.7fr_0.6fr] gap-2 items-center text-xs">
                               <div className="font-semibold text-blue-400">{stock.symbol}</div>
-                              <div className="text-xs">{stock.name}</div>
-                              <div className={`text-xs ${shell.textMuted}`}>{stock.sector}</div>
-                              <div className="font-semibold">₹{stock.price.toFixed(2)}</div>
+                              <div className="truncate">{stock.name}</div>
+                              <div className={`${shell.textMuted}`}>{stock.sector}</div>
+                              <div className="font-semibold">₹{stock.price.toFixed(0)}</div>
+                              <div className="text-emerald-400">₹{stock.entryPrice?.toFixed(0) || '-'}</div>
+                              <div className="text-rose-400">₹{stock.stopLoss?.toFixed(0) || '-'}</div>
+                              <div className="text-amber-400">₹{stock.target1?.toFixed(0) || '-'}</div>
+                              <div className="text-amber-500">₹{stock.target2?.toFixed(0) || '-'}</div>
                               <div className={stock.rsi >= 40 && stock.rsi <= 60 ? 'text-emerald-400' : 'text-rose-400'}>
-                                {stock.rsi.toFixed(1)}
+                                {stock.rsi.toFixed(0)}
                               </div>
                               <div className={stock.macdStatus === 'bullish' ? 'text-emerald-400' : stock.macdStatus === 'bearish' ? 'text-rose-400' : shell.textMuted}>
                                 {stock.macdStatus === 'bullish' ? '↗' : stock.macdStatus === 'bearish' ? '↘' : '→'}
                               </div>
                               <div className={stock.volumeRatio > 1.5 ? 'text-emerald-400' : shell.textMuted}>
-                                {stock.volumeRatio.toFixed(2)}x
+                                {stock.volumeRatio.toFixed(1)}x
                               </div>
-                              <div className="text-xs capitalize">
-                                {stock.setupType === 'uptrend-continuation' ? '📈 Up' : stock.setupType === 'recovery-play' ? '🔄 Rec' : '-'}
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <div className="w-20 bg-zinc-700/40 rounded h-6 flex items-center justify-center">
-                                  <span className={`text-xs font-bold ${
-                                    stock.setupStrength >= 8 ? 'text-emerald-400' :
-                                    stock.setupStrength >= 6 ? 'text-yellow-400' : 'text-zinc-400'
-                                  }`}>
-                                    {stock.setupStrength}/10
-                                  </span>
-                                </div>
+                              <div className="flex items-center gap-1">
+                                <span className={`text-xs font-bold ${
+                                  stock.setupStrength >= 8 ? 'text-emerald-400' :
+                                  stock.setupStrength >= 6 ? 'text-yellow-400' : 'text-zinc-400'
+                                }`}>
+                                  {stock.setupStrength}/10
+                                </span>
                               </div>
                             </div>
                           </div>
