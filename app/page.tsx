@@ -28,6 +28,7 @@ import {
   AlertCircle,
   Calendar,
   Bell,
+  Wallet,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
@@ -276,6 +277,84 @@ function MissionControlContent() {
     marketTrendOK: false,
   })
 
+  // Expense tracker state
+  interface Expense {
+    id: string
+    amount: number
+    description: string
+    date: string
+    createdAt: string
+    category?: string
+  }
+  interface ExpenseSummary {
+    total: number
+    income: number
+    expense: number
+    count: number
+  }
+  interface ExpenseAnalysis {
+    categoryBreakdown: Record<string, number>
+    monthlyBreakdown: Record<string, number>
+    averagePerDay: number
+  }
+  const [expenses, setExpenses] = useState<Expense[]>([])
+  const [expenseSummary, setExpenseSummary] = useState<ExpenseSummary>({ total: 0, income: 0, expense: 0, count: 0 })
+  const [expenseAnalysis, setExpenseAnalysis] = useState<ExpenseAnalysis>({ categoryBreakdown: {}, monthlyBreakdown: {}, averagePerDay: 0 })
+  const [expenseLoading, setExpenseLoading] = useState(false)
+  const [expenseSearch, setExpenseSearch] = useState('')
+  const [newExpense, setNewExpense] = useState({ amount: '', description: '', date: new Date().toISOString().split('T')[0] })
+
+  const loadExpenses = useCallback(async (query = '') => {
+    setExpenseLoading(true)
+    try {
+      const url = `/api/expenses${query ? `?q=${encodeURIComponent(query)}` : ''}`
+      const res = await fetch(url, { cache: 'no-store' })
+      const data = await res.json()
+      setExpenses(data.expenses || [])
+      setExpenseSummary(data.summary || { total: 0, income: 0, expense: 0, count: 0 })
+      setExpenseAnalysis(data.analysis || { categoryBreakdown: {}, monthlyBreakdown: {}, averagePerDay: 0 })
+    } catch (error) {
+      console.error('Failed to load expenses:', error)
+    } finally {
+      setExpenseLoading(false)
+    }
+  }, [])
+
+  const addExpense = async () => {
+    if (!newExpense.amount || !newExpense.description) return
+    try {
+      await fetch('/api/expenses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: parseFloat(newExpense.amount),
+          description: newExpense.description,
+          date: newExpense.date,
+        }),
+      })
+      setNewExpense({ amount: '', description: '', date: new Date().toISOString().split('T')[0] })
+      loadExpenses(expenseSearch)
+    } catch (error) {
+      console.error('Failed to add expense:', error)
+    }
+  }
+
+  const deleteExpense = async (id: string) => {
+    try {
+      await fetch(`/api/expenses?id=${id}`, { method: 'DELETE' })
+      loadExpenses(expenseSearch)
+    } catch (error) {
+      console.error('Failed to delete expense:', error)
+    }
+  }
+
+  // Load expenses when tab changes to expenses
+  useEffect(() => {
+    if (activeTab === 'expenses') {
+      loadExpenses()
+    }
+  }, [activeTab, loadExpenses])
+
   // Notifications state
   interface NotificationItem {
     id: string
@@ -491,6 +570,7 @@ function MissionControlContent() {
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
     { id: 'trading-center', label: 'TRADING CENTER', icon: TrendingUp },
     { id: 'swing-screener', label: 'SWING SCREENER', icon: BarChart3 },
+    { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
     { id: 'software-team', label: 'TEAM', icon: Users },
@@ -2365,6 +2445,168 @@ function MissionControlContent() {
                   </div>
                 )}
               </section>
+            </motion.div>
+          )}
+
+          {activeTab === 'expenses' && (
+            <motion.div key="expenses" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className={`border p-4 ${shell.panel}`}>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">EXPENSE TRACKER</h2>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                  ADD EXPENSE: E [AMOUNT] [DESCRIPTION] OR USE FORM BELOW
+                </p>
+              </div>
+
+              {/* Add Expense Form */}
+              <div className={`border p-4 ${shell.panel}`}>
+                <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>ADD NEW EXPENSE</p>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                  <input
+                    type="number"
+                    placeholder="Amount (₹)"
+                    value={newExpense.amount}
+                    onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
+                    className={`px-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={newExpense.description}
+                    onChange={(e) => setNewExpense({ ...newExpense, description: e.target.value })}
+                    className={`px-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none md:col-span-2`}
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={newExpense.date}
+                      onChange={(e) => setNewExpense({ ...newExpense, date: e.target.value })}
+                      className={`px-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none flex-1`}
+                    />
+                    <button
+                      onClick={addExpense}
+                      disabled={!newExpense.amount || !newExpense.description}
+                      className={`px-4 py-2 border text-xs tracking-wider bg-zinc-800/40 hover:bg-zinc-700/40 disabled:opacity-50 ${shell.panel}`}
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL</p>
+                  <p className={`text-xl font-bold mt-1 ${expenseSummary.total >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    ₹{Math.abs(expenseSummary.total).toLocaleString()}
+                  </p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>INCOME</p>
+                  <p className="text-xl font-bold mt-1 text-emerald-400">
+                    +₹{expenseSummary.income.toLocaleString()}
+                  </p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>EXPENSES</p>
+                  <p className="text-xl font-bold mt-1 text-rose-400">
+                    -₹{expenseSummary.expense.toLocaleString()}
+                  </p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>AVG/DAY</p>
+                  <p className="text-xl font-bold mt-1 text-amber-400">
+                    ₹{expenseAnalysis.averagePerDay.toFixed(0)}
+                  </p>
+                </div>
+              </div>
+
+              {/* Search & Filter */}
+              <div className={`border p-4 ${shell.panel}`}>
+                <div className="flex gap-3">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+                    <input
+                      type="text"
+                      placeholder="Search expenses..."
+                      value={expenseSearch}
+                      onChange={(e) => {
+                        setExpenseSearch(e.target.value)
+                        loadExpenses(e.target.value)
+                      }}
+                      className={`w-full pl-10 pr-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none`}
+                    />
+                  </div>
+                  <button
+                    onClick={() => loadExpenses()}
+                    className={`px-4 py-2 border text-xs tracking-wider hover:bg-zinc-800/40 ${shell.panel}`}
+                  >
+                    <RefreshCw className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Expense List */}
+              <div className={`border ${shell.panel} overflow-hidden`}>
+                <div className="hidden md:grid md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.5fr] gap-3 text-[10px] tracking-[0.12em] text-zinc-400 uppercase px-4 py-3 border-b border-zinc-700/40">
+                  <span>Date</span>
+                  <span>Description</span>
+                  <span>Amount</span>
+                  <span>Type</span>
+                  <span></span>
+                </div>
+                <div className="divide-y divide-zinc-700/40 max-h-[50vh] overflow-y-auto">
+                  {expenseLoading ? (
+                    <div className="p-8 text-center">
+                      <p className={`text-sm ${shell.textMuted}`}>Loading expenses...</p>
+                    </div>
+                  ) : expenses.length === 0 ? (
+                    <div className="p-8 text-center">
+                      <p className={`text-sm ${shell.textMuted}`}>No expenses yet. Add your first expense above.</p>
+                    </div>
+                  ) : (
+                    expenses.map((expense) => (
+                      <div key={expense.id} className={`p-3 hover:bg-zinc-800/20 ${shell.panel}`}>
+                        <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.5fr_1fr_0.8fr_0.5fr] gap-2 items-center text-sm">
+                          <div className="text-xs text-zinc-400">{expense.date}</div>
+                          <div className="font-medium">{expense.description}</div>
+                          <div className={`font-semibold ${expense.amount >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                            {expense.amount >= 0 ? '+' : '-'}₹{Math.abs(expense.amount).toLocaleString()}
+                          </div>
+                          <div className={`text-xs px-2 py-1 rounded inline-block w-fit ${
+                            expense.amount >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'
+                          }`}>
+                            {expense.amount >= 0 ? 'INCOME' : 'EXPENSE'}
+                          </div>
+                          <button
+                            onClick={() => deleteExpense(expense.id)}
+                            className="text-zinc-500 hover:text-rose-400 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Category Analysis */}
+              {Object.keys(expenseAnalysis.categoryBreakdown).length > 0 && (
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>CATEGORY BREAKDOWN</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {Object.entries(expenseAnalysis.categoryBreakdown).map(([cat, amount]) => (
+                      <div key={cat} className={`p-3 border ${shell.panelMuted}`}>
+                        <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>{cat || 'Uncategorized'}</p>
+                        <p className={`text-lg font-bold mt-1 ${amount >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          ₹{Math.abs(amount).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </motion.div>
           )}
 
