@@ -1257,13 +1257,13 @@ function MissionControlContent() {
                           ))}
                         </div>
                       ) : (
-                        <p className={`text-sm ${shell.textMuted}`}>• Maintain posting cadence and monitor feed freshness.</p>
+                        <p className={`text-sm ${shell.textMuted} break-words`}>• Maintain posting cadence and monitor feed freshness.</p>
                       )}
                     </div>
 
                     <div>
                       <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>GROWTH SIGNAL SUMMARY</p>
-                      <p className={`text-sm ${shell.textMuted}`}>{growthSignals[0]} · {growthSignals[1]}</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>{growthSignals[0]} · {growthSignals[1]}</p>
                     </div>
 
                     <div>
@@ -1273,7 +1273,7 @@ function MissionControlContent() {
 
                     <div>
                       <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>NEXT POST RECOMMENDATION</p>
-                      <p className={`text-sm ${shell.textMuted}`}>{nextPostRecommendation}</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>{nextPostRecommendation}</p>
                     </div>
                   </div>
                 </div>
@@ -1485,11 +1485,11 @@ function MissionControlContent() {
           )}
 
           {activeTab === 'xmax-work' && (
-            <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-10">
+            <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 md:space-y-10 overflow-x-hidden">
               <section className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">X GROWTH STRATEGY</h2>
-                  <button onClick={refreshTopics} disabled={isRefreshing} className={`px-3 py-1.5 text-[11px] tracking-[0.16em] border ${shell.panel}`}>
+                  <button onClick={refreshTopics} disabled={isRefreshing} className={`px-3 py-1.5 text-[11px] tracking-[0.16em] border ${shell.panel} w-full sm:w-auto`}>
                     {isRefreshing ? 'REFRESHING...' : 'REFRESH'}
                   </button>
                 </div>
@@ -1526,8 +1526,8 @@ function MissionControlContent() {
                               <p className="text-[10px] tracking-[0.14em] text-zinc-400">DRAFT {idx + 1}</p>
                               <p className="text-[10px] text-zinc-500">{tweet.length}/280</p>
                             </div>
-                            <p className={`text-sm ${shell.textMuted}`}>{tweet}</p>
-                            <div className="flex items-center gap-2 mt-2">
+                            <p className={`text-sm ${shell.textMuted} break-words`}>{tweet}</p>
+                            <div className="flex flex-wrap items-center gap-2 mt-2">
                               <button
                                 onClick={() => handleCopyPost(`tweet-${idx}`, tweet)}
                                 className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
@@ -1611,7 +1611,7 @@ function MissionControlContent() {
                               <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>{label.toUpperCase()}</p>
                               <p className={`text-[10px] ${shell.textSoft}`}>{text.length} chars</p>
                             </div>
-                            <p className={`text-sm ${shell.textMuted}`}>{text || 'No text available'}</p>
+                            <p className={`text-sm ${shell.textMuted} break-words`}>{text || 'No text available'}</p>
                           </div>
                         )
                       })}
@@ -1985,17 +1985,17 @@ function MissionControlContent() {
                     )}
 
                     {optionsData && optionsData.expirations.length === 0 && (
-                      <p className={`text-sm ${shell.textMuted}`}>No options data available for this symbol.</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>No options data available for this symbol.</p>
                     )}
 
                     {!optionsData && (
-                      <p className={`text-sm ${shell.textMuted}`}>Click "FETCH OPTIONS" to view the options chain.</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>Click "FETCH OPTIONS" to view the options chain.</p>
                     )}
                   </div>
                 )}
 
                 {!stockData && (
-                  <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote first to view options.</p>
+                  <p className={`text-sm ${shell.textMuted} break-words`}>Fetch a stock quote first to view options.</p>
                 )}
               </section>
 
@@ -2154,7 +2154,7 @@ function MissionControlContent() {
                 )}
 
                 {journalEntries.length === 0 && (
-                  <p className={`text-sm ${shell.textMuted}`}>No journal entries yet. Add your first trade above.</p>
+                  <p className={`text-sm ${shell.textMuted} break-words`}>No journal entries yet. Add your first trade above.</p>
                 )}
               </section>
 
@@ -2232,7 +2232,7 @@ function MissionControlContent() {
                 )}
 
                 {journalEntries.filter(e => !e.exitPrice).length === 0 && (
-                  <p className={`text-sm ${shell.textMuted}`}>No open positions.</p>
+                  <p className={`text-sm ${shell.textMuted} break-words`}>No open positions.</p>
                 )}
               </section>
 
@@ -2342,7 +2342,7 @@ function MissionControlContent() {
                 )}
 
                 {!stockData && (
-                  <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote to view technical indicators.</p>
+                  <p className={`text-sm ${shell.textMuted} break-words`}>Fetch a stock quote to view technical indicators.</p>
                 )}
               </section>
               </div>
@@ -2445,11 +2445,11 @@ function MissionControlContent() {
                   <div className="divide-y divide-zinc-700/40">
                     {screenerLoading ? (
                       <div className="p-8 text-center">
-                        <p className={`text-sm ${shell.textMuted}`}>Analyzing Nifty 100 stocks...</p>
+                        <p className={`text-sm ${shell.textMuted} break-words`}>Analyzing Nifty 100 stocks...</p>
                       </div>
                     ) : screenerStocks.length === 0 ? (
                       <div className="p-8 text-center">
-                        <p className={`text-sm ${shell.textMuted}`}>No matching setups found. Click "Refresh Screener" to scan again.</p>
+                        <p className={`text-sm ${shell.textMuted} break-words`}>No matching setups found. Click "Refresh Screener" to scan again.</p>
                       </div>
                     ) : (
                       screenerStocks
@@ -2631,11 +2631,11 @@ function MissionControlContent() {
                 <div className="divide-y divide-zinc-700/40 max-h-[50vh] overflow-y-auto">
                   {expenseLoading ? (
                     <div className="p-8 text-center">
-                      <p className={`text-sm ${shell.textMuted}`}>Loading expenses...</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>Loading expenses...</p>
                     </div>
                   ) : expenses.length === 0 ? (
                     <div className="p-8 text-center">
-                      <p className={`text-sm ${shell.textMuted}`}>No expenses yet. Add your first expense above.</p>
+                      <p className={`text-sm ${shell.textMuted} break-words`}>No expenses yet. Add your first expense above.</p>
                     </div>
                   ) : (
                     expenses.map((expense) => (
