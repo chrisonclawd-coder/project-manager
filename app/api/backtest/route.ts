@@ -243,6 +243,12 @@ function findEntrySignals(candles: Candle[]): number[] {
     if (uptrendContinuation || recoveryPlay) {
       signals.push(i)
     }
+
+    // Extra filter: Skip if no strong volume spike - reduces false signals
+    if (currVolume < currVolumeMA * 1.5) {
+      // Remove last signal if too weak
+      if (signals.length > 0) signals.pop()
+    }
   }
 
   return signals
