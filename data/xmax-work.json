@@ -20,7 +20,7 @@
   },
   "viral_tweet": {
     "topic": "AI Voice Agents - Token Efficiency Crisis",
-    "draft": "Voice transcripts bloat your context windows. Every 'um' and 'uh' burns tokens. We built Mdify to strip the noise—convert voice→text→clean markdown→feed to agent. 70% less token waste. No more fighting bot protection. Just signal.",
+    "draft": "Voice transcripts bloat your context windows. Every 'um' and 'uh' burns tokens. We built Mdify to strip the noise\u2014convert voice\u2192text\u2192clean markdown\u2192feed to agent. 70% less token waste. No more fighting bot protection. Just signal.",
     "character_count": 240,
     "algorithm_signals": {
       "real_graph_trigger": "Appeal to AI builders, prompt engineers, voice agent developers",
@@ -33,7 +33,7 @@
   "product_marketing_tweet": {
     "topic": "Mdify - Security & Compliance",
     "product": "Mdify - Chrome Extension",
-    "draft": "Your agents deserve better inputs. Stop copy-pasting janky HTML. Stop fighting Cloudflare. Stop wasting 40% of your tokens on whitespace garbage. Mdify: Convert articles → clean markdown → feed to your AI. Open source. No tracking. No JavaScript execution.",
+    "draft": "Your agents deserve better inputs. Stop copy-pasting janky HTML. Stop fighting Cloudflare. Stop wasting 40% of your tokens on whitespace garbage. Mdify: Convert articles \u2192 clean markdown \u2192 feed to your AI. Open source. No tracking. No JavaScript execution.",
     "character_count": 278,
     "url": "https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
     "algorithm_signals": {
@@ -71,7 +71,7 @@
       "example": "Engage with other OpenClaw builders"
     }
   ],
-  "execution_notes": "• API keys needed for exa-web-search to pull live trending data\n• Tweets optimized for Real-graph (follower engagement) + SimClusters (community resonance)\n• Mdify tweet focuses on practical pain points (token waste, bot protection)\n• Viral tweet bridges product capability with trending topic (voice agents)\n• Engagement strategy: quality replies > volume; authentic perspective > bait\n• Twitter Algorithm Optimizer applied for maximum algorithmic visibility",
+  "execution_notes": "\u2022 API keys needed for exa-web-search to pull live trending data\n\u2022 Tweets optimized for Real-graph (follower engagement) + SimClusters (community resonance)\n\u2022 Mdify tweet focuses on practical pain points (token waste, bot protection)\n\u2022 Viral tweet bridges product capability with trending topic (voice agents)\n\u2022 Engagement strategy: quality replies > volume; authentic perspective > bait\n\u2022 Twitter Algorithm Optimizer applied for maximum algorithmic visibility",
   "status": "READY FOR POSTING",
   "next_steps": [
     "Post viral tweet (AI Voice Agents focus)",
@@ -79,5 +79,36 @@
     "Execute 10+ engagement actions across trending posts",
     "Track engagement metrics for 24-48 hours",
     "Report back to Chrisly with results and performance data"
-  ]
+  ],
+  "comment_replies": {
+    "topic": "show me what you build / show me ur saas",
+    "mdify": [
+      {
+        "reply": "Built Mdify to convert any article to clean markdown for AI agents. No more HTML clutter\u2014just pure signal. Try it \u2192 https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+        "chars": 179
+      },
+      {
+        "reply": "My SaaS: Mdify converts web pages to markdown for ChatGPT Claude Gemini. One click. Clean output. Try it \u2192 https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+        "chars": 156
+      },
+      {
+        "reply": "Mdify here! Chrome extension that turns any webpage into clean markdown. Perfect for feeding AI agents. Get it \u2192 https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+        "chars": 158
+      }
+    ],
+    "guardskills": [
+      {
+        "reply": "@guardskills_ scans npm packages for malicious code. Essential for any AI project. Keeps your keys safe. Check it out!",
+        "chars": 119
+      },
+      {
+        "reply": "Built with @guardskills_ \u2014 scans your AI skills for malicious code. Security without the headache. Try it!",
+        "chars": 114
+      },
+      {
+        "reply": "@guardskills_ is my go-to for scanning npm packages before using them. Protects your API keys and data. Essential tool!",
+        "chars": 135
+      }
+    ]
+  }
 }

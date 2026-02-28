@@ -22,5 +22,21 @@
     "date": "2026-02-28",
     "createdAt": "2026-02-28T07:56:25.031Z",
     "category": "Misc"
+  },
+  {
+    "id": "1772286313844",
+    "amount": 45,
+    "description": "Rosemilk",
+    "date": "2026-02-28",
+    "createdAt": "2026-02-28T13:45:13.844Z",
+    "category": "Food"
+  },
+  {
+    "id": "1772288279577",
+    "amount": 199,
+    "description": "Apollo Circle",
+    "date": "2026-02-28",
+    "createdAt": "2026-02-28T14:17:59.577Z",
+    "category": "Misc"
   }
 ]
