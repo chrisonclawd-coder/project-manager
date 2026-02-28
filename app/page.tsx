@@ -224,6 +224,7 @@ function MissionControlContent() {
   const initialTab = searchParams.get('tab') || 'home'
 
   const [activeTab, setActiveTab] = useState(initialTab as string)
+  const [tradingSubTab, setTradingSubTab] = useState<'quote-board' | 'swing-screener'>('quote-board')
   const [filterStatus, setFilterStatus] = useState<TaskStatus | 'all'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
@@ -568,8 +569,7 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
-    { id: 'trading-center', label: 'TRADING CENTER', icon: TrendingUp },
-    { id: 'swing-screener', label: 'SWING SCREENER', icon: BarChart3 },
+    { id: 'trading', label: 'TRADING', icon: TrendingUp },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
@@ -850,18 +850,32 @@ function MissionControlContent() {
   }
 
   const fetchStockQuote = async (ticker: string) => {
+    if (!ticker || ticker.trim() === '') {
+      alert('Please enter a valid ticker symbol')
+      return
+    }
+
     setLoadingStock(true)
     try {
-      const res = await fetch(`/api/stock/quote?ticker=${ticker}`, { cache: 'no-store' })
+      const res = await fetch(`/api/stock/quote?ticker=${ticker.toUpperCase()}`, { cache: 'no-store' })
       const data = await res.json()
 
       if (res.ok) {
-        setStockData(data)
+        // Validate data before setting state
+        if (!data.symbol || typeof data.price !== 'number' || isNaN(data.price)) {
+          alert('Invalid stock data received. Please try again.')
+          setStockData(null)
+        } else {
+          setStockData(data)
+        }
       } else {
-        alert(data.error || 'Failed to fetch stock quote')
+        alert(data.error || 'Failed to fetch stock quote. Please verify the ticker symbol.')
+        setStockData(null)
       }
     } catch (error) {
-      alert('Failed to fetch stock quote')
+      console.error('Fetch error:', error)
+      alert('Network error: Failed to fetch stock quote')
+      setStockData(null)
     } finally {
       setLoadingStock(false)
     }
@@ -1692,8 +1706,35 @@ function MissionControlContent() {
             </motion.div>
           )}
 
-          {activeTab === 'trading-center' && (
-            <motion.div key="trading-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+          {activeTab === 'trading' && (
+            <motion.div key="trading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              {/* Trading Sub-Navigation */}
+              <div className="flex gap-2 border-b border-zinc-700/40">
+                <button
+                  onClick={() => setTradingSubTab('quote-board')}
+                  className={`px-4 py-3 text-xs tracking-[0.16em] font-semibold border-b-2 transition-colors ${
+                    tradingSubTab === 'quote-board'
+                      ? 'border-zinc-300 text-zinc-100'
+                      : `border-transparent ${shell.textMuted} hover:text-zinc-300`
+                  }`}
+                >
+                  QUOTE BOARD
+                </button>
+                <button
+                  onClick={() => setTradingSubTab('swing-screener')}
+                  className={`px-4 py-3 text-xs tracking-[0.16em] font-semibold border-b-2 transition-colors ${
+                    tradingSubTab === 'swing-screener'
+                      ? 'border-zinc-300 text-zinc-100'
+                      : `border-transparent ${shell.textMuted} hover:text-zinc-300`
+                  }`}
+                >
+                  SWING SCREENER
+                </button>
+              </div>
+
+              {/* Quote Board Sub-Tab Content */}
+              {tradingSubTab === 'quote-board' && (
+              <div className="space-y-6">
               {/* Stock Quote Board */}
               <section className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -2275,11 +2316,12 @@ function MissionControlContent() {
                   <p className={`text-sm ${shell.textMuted}`}>Fetch a stock quote to view technical indicators.</p>
                 )}
               </section>
-            </motion.div>
-          )}
+              </div>
+              )}
 
-          {activeTab === 'swing-screener' && (
-            <motion.div key="swing-screener" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              {/* Swing Screener Sub-Tab Content */}
+              {tradingSubTab === 'swing-screener' && (
+              <div className="space-y-6">
               <section className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">NIFTY 100 SWING TRADE SCREENER</h2>
@@ -2445,6 +2487,8 @@ function MissionControlContent() {
                   </div>
                 )}
               </section>
+              </div>
+              )}
             </motion.div>
           )}
 
