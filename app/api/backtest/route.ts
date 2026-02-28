@@ -141,7 +141,7 @@ function calculateVolumeMA(volumes: number[], period: number = 20): number[] {
 async function fetchHistoricalData(symbol: string, apiKey: string): Promise<Candle[]> {
   try {
     const response = await fetch(
-      `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=180&apikey=${apiKey}`
+      `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=1day&outputsize=365&apikey=${apiKey}`
     )
 
     if (!response.ok) {
