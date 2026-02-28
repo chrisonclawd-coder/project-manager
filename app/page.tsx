@@ -686,11 +686,40 @@ function MissionControlContent() {
 
   const handleCopyPost = async (id: string, text: string) => {
     try {
-      await navigator.clipboard.writeText(text)
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        // Fallback for mobile/unsecure contexts
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-9999px'
+        textArea.style.top = '-9999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+      }
       setCopiedPostId(id)
       setTimeout(() => setCopiedPostId(null), 1200)
     } catch {
-      setCopiedPostId(null)
+      // Final fallback: select text
+      try {
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-9999px'
+        document.body.appendChild(textArea)
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+        setCopiedPostId(id)
+        setTimeout(() => setCopiedPostId(null), 1200)
+      } catch {
+        setCopiedPostId(null)
+      }
     }
   }
 
