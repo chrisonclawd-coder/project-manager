@@ -27,6 +27,7 @@ import {
   RefreshCw,
   AlertCircle,
   Calendar,
+  Bell,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
@@ -274,6 +275,55 @@ function MissionControlContent() {
     vixLevel: 0,
     marketTrendOK: false,
   })
+
+  // Notifications state
+  interface NotificationItem {
+    id: string
+    title: string
+    message: string
+    type: 'info' | 'success' | 'warning' | 'error'
+    timestamp: string
+    read: boolean
+  }
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mission-control-notifications')
+      return saved ? JSON.parse(saved) : []
+    }
+    return []
+  })
+  const [showNotifications, setShowNotifications] = useState(false)
+
+  // Save notifications to localStorage
+  useEffect(() => {
+    localStorage.setItem('mission-control-notifications', JSON.stringify(notifications))
+  }, [notifications])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const addNotification = (title: string, message: string, type: NotificationItem['type'] = 'info') => {
+    const newNotification: NotificationItem = {
+      id: Date.now().toString(),
+      title,
+      message,
+      type,
+      timestamp: new Date().toISOString(),
+      read: false,
+    }
+    setNotifications(prev => [newNotification, ...prev].slice(0, 50)) // Keep last 50
+  }
+
+  const markAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+  }
+
+  const clearNotifications = () => {
+    setNotifications([])
+  }
 
   const shell = darkMode
     ? {
@@ -873,9 +923,22 @@ function MissionControlContent() {
             <Zap className="w-6 h-6 text-zinc-300" />
             <span className="font-semibold tracking-[0.2em] ml-2 text-zinc-200">MISSION</span>
           </div>
-          <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-md transition-colors ${shell.navHover}`}>
-            {darkMode ? <Sun className="w-5 h-5 text-zinc-300" /> : <Moon className="w-5 h-5 text-zinc-700" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <button 
+              onClick={() => setShowNotifications(!showNotifications)} 
+              className={`p-2 rounded-md transition-colors relative ${shell.navHover}`}
+            >
+              <Bell className="w-5 h-5 text-zinc-300" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+            <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-md transition-colors ${shell.navHover}`}>
+              {darkMode ? <Sun className="w-5 h-5 text-zinc-300" /> : <Moon className="w-5 h-5 text-zinc-700" />}
+            </button>
+          </div>
         </div>
 
         <div className="p-3 space-y-1.5">
@@ -925,7 +988,124 @@ function MissionControlContent() {
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
 
+      {/* Notification Bell */}
+      <div className="lg:hidden fixed top-4 right-4 z-50">
+        <button
+          onClick={() => setShowNotifications(!showNotifications)}
+          className={`p-2 rounded border transition-colors duration-200 ${shell.panel} relative`}
+        >
+          <Bell className="w-5 h-5" />
+          {unreadCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+        </button>
+      </div>
+
       {sidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />}
+
+      {/* Notification Panel */}
+      {showNotifications && (
+        <div className="fixed inset-0 z-50 lg:z-40 lg:hidden">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowNotifications(false)} />
+          <div className={`fixed right-0 top-0 h-full w-80 max-w-full ${shell.panel} border-l overflow-hidden flex flex-col`}>
+            <div className="p-4 border-b border-zinc-700/40 flex items-center justify-between">
+              <h3 className="text-sm font-semibold tracking-wider">NOTIFICATIONS</h3>
+              <button onClick={() => setShowNotifications(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2">
+              {notifications.length === 0 ? (
+                <p className={`text-center py-8 ${shell.textMuted} text-sm`}>No notifications yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {notifications.map(n => (
+                    <div
+                      key={n.id}
+                      className={`p-3 border rounded cursor-pointer transition-colors ${
+                        n.read ? 'opacity-50' : ''
+                      } ${n.type === 'error' ? 'border-red-500/30 bg-red-500/5' : n.type === 'warning' ? 'border-amber-500/30 bg-amber-500/5' : n.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-700/40'}`}
+                      onClick={() => markAsRead(n.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <p className="text-sm font-medium">{n.title}</p>
+                        {!n.read && <span className="w-2 h-2 bg-blue-400 rounded-full" />}
+                      </div>
+                      <p className={`text-xs mt-1 ${shell.textMuted}`}>{n.message}</p>
+                      <p className={`text-[10px] mt-2 ${shell.textSoft}`}>
+                        {new Date(n.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {notifications.length > 0 && (
+              <div className="p-3 border-t border-zinc-700/40 flex gap-2">
+                <button onClick={markAllAsRead} className={`flex-1 text-xs py-2 border ${shell.panel} hover:bg-zinc-800/40`}>
+                  Mark All Read
+                </button>
+                <button onClick={clearNotifications} className={`flex-1 text-xs py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10`}>
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Notification Panel */}
+      {showNotifications && (
+        <div className="hidden lg:block fixed inset-0 z-40">
+          <div className="fixed inset-0" onClick={() => setShowNotifications(false)} />
+          <div className={`fixed right-4 top-14 w-96 max-w-full ${shell.panel} border shadow-xl overflow-hidden flex flex-col`}>
+            <div className="p-4 border-b border-zinc-700/40 flex items-center justify-between">
+              <h3 className="text-sm font-semibold tracking-wider">NOTIFICATIONS</h3>
+              <button onClick={() => setShowNotifications(false)}>
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 max-h-[60vh]">
+              {notifications.length === 0 ? (
+                <p className={`text-center py-8 ${shell.textMuted} text-sm`}>No notifications yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {notifications.map(n => (
+                    <div
+                      key={n.id}
+                      className={`p-3 border rounded cursor-pointer transition-colors ${
+                        n.read ? 'opacity-50' : ''
+                      } ${n.type === 'error' ? 'border-red-500/30 bg-red-500/5' : n.type === 'warning' ? 'border-amber-500/30 bg-amber-500/5' : n.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-700/40'}`}
+                      onClick={() => markAsRead(n.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <p className="text-sm font-medium">{n.title}</p>
+                        {!n.read && <span className="w-2 h-2 bg-blue-400 rounded-full" />}
+                      </div>
+                      <p className={`text-xs mt-1 ${shell.textMuted}`}>{n.message}</p>
+                      <p className={`text-[10px] mt-2 ${shell.textSoft}`}>
+                        {new Date(n.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {notifications.length > 0 && (
+              <div className="p-3 border-t border-zinc-700/40 flex gap-2">
+                <button onClick={markAllAsRead} className={`flex-1 text-xs py-2 border ${shell.panel} hover:bg-zinc-800/40`}>
+                  Mark All Read
+                </button>
+                <button onClick={clearNotifications} className={`flex-1 text-xs py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10`}>
+                  Clear All
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <main className="lg:ml-64 min-h-screen p-4 md:p-8 pt-16 lg:pt-8">
         <AnimatePresence mode="wait">

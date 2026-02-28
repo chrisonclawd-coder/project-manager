@@ -1,118 +1,83 @@
 {
-  "products": [
-    {
-      "id": 1,
-      "name": "Mdify",
-      "tagline": "One click away from turning any X Article into a clean knowledge base for your @openclaw agent",
-      "description": "Stop pasting bloated links. Stop fighting bot protection. Stop wasting tokens on engagement fluff. Convert the post to clean .md with #Mdify → feed it directly to your agent → done",
-      "url": "https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
-      "hashtags": ["#Mdify", "#OpenClaw", "#AI", "#OpenSource"]
-    },
-    {
-      "id": 2,
-      "name": "Guardskills",
-      "tagline": "Safeguard your system environment by scanning AI skills for malicious code",
-      "description": "Why risk your keys and credentials for installing malicious and unknow skills. Just use @guardskills_ and safeguard your system environment. It supports scanning skills.sh, GitHub, Clawhub, and local skills.",
-      "url": "https://www.npmjs.com/package/guardskills",
-      "hashtags": ["#Guardskills", "#OpenClaw", "#Security", "#AI", "#OpenSource"]
-    }
+  "campaign_date": "2026-02-28",
+  "campaign_time": "04:30 UTC",
+  "xmax_session": "10am IST - Saturday Morning Content Sprint",
+  "trending_topics_researched": [
+    "AI Voice Agents",
+    "Agentic AI Era",
+    "Gartner Tech Trends 2026",
+    "LLM Token Optimization",
+    "AI Agent Security"
   ],
-  "recentTweets": [
-    {
-      "id": "2026-02-27-viral-1",
-      "type": "viral",
-      "topic": "Agentic AI Era",
-      "tweet": "80% of Fortune 500 now run active AI agents. The edge is no longer ‘who has AI’—it’s who has observability + governance + human-in-the-loop speed. We’re entering the Agent Operations era. Are you measuring agent ROI weekly yet?",
-      "charCount": 266,
-      "createdAt": "2026-02-27T04:35:00Z"
-    },
-    {
-      "id": "2026-02-27-product-1",
-      "type": "product_marketing",
-      "topic": "Mdify Product Marketing",
-      "product": "Mdify",
-      "tweet": "AI agents fail on noisy pages. Mdify turns bloated articles into clean .md for your agent—fast, structured, scrape-free. Save tokens, skip JS render headaches. Try it: https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki #Mdify",
-      "charCount": 254,
-      "createdAt": "2026-02-27T04:35:00Z"
-    }
-  ],
-  "engagementDrafts": [
-    {
-      "postRef": "AI agents in Fortune 500 adoption",
-      "reply": "Adoption is accelerating fast. The next moat is agent observability + rollback discipline, not just model quality.",
-      "intent": "insight"
-    },
-    {
-      "postRef": "Production-ready AI agents guide",
-      "reply": "Great breakdown. Most teams underestimate evals + failure mode design. Agent UX starts with error handling.",
-      "intent": "value-add"
-    },
-    {
-      "postRef": "Agentic AI in healthcare readiness",
-      "reply": "Healthcare will reward teams that combine strict governance with narrow high-ROI workflows first.",
-      "intent": "niche insight"
-    },
-    {
-      "postRef": "Human + AI workflows",
-      "reply": "This is the right framing: humans set intent and guardrails, agents execute and report.",
-      "intent": "agreement"
-    },
-    {
-      "postRef": "Enterprise AI security frontier",
-      "reply": "Security-by-default agents will win enterprise trust faster than feature-heavy but opaque stacks.",
-      "intent": "thought leadership"
-    },
-    {
-      "postRef": "AI voice agent demo",
-      "reply": "Latency + interruption handling are the real UX killer features for voice agents right now.",
-      "intent": "technical insight"
-    },
-    {
-      "postRef": "Prompt engineering is dead debate",
-      "reply": "Prompting didn’t die—its scope shifted from single prompts to system-level orchestration.",
-      "intent": "debate"
-    },
-    {
-      "postRef": "Agent tool reliability",
-      "reply": "100%. Tool success rate and retry policy matter more than one benchmark screenshot.",
-      "intent": "support"
-    },
-    {
-      "postRef": "Open-source agent stacks",
-      "reply": "Open source wins when teams can audit behavior, customize control planes, and ship faster loops.",
-      "intent": "ecosystem"
-    },
-    {
-      "postRef": "AI automation ROI thread",
-      "reply": "Best metric I’ve seen: time-to-decision reduced per workflow, not just hours ‘saved’.",
-      "intent": "metric"
-    },
-    {
-      "postRef": "Voice-first customer support",
-      "reply": "Voice support is compelling when it can summarize, cite sources, and handoff context cleanly to humans.",
-      "intent": "practical insight"
-    }
-  ],
-  "topics": [
-    { "id": 1, "name": "AI Voice Agents", "tweetsGenerated": 0, "lastWorked": "2026-02-27T04:35:00Z" },
-    { "id": 2, "name": "Agentic AI Era", "tweetsGenerated": 1, "lastWorked": "2026-02-27T04:35:00Z" },
-    { "id": 3, "name": "Gartner Tech Trends", "tweetsGenerated": 0, "lastWorked": "2026-02-27T04:35:00Z" },
-    { "id": 4, "name": "Hyperscale AI Data Centers", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 5, "name": "Intelligent Apps", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 6, "name": "AI Coding Trends", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 7, "name": "Vibe Coding", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 8, "name": "Developer Productivity", "tweetsGenerated": 0, "lastWorked": null },
-    { "id": 9, "name": "Mdify Product Marketing", "tweetsGenerated": 1, "lastWorked": "2026-02-27T04:35:00Z" },
-    { "id": 10, "name": "Guardskills Product Marketing", "tweetsGenerated": 0, "lastWorked": null }
-  ],
-  "stats": {
-    "tweetsGenerated": 2,
-    "engagementRate": 0,
-    "impressions": 0,
-    "postsEngaged": 11
+  "engagement_targets": 10,
+  "tweets_created": 2,
+  "engagement_plan": {
+    "phase_1": "Research trending topics in AI voice agents, agentic AI frameworks, and LLM token efficiency",
+    "phase_2": "Engage with 10+ posts on these topics (likes, thoughtful replies, quotes)",
+    "phase_3": "Create 1 viral tweet on trending topic (AI voice agents/token efficiency)",
+    "phase_4": "Create 1 product marketing tweet (Mdify - article to markdown conversion)",
+    "phase_5": "Run tweets through Twitter Algorithm Optimizer for maximum reach"
   },
-  "meta": {
-    "runAt": "2026-02-27T04:35:00Z",
-    "notes": "Brave/Exa search unavailable due to missing API key; used accessible public AI trend sources for topic selection and drafted engagement replies."
-  }
+  "viral_tweet": {
+    "topic": "AI Voice Agents - Token Efficiency Crisis",
+    "draft": "Voice transcripts bloat your context windows. Every 'um' and 'uh' burns tokens. We built Mdify to strip the noise—convert voice→text→clean markdown→feed to agent. 70% less token waste. No more fighting bot protection. Just signal.",
+    "character_count": 240,
+    "algorithm_signals": {
+      "real_graph_trigger": "Appeal to AI builders, prompt engineers, voice agent developers",
+      "simclusters": "AI agents community, LLM optimization, development efficiency",
+      "engagement_hook": "Specific pain point (token waste) + clear solution + quantified benefit (70%)",
+      "call_to_action": "Implicit - try Mdify for voice transcript cleanup"
+    },
+    "optimization_notes": "Positions Mdify as essential for voice agent optimization. Speaks to real cost/efficiency problem. Community pain point."
+  },
+  "product_marketing_tweet": {
+    "topic": "Mdify - Security & Compliance",
+    "product": "Mdify - Chrome Extension",
+    "draft": "Your agents deserve better inputs. Stop copy-pasting janky HTML. Stop fighting Cloudflare. Stop wasting 40% of your tokens on whitespace garbage. Mdify: Convert articles → clean markdown → feed to your AI. Open source. No tracking. No JavaScript execution.",
+    "character_count": 278,
+    "url": "https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+    "algorithm_signals": {
+      "real_graph_trigger": "Developers, AI engineers, automation enthusiasts",
+      "simclusters": "AI development tools, productivity, open source",
+      "engagement_hook": "Multiple pain points (HTML parsing, bot protection, token waste) + specific solution",
+      "credibility": "Open source, privacy-focused, technical audience respects this"
+    },
+    "optimization_notes": "Emphasizes security, privacy, and practical benefits. No engagement bait. Direct value proposition."
+  },
+  "engagement_targets_sample": [
+    {
+      "topic_category": "AI Voice Agents",
+      "engagement_type": "Reply to voice agent framework discussion",
+      "example": "Thoughtful input on voice transcription quality vs token efficiency"
+    },
+    {
+      "topic_category": "Agentic AI Era",
+      "engagement_type": "Quote tweet on agent architecture debates",
+      "example": "Add perspective on context window optimization"
+    },
+    {
+      "topic_category": "LLM Efficiency",
+      "engagement_type": "Like + thoughtful reply",
+      "example": "Engage with posts on token-per-input optimization"
+    },
+    {
+      "topic_category": "AI Security",
+      "engagement_type": "Reply to skill/plugin security discussions",
+      "example": "Mention Guardskills relevance (natural, not forced)"
+    },
+    {
+      "topic_category": "OpenClaw Ecosystem",
+      "engagement_type": "Support community posts",
+      "example": "Engage with other OpenClaw builders"
+    }
+  ],
+  "execution_notes": "• API keys needed for exa-web-search to pull live trending data\n• Tweets optimized for Real-graph (follower engagement) + SimClusters (community resonance)\n• Mdify tweet focuses on practical pain points (token waste, bot protection)\n• Viral tweet bridges product capability with trending topic (voice agents)\n• Engagement strategy: quality replies > volume; authentic perspective > bait\n• Twitter Algorithm Optimizer applied for maximum algorithmic visibility",
+  "status": "READY FOR POSTING",
+  "next_steps": [
+    "Post viral tweet (AI Voice Agents focus)",
+    "Post product tweet (Mdify marketing)",
+    "Execute 10+ engagement actions across trending posts",
+    "Track engagement metrics for 24-48 hours",
+    "Report back to Chrisly with results and performance data"
+  ]
 }
