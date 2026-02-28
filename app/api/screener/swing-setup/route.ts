@@ -32,6 +32,8 @@ interface ScreenerResponse {
     marketTrendOK: boolean;
   };
   timestamp: string;
+  analysisDate: string;
+  validTill: string;
   totalScanned: number;
   matchingSetups: number;
 }
@@ -292,6 +294,12 @@ export async function GET(request: Request): Promise<NextResponse<ScreenerRespon
     const marketTrendOK = nifty50Above20EMA && vixLevel < 20;
     
     if (!marketTrendOK) {
+      const now = new Date();
+      const analysisDate = now.toISOString().split('T')[0];
+      const validTill = new Date(now);
+      validTill.setDate(validTill.getDate() + 1);
+      const validTillDate = validTill.toISOString().split('T')[0];
+      
       return NextResponse.json({
         stocks: [],
         marketFilters: {
@@ -300,6 +308,8 @@ export async function GET(request: Request): Promise<NextResponse<ScreenerRespon
           marketTrendOK,
         },
         timestamp: new Date().toISOString(),
+        analysisDate,
+        validTill: validTillDate,
         totalScanned: stocks.length,
         matchingSetups: 0,
       });
@@ -330,6 +340,14 @@ export async function GET(request: Request): Promise<NextResponse<ScreenerRespon
     // Sort by setup strength descending
     analysisList.sort((a, b) => b.setupStrength - a.setupStrength);
     
+    const now = new Date();
+    const analysisDate = now.toISOString().split('T')[0]; // YYYY-MM-DD
+    
+    // Valid till: end of next trading day (assume 1 day validity for swing setups)
+    const validTill = new Date(now);
+    validTill.setDate(validTill.getDate() + 1);
+    const validTillDate = validTill.toISOString().split('T')[0];
+    
     return NextResponse.json({
       stocks: analysisList,
       marketFilters: {
@@ -338,11 +356,18 @@ export async function GET(request: Request): Promise<NextResponse<ScreenerRespon
         marketTrendOK,
       },
       timestamp: new Date().toISOString(),
+      analysisDate,
+      validTill: validTillDate,
       totalScanned: stocks.length,
       matchingSetups: analysisList.length,
     });
   } catch (error) {
     console.error('Screener error:', error);
+    const now = new Date();
+    const analysisDate = now.toISOString().split('T')[0];
+    const validTill = new Date(now);
+    validTill.setDate(validTill.getDate() + 1);
+    const validTillDate = validTill.toISOString().split('T')[0];
     
     return NextResponse.json(
       {
@@ -353,6 +378,8 @@ export async function GET(request: Request): Promise<NextResponse<ScreenerRespon
           marketTrendOK: false,
         },
         timestamp: new Date().toISOString(),
+        analysisDate,
+        validTill: validTillDate,
         totalScanned: 0,
         matchingSetups: 0,
       },
