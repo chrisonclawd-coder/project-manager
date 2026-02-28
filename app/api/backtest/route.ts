@@ -217,25 +217,20 @@ function findEntrySignals(candles: Candle[]): number[] {
       continue
     }
 
-    // SIMPLIFIED - Focus on just RSI + Volume (most reliable)
+    // OVERSOLD RECOVERY - RSI oversold + volume
     
-    // RSI in sweet spot - oversold to neutral
-    if (currRSI < 35 || currRSI > 55) {
+    // RSI oversold (ready to bounce)
+    if (currRSI < 30 || currRSI > 50) {
       continue
     }
 
-    // Strong volume spike
-    if (currVolume < currVolumeMA * 2.0) {
+    // Moderate volume
+    if (currVolume < currVolumeMA * 1.3) {
       continue
     }
 
-    // Price above 20 EMA (basic trend)
-    if (price < currEMA20) {
-      continue
-    }
-
-    // MACD turning positive (momentum shift)
-    if (currMACDHist <= 0) {
+    // Price near or below 20 EMA (potential bounce off support)
+    if (price > currEMA20 * 1.02) {  // Allow 2% above EMA
       continue
     }
 
