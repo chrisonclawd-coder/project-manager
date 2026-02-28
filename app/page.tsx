@@ -26,6 +26,7 @@ import {
   Trash2,
   RefreshCw,
   AlertCircle,
+  Calendar,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
@@ -128,6 +129,8 @@ interface ScreenerResponse {
     marketTrendOK: boolean
   }
   timestamp: string
+  analysisDate: string
+  validTill: string
   totalScanned: number
   matchingSetups: number
 }
@@ -256,6 +259,8 @@ function MissionControlContent() {
   // Swing Screener state
   const [screenerStocks, setScreenerStocks] = useState<ScreenerStock[]>([])
   const [screenerLoading, setScreenerLoading] = useState(false)
+  const [screenerAnalysisDate, setScreenerAnalysisDate] = useState('')
+  const [screenerValidTill, setScreenerValidTill] = useState('')
   const [screenerLastUpdate, setScreenerLastUpdate] = useState<string>('')
   const [screenerFilterSector, setScreenerFilterSector] = useState<string>('all')
   const [screenerMarketFilters, setScreenerMarketFilters] = useState({
@@ -487,6 +492,8 @@ function MissionControlContent() {
 
       setScreenerStocks(payload.stocks || [])
       setScreenerLastUpdate(payload.timestamp)
+      setScreenerAnalysisDate(payload.analysisDate || '')
+      setScreenerValidTill(payload.validTill || '')
       setScreenerMarketFilters(payload.marketFilters || {
         nifty50Above20EMA: false,
         vixLevel: 0,
@@ -2019,6 +2026,22 @@ function MissionControlContent() {
                     {screenerLoading ? 'SCANNING...' : 'REFRESH SCREENER'}
                   </button>
                 </div>
+
+                {/* Analysis Date Info */}
+                {(screenerAnalysisDate || screenerValidTill) && (
+                  <div className={`border p-3 flex items-center justify-between text-xs ${shell.panel}`}>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-zinc-500" />
+                      <span className={shell.textSoft}>Analysis:</span>
+                      <span className="text-zinc-300">{screenerAnalysisDate}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4 text-zinc-500" />
+                      <span className={shell.textSoft}>Valid Till:</span>
+                      <span className="text-amber-400">{screenerValidTill}</span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Market Filters Status */}
                 <div className={`border p-4 ${shell.panel}`}>
