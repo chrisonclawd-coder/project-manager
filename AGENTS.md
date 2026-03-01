@@ -12,8 +12,10 @@ Before doing anything else:
 
 1. Read `SOUL.md` — this is who you are
 2. Read `USER.md` — this is who you're helping
-3. Read `MEMORY.md` — THIS IS CRITICAL (long-term memory: goals, preferences, what annoys you)
-4. Read `memory/YYYY-MM-DD.md` (today + yesterday) — recent context, decisions, tasks
+3. Read `MEMORY.md` — THIS IS CRITICAL (long-term memory)
+4. Read `learning.md` — agent's learning log (mistakes, improvements)
+5. Read `shared-knowledge.md` — cross-agent insights for context sharing
+6. Read `memory/YYYY-MM-DD.md` (today + yesterday)
 
 **Order matters:** MEMORY.md → daily journal → SOUL.md → USER.md
 
@@ -40,7 +42,9 @@ You wake up fresh each session. These files are your continuity.
 
 **When Robin says "remember this" → WRITE IT IMMEDIATELY to a file.**
 
-**When you make a mistake → DOCUMENT IT so you never repeat it.**
+**When you make a mistake → DOCUMENT IT in learning.md so you never repeat it.**
+
+**When you learn something → UPDATE learning.md + shared-knowledge.md for cross-agent context.**
 
 **When you learn something about Robin → UPDATE MEMORY.md.**
 
