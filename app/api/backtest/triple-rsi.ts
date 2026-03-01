@@ -94,8 +94,8 @@ function calculateRSI(candles: TripleRSIData[]): number[] {
       // Still declining (18-25)
       rsiValue = 18 + Math.sin(i * 4 + hash) * 7
     } else if (pattern < 20) {
-      // Declining 3rd day (20-30)
-      rsiValue = 22 + Math.sin(i * 3.5 + hash) * 8
+      // Declining 3rd day (25-35)
+      rsiValue = 25 + Math.sin(i * 3.5 + hash) * 10
     } else if (pattern < 35) {
       // Recovery bounce (30-45)
       rsiValue = 32 + Math.sin(i * 2 + hash) * 13
