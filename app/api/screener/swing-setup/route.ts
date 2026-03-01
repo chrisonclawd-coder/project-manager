@@ -6,10 +6,12 @@ interface StockAnalysis {
   sector: string;
   price: number;
   rsi: number;
+  rsi3DaysAgo: number;
+  rsiDeclining: boolean;
   macdStatus: 'bullish' | 'bearish' | 'neutral';
   volumeRatio: number;
   setupStrength: number;
-  setupType: 'uptrend-continuation' | 'recovery-play' | 'none';
+  setupType: 'triple-rsi' | 'oversold-bounce' | 'none';
   pricePosition: {
     above20EMA: boolean;
     below50EMA: boolean;
@@ -22,6 +24,12 @@ interface StockAnalysis {
   target2: number;
   riskReward1: number;
   riskReward2: number;
+  // Triple RSI criteria
+  tripleRSICriteria: {
+    rsiLessThan30: boolean;
+    rsiDeclining3Days: boolean;
+    rsiWasBelow55: boolean;
+  };
 }
 
 interface ScreenerResponse {
@@ -69,24 +77,67 @@ async function getTechnicalIndicators(symbol: string): Promise<any> {
   if (!apiKey) return null;
   
   try {
-    // Get RSI, EMA20, MACD in parallel
-    const [rsiRes, emaRes, macdRes] = await Promise.all([
+    // Get current indicators + historical data for RSI trends
+    const [rsiRes, emaRes, macdRes, historyRes] = await Promise.all([
       fetch(`https://api.twelvedata.com/rsi?symbol=${symbol}&interval=daily&time_period=14&apikey=${apiKey}`),
       fetch(`https://api.twelvedata.com/ema?symbol=${symbol}&interval=daily&time_period=20&apikey=${apiKey}`),
-      fetch(`https://api.twelvedata.com/macd?symbol=${symbol}&interval=daily&fast_period=12&slow_period=26&signal_period=9&apikey=${apiKey}`)
+      fetch(`https://api.twelvedata.com/macd?symbol=${symbol}&interval=daily&fast_period=12&slow_period=26&signal_period=9&apikey=${apiKey}`),
+      fetch(`https://api.twelvedata.com/time_series?symbol=${symbol}&interval=daily&outputsize=30&apikey=${apiKey}`)
     ]);
-    
-    const [rsi, ema, macd] = await Promise.all([
+
+    const [rsi, ema, macd, history] = await Promise.all([
       rsiRes.json(),
       emaRes.json(),
-      macdRes.json()
+      macdRes.json(),
+      historyRes.json()
     ]);
+
+    // Calculate RSI trends from historical data
+    let rsiHistory: number[] = [];
+    if (history.values && Array.isArray(history.values)) {
+      const closes = history.values.map((v: any) => parseFloat(v.close)).reverse();
+      rsiHistory = calculateRSIHistory(closes);
+    }
     
-    return { rsi, ema, macd };
+    return { rsi, ema, macd, rsiHistory };
   } catch (error) {
     console.error(`Error fetching indicators for ${symbol}:`, error);
     return null;
   }
+}
+
+// Calculate RSI from price history
+function calculateRSIHistory(closes: number[]): number[] {
+  const rsi: number[] = [];
+  const period = 14;
+  
+  for (let i = 0; i < closes.length; i++) {
+    if (i < period) {
+      rsi.push(50); // Default neutral
+      continue;
+    }
+    
+    let gains = 0;
+    let losses = 0;
+    
+    for (let j = i - period + 1; j <= i; j++) {
+      const change = closes[j] - closes[j - 1];
+      if (change > 0) gains += change;
+      else losses += Math.abs(change);
+    }
+    
+    const avgGain = gains / period;
+    const avgLoss = losses / period;
+    
+    if (avgLoss === 0) {
+      rsi.push(100);
+    } else {
+      const rs = avgGain / avgLoss;
+      rsi.push(100 - (100 / (1 + rs)));
+    }
+  }
+  
+  return rsi;
 }
 
 async function analyzeStock(symbol: string, name: string, sector: string): Promise<StockAnalysis | null> {
@@ -130,37 +181,51 @@ async function analyzeStock(symbol: string, name: string, sector: string): Promi
     
     const macdStatus = macdLine > macdSignal ? 'bullish' : macdLine < macdSignal ? 'bearish' : 'neutral';
     
+    // Get RSI history for Triple RSI analysis
+    const rsiHistory = indicators?.rsiHistory || [];
+    const rsi3DaysAgo = rsiHistory.length > 3 ? rsiHistory[rsiHistory.length - 4] : 50;
+    const rsi2DaysAgo = rsiHistory.length > 2 ? rsiHistory[rsiHistory.length - 3] : 50;
+    const rsi1DayAgo = rsiHistory.length > 1 ? rsiHistory[rsiHistory.length - 2] : 50;
+    const currentRSI = rsiHistory.length > 0 ? rsiHistory[rsiHistory.length - 1] : rsi;
+    
+    // TRIPLE RSI CONDITIONS (from backtest)
+    // 1. RSI < 30 (deeply oversold)
+    const rsiLessThan30 = currentRSI < 30;
+    // 2. RSI declining 3 consecutive days
+    const rsiDeclining3Days = rsi2DaysAgo < rsi3DaysAgo && rsi1DayAgo < rsi2DaysAgo && currentRSI < rsi1DayAgo;
+    // 3. RSI was < 55 three days ago
+    const rsiWasBelow55 = rsi3DaysAgo < 55;
+    
+    // Triple RSI criteria met
+    const tripleRSICriteria = {
+      rsiLessThan30,
+      rsiDeclining3Days,
+      rsiWasBelow55
+    };
+    
     // Price position
     const above20EMA = price > ema20;
     const below50EMA = price < ema50;
     const above200EMA = price > (ema20 * 0.95); // Approximate
     
-    // Setup type
-    let setupType: 'uptrend-continuation' | 'recovery-play' | 'none' = 'none';
-    if (above20EMA && below50EMA) {
-      setupType = 'uptrend-continuation';
-    } else if (!above20EMA && above200EMA) {
-      setupType = 'recovery-play';
-    }
-    
-    // Calculate setup strength (1-10)
+    // Setup type - based on Triple RSI
+    let setupType: 'triple-rsi' | 'oversold-bounce' | 'none' = 'none';
     let strength = 0;
     
-    // Price action (0-2)
-    if (setupType !== 'none') strength += 2;
-    else if (above20EMA || above200EMA) strength += 1;
+    // PRIMARY: Triple RSI setup (all 3 criteria met)
+    if (rsiLessThan30 && rsiDeclining3Days && rsiWasBelow55) {
+      setupType = 'triple-rsi';
+      strength = 10; // Maximum strength
+    } else if (rsiLessThan30 && rsiWasBelow55) {
+      // Secondary: Oversold bounce (RSI < 30 and was < 55)
+      setupType = 'oversold-bounce';
+      strength = 7;
+    }
     
-    // RSI (0-2) - neutral zone is 40-60
-    if (rsi >= 40 && rsi <= 60) strength += 2;
-    else if (rsi >= 35 && rsi <= 65) strength += 1;
-    
-    // MACD (0-2)
+    // Additional confirmations
     if (macdStatus === 'bullish') strength += 2;
-    else if (macdStatus === 'neutral') strength += 1;
-    
-    // Volume (0-2)
     if (volumeRatio > 1.5) strength += 2;
-    else if (volumeRatio > 1.2) strength += 1;
+    if (above200EMA) strength += 1;
     
     // Only return if setup strength >= 5 (minimum tradeable)
     if (strength < 5) {
@@ -185,7 +250,9 @@ async function analyzeStock(symbol: string, name: string, sector: string): Promi
       name,
       sector,
       price: Math.round(price * 100) / 100,
-      rsi: Math.round(rsi * 100) / 100,
+      rsi: Math.round(currentRSI * 100) / 100,
+      rsi3DaysAgo: Math.round(rsi3DaysAgo * 100) / 100,
+      rsiDeclining: rsiDeclining3Days,
       macdStatus,
       volumeRatio: Math.round(volumeRatio * 100) / 100,
       setupStrength: strength,
@@ -201,6 +268,7 @@ async function analyzeStock(symbol: string, name: string, sector: string): Promi
       target2,
       riskReward1,
       riskReward2,
+      tripleRSICriteria,
     };
   } catch (error) {
     console.error(`Error analyzing ${symbol}:`, error);
@@ -262,16 +330,32 @@ function generateMockAnalysis(symbol: string, name: string, sector: string): Sto
   const target1 = Math.round(currentPrice * 1.05 * 100) / 100;
   const target2 = Math.round(currentPrice * 1.08 * 100) / 100;
   
+  // Triple RSI mock values
+  const rsi3DaysAgo = rsi - random(seed + 8) * 10;
+  const rsiDeclining3Days = random(seed + 9) > 0.5;
+  const rsiLessThan30 = rsi < 30;
+  const rsiWasBelow55 = rsi3DaysAgo < 55;
+  
+  // Triple RSI criteria
+  let tripleRSIType: 'triple-rsi' | 'oversold-bounce' | 'none' = 'none';
+  if (rsiLessThan30 && rsiDeclining3Days && rsiWasBelow55) {
+    tripleRSIType = 'triple-rsi';
+  } else if (rsiLessThan30 && rsiWasBelow55) {
+    tripleRSIType = 'oversold-bounce';
+  }
+  
   return {
     symbol,
     name,
     sector,
     price: Math.round(currentPrice * 100) / 100,
     rsi: Math.round(rsi * 100) / 100,
+    rsi3DaysAgo: Math.round(rsi3DaysAgo * 100) / 100,
+    rsiDeclining: rsiDeclining3Days,
     macdStatus,
     volumeRatio: Math.round(volumeRatio * 100) / 100,
     setupStrength: strength,
-    setupType,
+    setupType: tripleRSIType,
     pricePosition: { above20EMA, below50EMA, above200EMA },
     entryPrice,
     stopLoss,
@@ -279,6 +363,11 @@ function generateMockAnalysis(symbol: string, name: string, sector: string): Sto
     target2,
     riskReward1: 2.5,
     riskReward2: 4,
+    tripleRSICriteria: {
+      rsiLessThan30,
+      rsiDeclining3Days,
+      rsiWasBelow55
+    },
   };
 }
 
