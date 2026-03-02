@@ -67,47 +67,70 @@ const fallbackData: StatusPayload = {
   },
 }
 
-// Map subagent labels to team roles
-function getRoleFromLabel(label: string): string | null {
-  const labelLower = label.toLowerCase()
-  if (labelLower.includes('dev')) return 'developer'
-  if (labelLower.includes('qa')) return 'qa'
-  if (labelLower.includes('devops')) return 'devops'
-  if (labelLower.includes('test')) return 'tester'
-  if (labelLower.includes('xmax')) return 'xmax'
-  if (labelLower.includes('manager')) return 'manager'
+// Map session file names to team roles
+function getRoleFromSessionFile(filename: string): string | null {
+  const name = filename.toLowerCase()
+  if (name.includes('dev-xmax') || name.includes('developer')) return 'developer'
+  if (name.includes('qa-')) return 'qa'
+  if (name.includes('devops')) return 'devops'
+  if (name.includes('test')) return 'tester'
+  if (name.includes('xmax')) return 'xmax'
+  if (name.includes('manager')) return 'manager'
   return null
 }
 
-// Get active sub-agents from OpenClaw
-function getActiveAgents(): Record<string, { task: string; runtime: string }> {
+// Get active sub-agents by checking recently modified session files
+function getActiveAgents(): Record<string, { task: string }> {
+  const sessionsDir = '/home/clawdonaws/.openclaw/agents/main/sessions'
+  const activeAgents: Record<string, { task: string }> = {}
+  
   try {
-    const result = execSync('openclaw sessions list --json 2>/dev/null || echo "[]"', {
-      encoding: 'utf-8',
-      timeout: 5000,
-    })
+    if (!fs.existsSync(sessionsDir)) {
+      return activeAgents
+    }
     
-    const sessions = JSON.parse(result || '[]')
-    const activeAgents: Record<string, { task: string; runtime: string }> = {}
+    const files = fs.readdirSync(sessionsDir)
+    const now = Date.now()
+    const TWO_MINUTES = 2 * 60 * 1000
     
-    // Look for subagents with labels
-    for (const session of sessions) {
-      if (session.kind === 'subagent' && session.status === 'active' && session.label) {
-        const role = getRoleFromLabel(session.label)
+    for (const file of files) {
+      if (!file.endsWith('.jsonl')) continue
+      
+      const filePath = path.join(sessionsDir, file)
+      const stats = fs.statSync(filePath)
+      const age = now - stats.mtimeMs
+      
+      // If modified in last 2 minutes, consider it active
+      if (age < TWO_MINUTES) {
+        const role = getRoleFromSessionFile(file)
         if (role) {
-          activeAgents[role] = {
-            task: session.task?.substring(0, 100) || 'Working...',
-            runtime: session.runtime || 'running',
+          // Get last line to see what task
+          const content = fs.readFileSync(filePath, 'utf-8')
+          const lines = content.trim().split('\n')
+          let task = 'Working...'
+          
+          // Try to extract task from last user message
+          for (let i = lines.length - 1; i >= 0; i--) {
+            try {
+              const line = JSON.parse(lines[i])
+              if (line.role === 'user' && line.content) {
+                task = line.content.substring(0, 80)
+                break
+              }
+            } catch {
+              // Skip parse errors
+            }
           }
+          
+          activeAgents[role] = { task }
         }
       }
     }
-    
-    return activeAgents
   } catch (error) {
     console.error('Failed to get active agents:', error)
-    return {}
   }
+  
+  return activeAgents
 }
 
 export async function GET() {
