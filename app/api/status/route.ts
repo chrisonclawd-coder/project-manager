@@ -78,7 +78,7 @@ function getActiveAgents(): Record<string, { task: string }> {
     
     const files = fs.readdirSync(sessionsDir)
     const now = Date.now()
-    const TWO_MINUTES = 2 * 60 * 1000
+    const THIRTY_SECONDS = 30 * 1000
     
     // Main session file patterns
     const mainSessionId = '6c766e0b-92e8-4fdc-92db-73784b5afbf0'
@@ -90,8 +90,8 @@ function getActiveAgents(): Record<string, { task: string }> {
       const stats = fs.statSync(filePath)
       const age = now - stats.mtimeMs
       
-      // If modified in last 2 minutes, consider it active
-      if (age < TWO_MINUTES) {
+      // If modified in last 30 seconds, consider it active
+      if (age < THIRTY_SECONDS) {
         // Check if it's the main session
         if (file.includes(mainSessionId)) {
           activeAgents['manager'] = { task: 'Overseeing operations...' }

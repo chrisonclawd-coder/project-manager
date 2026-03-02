@@ -187,28 +187,63 @@ const defaultTopics = [
 ]
 
 const marketingPosts = [
+  // MDIFY - 3 posts
   {
-    id: 'mdify-x',
+    id: 'mdify-x1',
     product: 'MDIFY',
     channel: 'X',
     target: '280',
-    text: 'Stop pasting bloated links. Stop fighting bot protection. Stop wasting tokens. Convert any article to clean .md with #Mdify → feed it to your AI agent → done. Your agent will thank you. https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki',
-    link: 'https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Stop%20fighting%20bot%20protection.%20Stop%20wasting%20tokens%20on%20engagement%20fluff.%20Convert%20any%20article%20to%20clean%20.md%20with%20%23Mdify%20→%20feed%20it%20directly%20to%20your%20AI%20agent%20→%20done.%20Your%20agent%20will%20thank%20you.',
+    text: 'Stop pasting bloated links. Convert any article to clean .md with #Mdify → feed it to AI → done. Your agent will thank you. https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki',
+    link: 'https://twitter.com/intent/tweet?text=Stop%20pasting%20bloated%20links.%20Convert%20any%20article%20to%20clean%20.md%20with%20%23Mdify%20→%20feed%20it%20to%20AI%20→%20done.',
   },
+  {
+    id: 'mdify-x2',
+    product: 'MDIFY',
+    channel: 'X',
+    target: '280',
+    text: 'AI agents deserve clean input. One click → any article to .md. No paywalls, no tracking, no fluff. Just content. Get better AI outputs. #Mdify',
+    link: 'https://twitter.com/intent/tweet?text=AI%20agents%20deserve%20clean%20input.%20One%20click%20→%20any%20article%20to%20.md.%20No%20paywalls,%20no%20tracking,%20no%20fluff.%20Just%20content.',
+  },
+  {
+    id: 'mdify-x3',
+    product: 'MDIFY',
+    channel: 'X',
+    target: '280',
+    text: 'Your AI is only as good as what you feed it. Stop dumping bloated HTML. Get clean .md in seconds. Your tokens will last longer. #AI #Tools',
+    link: 'https://twitter.com/intent/tweet?text=Your%20AI%20is%20only%20as%20good%20as%20what%20you%20feed%20it.%20Stop%20dumping%20bloated%20HTML.%20Get%20clean%20.md%20in%20seconds.',
+  },
+  // GUARDSKILLS - 3 posts
+  {
+    id: 'guardskills-x1',
+    product: 'GUARDSKILLS',
+    channel: 'X',
+    target: '280',
+    text: 'You install AI skills without thinking. But have you checked what\'s in that code? Your API keys are at risk. @guardskills_ scans for malicious code. #AI #Security',
+    link: 'https://twitter.com/intent/tweet?text=You%20install%20AI%20skills%20without%20thinking.%20But%20have%20you%20checked%20what%27s%20in%20that%20code%3F%20Your%20API%20keys%20are%20at%20risk.',
+  },
+  {
+    id: 'guardskills-x2',
+    product: 'GUARDSKILLS',
+    channel: 'X',
+    target: '280',
+    text: 'Running arbitrary AI skill code with your keys? Bold move. @guardskills_ scans for credential theft before you install. Stay safe. #OpenSource',
+    link: 'https://twitter.com/intent/tweet?text=Running%20arbitrary%20AI%20skill%20code%20with%20your%20keys%3F%20Bold%20move.%20%40guardskills_%20scans%20for%20credential%20theft%20before%20you%20install.',
+  },
+  {
+    id: 'guardskills-x3',
+    product: 'GUARDSKILLS',
+    channel: 'X',
+    target: '280',
+    text: 'npm install → running stranger code with your API keys. Scary, right? @guardskills_ checks AI skills for red flags. Don\'t trust, verify. #Dev',
+    link: 'https://twitter.com/intent/tweet?text=npm%20install%20→%20running%20stranger%20code%20with%20your%20API%20keys.%20Scary%2C%20right%3F%20%40guardskills_%20checks%20AI%20skills%20for%20red%20flags.',
+  },
+  // Reddit posts (500+)
   {
     id: 'mdify-reddit',
     product: 'MDIFY',
     channel: 'Reddit',
     target: '500+',
     text: "I've been using this Chrome extension called Mdify for the past few weeks and it's completely transformed my AI workflow. Before, I was manually copying and pasting articles, fighting with paywalls and bot protection, only to feed my AI agent bloated HTML with tracking pixels and ads. Now with one click, I get clean .md files that my AI agent can process instantly. No more wasted tokens on irrelevant content, no more copy-paste fatigue. My agent outputs have never been better. If you use AI agents professionally, you need this. It's free to try.",
-  },
-  {
-    id: 'guardskills-x',
-    product: 'GUARDSKILLS',
-    channel: 'X',
-    target: '280',
-    text: "You install AI skills without thinking. But have you checked what's in that code? Your API keys are at risk. @guardskills_ scans for malicious code before you install. Protect your keys. #AI #Security #OpenSource",
-    link: 'https://twitter.com/intent/tweet?text=You%20install%20AI%20skills%20without%20thinking.%20But%20have%20you%20checked%20what%27s%20actually%20in%20that%20code%3F%20Your%20API%20keys%20could%20be%20at%20risk.%20%40guardskills_%20scans%20AI%20skills%20for%20malicious%20code%20before%20you%20install.',
   },
   {
     id: 'guardskills-reddit',
@@ -711,13 +746,6 @@ function MissionControlContent() {
     const utcDayIndex = Math.floor(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 86400000)
     return (utcDayIndex + offset) % totalPosts
   }
-
-  // Comment templates for Mdify and GuardSkills
-  const commentTemplates = [
-    "Show me your SaaS 🛠️ Built something cool? Turn any article into flashcards with Mdify - AI-powered learning. Try free → https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
-    "Show me your work 🔧 Writing code? Guardskills scans AI skills for malicious code - keep your projects safe. Install now → https://www.npmjs.com/package/guardskills",
-    "Show me your product 🚀 Building something? Convert any article to flashcards with Mdify. AI that learns YOUR way → https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
-  ]
 
   const handleCopyPost = async (id: string, text: string) => {
     try {
@@ -1672,23 +1700,6 @@ function MissionControlContent() {
 
                 {/* COMMENTS - Copy & Reply */}
                 <div className="mt-6">
-                  <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-4">COMMENTS - Copy & Reply</h3>
-                  <div className="space-y-3">
-                    {commentTemplates.map((comment, idx) => (
-                      <div key={`comment-${idx}`} className={`border p-3 ${shell.panelMuted}`}>
-                        <div className="flex items-start justify-between gap-3">
-                          <p className={`text-sm ${shell.textMuted} break-words flex-1`}>{comment}</p>
-                          <button
-                            onClick={() => handleCopyPost(`comment-${idx}`, comment)}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30 shrink-0"
-                          >
-                            <Copy className="w-3.5 h-3.5" /> {copiedPostId === `comment-${idx}` ? 'COPIED' : 'COPY'}
-                          </button>
-                        </div>
-                        <p className={`text-[10px] mt-2 ${shell.textSoft}`}>{comment.length}/280 chars</p>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </section>
             </motion.div>
