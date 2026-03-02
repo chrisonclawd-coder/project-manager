@@ -1,6 +1,26 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getAllSecrets } from '@/lib/aws-secrets'
 
 export const dynamic = 'force-dynamic'
+
+// Cache for API keys
+let cachedSecrets: Record<string, string> = {}
+let cacheTime = 0
+const CACHE_TTL = 5 * 60 * 1000
+
+async function getApiKey(): Promise<string | null> {
+  const now = Date.now()
+  if (!cachedSecrets.TAVILY_API_KEY || (now - cacheTime) > CACHE_TTL) {
+    try {
+      cachedSecrets = await getAllSecrets()
+      cacheTime = now
+      console.log('Fetched secrets from AWS Parameter Store')
+    } catch (error) {
+      console.error('Failed to fetch secrets:', error)
+    }
+  }
+  return cachedSecrets.TAVILY_API_KEY || null
+}
 
 const TAVILY_URL = 'https://api.tavily.com/search'
 
@@ -26,14 +46,16 @@ type TavilyResponse = {
   results?: TavilyResult[]
 }
 
-export async function GET() {
-  const apiKey = process.env.TAVILY_API_KEY
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const topic = searchParams.get('topic') || trendQuery
+  const apiKey = await getApiKey()
 
   if (!apiKey) {
     return NextResponse.json(
       {
         available: false,
-        reason: 'TAVILY_API_KEY missing',
+        reason: 'TAVILY_API_KEY missing from AWS Parameter Store',
         results: [],
       },
       {
@@ -53,7 +75,7 @@ export async function GET() {
       },
       body: JSON.stringify({
         api_key: apiKey,
-        query: trendQuery,
+        query: topic,
         topic: 'news',
         search_depth: 'advanced',
         max_results: 10,

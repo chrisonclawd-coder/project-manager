@@ -3,48 +3,48 @@
     "name": "Chrisly",
     "role": "Manager",
     "status": "idle",
-    "currentTask": "Backtest blocked - TwelveData doesn't support NSE on free plan",
+    "currentTask": "Overseeing xMax automation and Mission Control",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   },
   "xmax": {
     "name": "xMax",
     "role": "X Strategy Lead",
     "status": "idle",
-    "currentTask": "",
+    "currentTask": "Content generation (4x daily)",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   },
   "developer": {
     "name": "Developer",
     "role": "Developer",
     "status": "idle",
-    "currentTask": "",
+    "currentTask": "Feature development on hold",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   },
   "qa": {
     "name": "QA",
     "role": "QA Engineer",
     "status": "idle",
-    "currentTask": "",
+    "currentTask": "Awaiting new features",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   },
   "devops": {
     "name": "DevOps",
     "role": "DevOps Engineer",
     "status": "idle",
-    "currentTask": "",
+    "currentTask": "CI/CD maintenance",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   },
   "tester": {
     "name": "Manual Test",
     "role": "Manual Tester",
     "status": "idle",
-    "currentTask": "",
+    "currentTask": "ProgresX extension testing pending",
     "blocker": "",
-    "updatedAt": "2026-02-28T19:34:23.764Z"
+    "updatedAt": "2026-03-02T17:30:00.000Z"
   }
 }

@@ -356,6 +356,23 @@ function MissionControlContent() {
     }
   }, [activeTab, loadExpenses])
 
+  // Check version on load
+  useEffect(() => {
+    fetch('/api/version')
+      .then(res => res.json())
+      .then(data => {
+        const versionEl = document.getElementById('version')
+        if (versionEl && data.current) {
+          versionEl.textContent = data.current
+        }
+        if (data.updateAvailable) {
+          const badge = document.getElementById('update-badge')
+          if (badge) badge.classList.remove('hidden')
+        }
+      })
+      .catch(() => {})
+  }, [])
+
   // Notifications state
   interface NotificationItem {
     id: string
@@ -1009,7 +1026,7 @@ function MissionControlContent() {
   const growthSignals = [
     npmMetrics?.available ? `GuardSkills ${guardskillsTotalLabel}: ${formatNumber(npmMetrics.totalDownloads)}` : 'GuardSkills metrics unavailable',
     npmMetrics?.available ? `GuardSkills last week: ${formatNumber(npmMetrics.lastWeek)}` : 'Weekly trend unavailable',
-    chromeMetrics?.available ? 'Mdify Chrome metric source connected' : 'Mdify Chrome installs data unavailable',
+    chromeMetrics?.available ? 'Mdify Chrome installs connected' : null,
     researchFeed.length > 0 ? `${researchFeed.length} fresh research signal(s) ready for xMax` : 'No fresh research signals loaded',
   ]
 
@@ -1242,6 +1259,18 @@ function MissionControlContent() {
                 <p className={`text-xs mt-4 border-l-2 pl-4 tracking-[0.16em] ${shell.textMuted} ${shell.borderStrong}`}>
                   {getGreeting().motivational}
                 </p>
+                <div className="mt-4 flex items-center gap-3">
+                  <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft}`}>
+                    v<span id="version">2026-02-26</span>
+                  </span>
+                  <span id="update-badge" className="hidden text-[10px] tracking-[0.1em] px-2 py-1 rounded bg-amber-500/20 text-amber-400">
+                    Update Available
+                  </span>
+                  <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft} flex items-center gap-1`}>
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    LIVE
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

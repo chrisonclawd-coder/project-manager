@@ -1,0 +1,54 @@
+{
+  "products": [
+    {
+      "name": "Mdify",
+      "description": "Convert articles to clean markdown for AI agents",
+      "tagline": {
+        "x": "One click. Clean .md. AI-ready.",
+        "reddit": "Tired of copy-pasting articles into your AI prompts? Mdify converts any article to clean markdown in one click. No more token waste on ads, popups, and clutter."
+      },
+      "hashtags": ["DevTools", "AI", "Productivity"]
+    },
+    {
+      "name": "Guardskills",
+      "description": "Scan AI skills for malicious code",
+      "tagline": {
+        "x": "Your AI skills might be stealing your data.",
+        "reddit": "Every AI skill you install is a potential backdoor. Guardskills scans for malicious patterns, credential theft, and data exfiltration before they run."
+      },
+      "hashtags": ["AISecurity", "InfoSec", "OpenSource"]
+    },
+    {
+      "name": "ProgresX",
+      "description": "X Article Scroll % progress bar",
+      "tagline": {
+        "x": "Now you know how much of the article you've actually read.",
+        "reddit": "Built a Chrome extension that shows scroll progress on X articles. 4px bar at the top. No more guessing how much is left."
+      },
+      "hashtags": ["ChromeExtension", "X", "Productivity"]
+    }
+  ],
+  "contentThemes": [
+    {
+      "name": "AI Agents",
+      "xAngle": "Hot takes on agent autonomy",
+      "redditAngle": "Deep dive on building autonomous agents"
+    },
+    {
+      "name": "Developer Productivity",
+      "xAngle": "Tools that save time",
+      "redditAngle": "Comprehensive tool comparisons"
+    },
+    {
+      "name": "AI Security",
+      "xAngle": "Fear + solution",
+      "redditAngle": "Technical security analysis"
+    },
+    {
+      "name": "Open Source",
+      "xAngle": "Community wins",
+      "redditAngle": "Project showcases and discussions"
+    }
+  ],
+  "lastUpdated": "2026-03-02"
+}

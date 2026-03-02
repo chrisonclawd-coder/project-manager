@@ -62,5 +62,13 @@
     "date": "2026-03-01",
     "createdAt": "2026-03-01T05:10:13.826Z",
     "category": "Food"
+  },
+  {
+    "id": "1772379621952",
+    "amount": 140,
+    "description": "Noodles",
+    "date": "2026-03-01",
+    "createdAt": "2026-03-01T15:40:21.952Z",
+    "category": "Misc"
   }
 ]

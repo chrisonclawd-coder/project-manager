@@ -9,7 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-ssm": "^3.1000.0",
     "framer-motion": "^11.0.0",
+    "fyers-api-v3": "^1.6.0",
     "lucide-react": "^0.320.0",
     "next": "14.1.0",
     "react": "^18.2.0",
