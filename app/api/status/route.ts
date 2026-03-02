@@ -79,8 +79,6 @@ function getActiveAgents(): Record<string, { task: string }> {
     const files = fs.readdirSync(sessionsDir)
     const now = Date.now()
     const THIRTY_SECONDS = 30 * 1000
-    
-    // Main session file patterns
     const mainSessionId = '6c766e0b-92e8-4fdc-92db-73784b5afbf0'
     
     for (const file of files) {
@@ -98,51 +96,9 @@ function getActiveAgents(): Record<string, { task: string }> {
           continue
         }
         
-        // For sub-agents, try to determine role from session file content
-        try {
-          const content = fs.readFileSync(filePath, 'utf-8')
-          const lines = content.trim().split('\n')
-          
-          // Look for label in session metadata
-          let label = ''
-          for (const line of lines.slice(0, 5)) {
-            try {
-              const parsed = JSON.parse(line)
-              // Session might have metadata
-              if (parsed.label) {
-                label = parsed.label.toLowerCase()
-                break
-              }
-            } catch {
-              // Skip
-            }
-          }
-          
-          // Map label to role
-          let role: string | null = null
-          if (label.includes('dev') || label.includes('developer')) {
-            role = 'developer'
-          } else if (label.includes('qa')) {
-            role = 'qa'
-          } else if (label.includes('devops')) {
-            role = 'devops'
-          } else if (label.includes('test')) {
-            role = 'tester'
-          } else if (label.includes('xmax')) {
-            role = 'xmax'
-          }
-          
-          if (role && !activeAgents[role]) {
-            activeAgents[role] = { task: label ? `Task: ${label}` : 'Working...' }
-          } else if (!role && !activeAgents['developer']) {
-            // Unknown sub-agent, assign to developer slot
-            activeAgents['developer'] = { task: label ? `Task: ${label}` : 'Working...' }
-          }
-        } catch {
-          // If can't read, just mark as working in available slot
-          if (!activeAgents['developer']) {
-            activeAgents['developer'] = { task: 'Working...' }
-          }
+        // For sub-agents, assign to developer slot (any subagent = developer working)
+        if (!activeAgents['developer']) {
+          activeAgents['developer'] = { task: 'Working on task...' }
         }
       }
     }
