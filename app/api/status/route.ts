@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import fs from 'fs'
 import path from 'path'
-import { execSync } from 'child_process'
 
 export const dynamic = 'force-dynamic'
 
@@ -67,18 +66,6 @@ const fallbackData: StatusPayload = {
   },
 }
 
-// Map session file names to team roles
-function getRoleFromSessionFile(filename: string): string | null {
-  const name = filename.toLowerCase()
-  if (name.includes('dev-xmax') || name.includes('developer')) return 'developer'
-  if (name.includes('qa-')) return 'qa'
-  if (name.includes('devops')) return 'devops'
-  if (name.includes('test')) return 'tester'
-  if (name.includes('xmax')) return 'xmax'
-  if (name.includes('manager')) return 'manager'
-  return null
-}
-
 // Get active sub-agents by checking recently modified session files
 function getActiveAgents(): Record<string, { task: string }> {
   const sessionsDir = '/home/clawdonaws/.openclaw/agents/main/sessions'
@@ -93,6 +80,9 @@ function getActiveAgents(): Record<string, { task: string }> {
     const now = Date.now()
     const TWO_MINUTES = 2 * 60 * 1000
     
+    // Main session file patterns
+    const mainSessionId = '6c766e0b-92e8-4fdc-92db-73784b5afbf0'
+    
     for (const file of files) {
       if (!file.endsWith('.jsonl')) continue
       
@@ -102,27 +92,57 @@ function getActiveAgents(): Record<string, { task: string }> {
       
       // If modified in last 2 minutes, consider it active
       if (age < TWO_MINUTES) {
-        const role = getRoleFromSessionFile(file)
-        if (role) {
-          // Get last line to see what task
+        // Check if it's the main session
+        if (file.includes(mainSessionId)) {
+          activeAgents['manager'] = { task: 'Overseeing operations...' }
+          continue
+        }
+        
+        // For sub-agents, try to determine role from session file content
+        try {
           const content = fs.readFileSync(filePath, 'utf-8')
           const lines = content.trim().split('\n')
-          let task = 'Working...'
           
-          // Try to extract task from last user message
-          for (let i = lines.length - 1; i >= 0; i--) {
+          // Look for label in session metadata
+          let label = ''
+          for (const line of lines.slice(0, 5)) {
             try {
-              const line = JSON.parse(lines[i])
-              if (line.role === 'user' && line.content) {
-                task = line.content.substring(0, 80)
+              const parsed = JSON.parse(line)
+              // Session might have metadata
+              if (parsed.label) {
+                label = parsed.label.toLowerCase()
                 break
               }
             } catch {
-              // Skip parse errors
+              // Skip
             }
           }
           
-          activeAgents[role] = { task }
+          // Map label to role
+          let role: string | null = null
+          if (label.includes('dev') || label.includes('developer')) {
+            role = 'developer'
+          } else if (label.includes('qa')) {
+            role = 'qa'
+          } else if (label.includes('devops')) {
+            role = 'devops'
+          } else if (label.includes('test')) {
+            role = 'tester'
+          } else if (label.includes('xmax')) {
+            role = 'xmax'
+          }
+          
+          if (role && !activeAgents[role]) {
+            activeAgents[role] = { task: label ? `Task: ${label}` : 'Working...' }
+          } else if (!role && !activeAgents['developer']) {
+            // Unknown sub-agent, assign to developer slot
+            activeAgents['developer'] = { task: label ? `Task: ${label}` : 'Working...' }
+          }
+        } catch {
+          // If can't read, just mark as working in available slot
+          if (!activeAgents['developer']) {
+            activeAgents['developer'] = { task: 'Working...' }
+          }
         }
       }
     }
