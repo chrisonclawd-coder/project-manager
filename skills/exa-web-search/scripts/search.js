@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Load API key from openclaw.json
-const openclawConfigPath = path.join(process.cwd(), '../../../openclaw.json');
+const openclawConfigPath = path.join(process.cwd(), '../../../../openclaw.json');
 const configContent = fs.readFileSync(openclawConfigPath, 'utf-8');
 const config = JSON.parse(configContent);
 
