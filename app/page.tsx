@@ -1668,14 +1668,6 @@ function MissionControlContent() {
                     const productPosts = marketingPosts.filter(post => post.product === product)
                     const xPosts = productPosts.filter(p => p.channel === 'X')
                     const redditPosts = productPosts.filter(p => p.channel === 'Reddit')
-                    
-                    // Get daily index for X posts (rotates daily)
-                    const xIndex = getDailyRotationIndex(xPosts.length, product === 'GUARDSKILLS' ? 3 : 0)
-                    // Get daily index for Reddit posts (rotates daily, offset by 1)
-                    const redditIndex = getDailyRotationIndex(redditPosts.length, product === 'GUARDSKILLS' ? 4 : 1)
-                    
-                    const dailyXPost = xPosts[xIndex]
-                    const dailyRedditPost = redditPosts[redditIndex]
 
                     return (
                       <div key={product} className={`border p-4 ${shell.panel}`}>
@@ -1698,63 +1690,63 @@ function MissionControlContent() {
                           </a>
                         </div>
                         
-                        {/* X POST */}
-                        {dailyXPost && (
-                          <div className={`border p-3 space-y-3 ${shell.panelMuted} mb-3`}>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft}`}>X POST</p>
-                                <p className={`text-[10px] ${shell.textSoft}`}>Target: {dailyXPost.target}</p>
+                        {/* X POSTS - All 3 */}
+                        <div className="mb-4">
+                          <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft} mb-2`}>X POSTS (3)</p>
+                          {xPosts.map((post, idx) => (
+                            <div key={post.id} className={`border p-3 space-y-2 ${shell.panelMuted} ${idx > 0 ? 'mt-2' : ''}`}>
+                              <div className="flex items-center justify-between">
+                                <p className={`text-[10px] ${shell.textSoft}`}>Post {idx + 1}</p>
+                                <span className={`text-[10px] px-2 py-0.5 border tracking-[0.12em] ${getPostBadge(post.channel, post.text).tone}`}>
+                                  {getPostBadge(post.channel, post.text).state} · {getPostBadge(post.channel, post.text).label}
+                                </span>
                               </div>
-                              <span className={`text-[10px] px-2 py-1 border tracking-[0.12em] ${getPostBadge(dailyXPost.channel, dailyXPost.text).tone}`}>
-                                {getPostBadge(dailyXPost.channel, dailyXPost.text).state} · {getPostBadge(dailyXPost.channel, dailyXPost.text).label}
-                              </span>
-                            </div>
-                            <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{dailyXPost.text}</p>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleCopyPost(dailyXPost.id, dailyXPost.text)}
-                                className="flex-1 px-3 py-2 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
-                              >
-                                <Copy className="w-3.5 h-3.5 inline mr-2" />COPY
-                              </button>
-                              {dailyXPost.link && (
-                                <a
-                                  href={dailyXPost.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex-1 px-3 py-2 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em] text-center"
+                              <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{post.text}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleCopyPost(post.id, post.text)}
+                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
                                 >
-                                  POST
-                                </a>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* REDDIT POST */}
-                        {dailyRedditPost && (
-                          <div className={`border p-3 space-y-3 ${shell.panelMuted}`}>
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft}`}>REDDIT POST</p>
-                                <p className={`text-[10px] ${shell.textSoft}`}>Target: {dailyRedditPost.target}</p>
+                                  <Copy className="w-3.5 h-3.5 inline mr-1" />COPY
+                                </button>
+                                {post.link && (
+                                  <a
+                                    href={post.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 px-3 py-1.5 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em] text-center"
+                                  >
+                                    POST
+                                  </a>
+                                )}
                               </div>
-                              <span className={`text-[10px] px-2 py-1 border tracking-[0.12em] ${getPostBadge(dailyRedditPost.channel, dailyRedditPost.text).tone}`}>
-                                {getPostBadge(dailyRedditPost.channel, dailyRedditPost.text).state} · {getPostBadge(dailyRedditPost.channel, dailyRedditPost.text).label}
-                              </span>
                             </div>
-                            <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{dailyRedditPost.text}</p>
-                            <div className="flex gap-2">
-                              <button
-                                onClick={() => handleCopyPost(dailyRedditPost.id, dailyRedditPost.text)}
-                                className="flex-1 px-3 py-2 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
-                              >
-                                <Copy className="w-3.5 h-3.5 inline mr-2" />COPY
-                              </button>
+                          ))}
+                        </div>
+                        
+                        {/* REDDIT POSTS - All 3 */}
+                        <div>
+                          <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft} mb-2`}>REDDIT POSTS (3)</p>
+                          {redditPosts.map((post, idx) => (
+                            <div key={post.id} className={`border p-3 space-y-2 ${shell.panelMuted} ${idx > 0 ? 'mt-2' : ''}`}>
+                              <div className="flex items-center justify-between">
+                                <p className={`text-[10px] ${shell.textSoft}`}>Post {idx + 1}</p>
+                                <span className={`text-[10px] px-2 py-0.5 border tracking-[0.12em] ${getPostBadge(post.channel, post.text).tone}`}>
+                                  {getPostBadge(post.channel, post.text).state} · {getPostBadge(post.channel, post.text).label}
+                                </span>
+                              </div>
+                              <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{post.text}</p>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleCopyPost(post.id, post.text)}
+                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                                >
+                                  <Copy className="w-3.5 h-3.5 inline mr-1" />COPY
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          ))}
+                        </div>
                           </div>
                     )
                   })}
