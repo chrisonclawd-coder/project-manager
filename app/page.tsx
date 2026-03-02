@@ -303,7 +303,11 @@ function MissionControlContent() {
   const [expenseAnalysis, setExpenseAnalysis] = useState<ExpenseAnalysis>({ categoryBreakdown: {}, monthlyBreakdown: {}, averagePerDay: 0 })
   const [expenseLoading, setExpenseLoading] = useState(false)
   const [expenseSearch, setExpenseSearch] = useState('')
-  const [newExpense, setNewExpense] = useState({ amount: '', description: '', date: new Date().toISOString().split('T')[0] })
+  const [expenseType, setExpenseType] = useState<'expense' | 'income'>('expense')
+  const [expenseCategory, setExpenseCategory] = useState('Food')
+  const [newExpense, setNewExpense] = useState({ amount: '', description: '', date: new Date().toISOString().split('T')[0], category: 'Food' })
+
+  const categories = ['Food', 'Transport', 'Shopping', 'Bills', 'Health', 'Entertainment', 'Personal', 'Education', 'Grooming', 'Household', 'Misc', 'Salary', 'Investment', 'Gift', 'Other']
 
   const loadExpenses = useCallback(async (query = '') => {
     setExpenseLoading(true)
@@ -323,17 +327,19 @@ function MissionControlContent() {
 
   const addExpense = async () => {
     if (!newExpense.amount || !newExpense.description) return
+    const amount = expenseType === 'income' ? -Math.abs(parseFloat(newExpense.amount)) : Math.abs(parseFloat(newExpense.amount))
     try {
       await fetch('/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: parseFloat(newExpense.amount),
+          amount,
           description: newExpense.description,
           date: newExpense.date,
+          category: newExpense.category,
         }),
       })
-      setNewExpense({ amount: '', description: '', date: new Date().toISOString().split('T')[0] })
+      setNewExpense({ amount: '', description: '', date: new Date().toISOString().split('T')[0], category: 'Food' })
       loadExpenses(expenseSearch)
     } catch (error) {
       console.error('Failed to add expense:', error)
@@ -2561,14 +2567,38 @@ function MissionControlContent() {
               {/* Add Expense Form */}
               <div className={`border p-4 ${shell.panel}`}>
                 <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>ADD NEW EXPENSE</p>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                {/* Type Toggle */}
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={() => setExpenseType('expense')}
+                    className={`px-3 py-1 text-xs tracking-wider border ${expenseType === 'expense' ? 'bg-rose-500/20 border-rose-500 text-rose-400' : 'bg-zinc-800/40 border-zinc-600 text-zinc-400'}`}
+                  >
+                    EXPENSE
+                  </button>
+                  <button
+                    onClick={() => setExpenseType('income')}
+                    className={`px-3 py-1 text-xs tracking-wider border ${expenseType === 'income' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400' : 'bg-zinc-800/40 border-zinc-600 text-zinc-400'}`}
+                  >
+                    INCOME
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
                   <input
                     type="number"
-                    placeholder="Amount (₹)"
+                    placeholder={expenseType === 'income' ? "Income (₹)" : "Amount (₹)"}
                     value={newExpense.amount}
                     onChange={(e) => setNewExpense({ ...newExpense, amount: e.target.value })}
                     className={`px-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none`}
                   />
+                  <select
+                    value={newExpense.category}
+                    onChange={(e) => setNewExpense({ ...newExpense, category: e.target.value })}
+                    className={`px-3 py-2 border bg-transparent text-sm ${shell.panel} focus:border-zinc-400 outline-none`}
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat} className="bg-zinc-800">{cat}</option>
+                    ))}
+                  </select>
                   <input
                     type="text"
                     placeholder="Description"

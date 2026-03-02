@@ -208,14 +208,15 @@ export async function POST(request: Request): Promise<NextResponse> {
         createdAt: new Date().toISOString(),
       };
     } else if (amount !== undefined && description) {
-      // Direct API call
+      // Direct API call - use provided category or auto-categorize
+      const providedCategory = body.category;
       newExpense = {
         id: Date.now().toString(),
         amount: parseFloat(amount),
         description,
         date: date || new Date().toISOString().split('T')[0],
         createdAt: new Date().toISOString(),
-        category: categorizeExpense(description),
+        category: providedCategory || categorizeExpense(description),
       };
     } else {
       return NextResponse.json(
