@@ -592,7 +592,6 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
-    { id: 'trading', label: 'TRADING', icon: TrendingUp },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
@@ -705,6 +704,26 @@ function MissionControlContent() {
       state: valid ? 'ON TARGET' : 'NEEDS EXPANSION',
       tone: valid ? 'text-emerald-400 border-emerald-500/40' : 'text-amber-400 border-amber-500/40',
     }
+  }
+
+  // Get daily rotation index for marketing posts
+  const getDailyRotationIndex = (totalPosts: number, offset = 0) => {
+    const utcDayIndex = Math.floor(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate()) / 86400000)
+    return (utcDayIndex + offset) % totalPosts
+  }
+
+  // Comment templates for Mdify and GuardSkills
+  const commentTemplates = {
+    mdify: [
+      "Show me your work - I'd love to see what you're building!",
+      "Show me your SaaS - always interested in what developers are shipping",
+      "What tools are you using to clean up content for AI?",
+    ],
+    guardskills: [
+      "Show me your work - security in AI skills is crucial!",
+      "Show me your SaaS - how are you handling AI skill security?",
+      "Do you scan AI skills before installing them?",
+    ],
   }
 
   const handleCopyPost = async (id: string, text: string) => {
@@ -1520,231 +1539,158 @@ function MissionControlContent() {
 
           {activeTab === 'xmax-work' && (
             <motion.div key="xmax-work" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6 md:space-y-10 overflow-x-hidden">
-              <section className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">X GROWTH STRATEGY</h2>
-                  <button onClick={refreshTopics} disabled={isRefreshing} className={`px-3 py-1.5 text-[11px] tracking-[0.16em] border ${shell.panel} w-full sm:w-auto`}>
-                    {isRefreshing ? 'REFRESHING...' : 'REFRESH'}
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
-                  {trendingTopics.map(topic => (
-                    <button
-                      key={topic.id}
-                      onClick={() => setSelectedTopic(selectedTopic === topic.id ? null : topic.id)}
-                      className={`border p-3 text-left transition-all ${
-                        selectedTopic === topic.id ? 'border-zinc-300 bg-zinc-800/40' : `${shell.panel} hover:border-zinc-500`
-                      }`}
-                    >
-                      <p className="text-sm font-semibold">{topic.title}</p>
-                      <p className={`text-xs mt-1 ${shell.textSoft}`}>{topic.source}</p>
-                    </button>
-                  ))}
-                </div>
-
-                <div className={`border p-4 ${shell.panelMuted}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold tracking-[0.12em]">RESEARCH FEED</h3>
-
-                <div className={`border p-4 ${shell.panel}`}>
-                  <h3 className="text-sm font-semibold tracking-[0.12em] border-l-2 border-zinc-300 pl-3 mb-3">VIRAL TWEET DRAFTS FROM RESEARCH</h3>
-                  {researchLoading && <p className={`text-xs ${shell.textMuted}`}>Generating tweet drafts...</p>}
-                  {!researchLoading && researchFeed.length > 0 && (
-                    <div className="space-y-3">
-                      {researchFeed.slice(0, 3).map((item, idx) => {
-                        const tweet = item.snippet ? item.snippet.slice(0, 250) + (item.snippet.length > 250 ? '...' : '') : ''
-                        return (
-                          <div key={`tweet-${idx}`} className={`border p-3 ${shell.panelMuted}`}>
-                            <div className="flex items-center justify-between mb-2">
-                              <p className="text-[10px] tracking-[0.14em] text-zinc-400">DRAFT {idx + 1}</p>
-                              <p className="text-[10px] text-zinc-500">{tweet.length}/280</p>
-                            </div>
-                            <p className={`text-sm ${shell.textMuted} break-words`}>{tweet}</p>
-                            <div className="flex flex-wrap items-center gap-2 mt-2">
-                              <button
-                                onClick={() => handleCopyPost(`tweet-${idx}`, tweet)}
-                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+              {/* VIRAL TWEET DRAFTS FROM RESEARCH */}
+              <div className={`border p-4 ${shell.panel}`}>
+                <h3 className="text-sm font-semibold tracking-[0.12em] border-l-2 border-zinc-300 pl-3 mb-3">VIRAL TWEET DRAFTS FROM RESEARCH</h3>
+                {researchLoading && <p className={`text-xs ${shell.textMuted}`}>Generating tweet drafts...</p>}
+                {!researchLoading && researchFeed.length > 0 && (
+                  <div className="space-y-3">
+                    {researchFeed.slice(0, 3).map((item, idx) => {
+                      const tweet = item.snippet ? item.snippet.slice(0, 250) + (item.snippet.length > 250 ? '...' : '') : ''
+                      return (
+                        <div key={`tweet-${idx}`} className={`border p-3 ${shell.panelMuted}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-[10px] tracking-[0.14em] text-zinc-400">DRAFT {idx + 1}</p>
+                            <p className="text-[10px] text-zinc-500">{tweet.length}/280</p>
+                          </div>
+                          <p className={`text-sm ${shell.textMuted} break-words`}>{tweet}</p>
+                          <div className="flex flex-wrap items-center gap-2 mt-2">
+                            <button
+                              onClick={() => handleCopyPost(`tweet-${idx}`, tweet)}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                            >
+                              <Copy className="w-3.5 h-3.5" /> {copiedPostId === `tweet-${idx}` ? 'COPIED' : 'COPY'}
+                            </button>
+                            {tweet.length <= 280 && (
+                              <a
+                                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
                               >
-                                <Copy className="w-3.5 h-3.5" /> {copiedPostId === `tweet-${idx}` ? 'COPIED' : 'COPY'}
-                              </button>
-                              {tweet.length <= 280 && (
-                                <a
-                                  href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
-                                >
-                                  <Twitter className="w-3.5 h-3.5" /> POST
-                                </a>
-                              )}
-                            </div>
+                                <Twitter className="w-3.5 h-3.5" /> POST
+                              </a>
+                            )}
                           </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                  {(!researchFeed || researchFeed.length === 0) && !researchLoading && (
-                    <p className={`text-xs ${shell.textMuted}`}>No research data to generate tweets from.</p>
-                  )}
-                </div>
-
-                    <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TAVILY SIGNALS</span>
+                        </div>
+                      )
+                    })}
                   </div>
+                )}
+                {(!researchFeed || researchFeed.length === 0) && !researchLoading && (
+                  <p className={`text-xs ${shell.textMuted}`}>No research data to generate tweets from.</p>
+                )}
+              </div>
 
-                  {researchLoading && <p className={`text-xs ${shell.textMuted}`}>Loading fresh research...</p>}
-
-                  {!researchLoading && researchError && <p className="text-xs text-rose-400">{researchError}</p>}
-
-                  {!researchLoading && !researchError && !researchAvailable && (
-                    <p className={`text-xs ${shell.textMuted}`}>{getResearchUnavailableMessage()}</p>
-                  )}
-
-                  {!researchLoading && !researchError && researchAvailable && researchFeed.length === 0 && (
-                    <p className={`text-xs ${shell.textMuted}`}>No research results found. Try refresh.</p>
-                  )}
-
-                  {!researchLoading && !researchError && researchAvailable && researchFeed.length > 0 && (
-                    <div className="space-y-3">
-                      {researchFeed.slice(0, 5).map(item => (
-                        <a
-                          key={`${item.url}-${item.title}`}
-                          href={item.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`block border p-3 transition-colors ${shell.panel} hover:border-zinc-500`}
-                        >
-                          <p className="text-sm font-medium line-clamp-2">{item.title}</p>
-                          <p className={`text-xs mt-1 line-clamp-2 ${shell.textMuted}`}>{item.snippet}</p>
-                          <p className={`text-[10px] mt-2 tracking-[0.12em] ${shell.textSoft}`}>{item.source || 'Web'} · SCORE {item.score.toFixed(2)}</p>
-                        </a>
-                      ))}
-                    </div>
-                  )}
+              {/* LATEST XMAX OUTPUTS */}
+              <div className={`border p-4 ${shell.panelMuted}`}>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-semibold tracking-[0.12em]">LATEST XMAX OUTPUTS</h3>
+                  <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>FROM /api/xmax</span>
                 </div>
-
-
-                <div className={`border p-4 ${shell.panelMuted}`}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-semibold tracking-[0.12em]">LATEST XMAX OUTPUTS</h3>
-                    <span className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>FROM /api/xmax</span>
-                  </div>
-
-                  {(!xmaxWork?.recentTweets || xmaxWork.recentTweets.length === 0) && (
-                    <p className={`text-xs ${shell.textMuted}`}>No recent tweets found in xMax data yet. Run xMax or refresh.</p>
-                  )}
-
-                  {xmaxWork?.recentTweets && xmaxWork.recentTweets.length > 0 && (
-                    <div className="space-y-2">
-                      {xmaxWork.recentTweets.slice(0, 6).map((tweet, idx) => {
-                        const text = typeof tweet === 'string' ? tweet : (tweet.text || '')
-                        const label = typeof tweet === 'string' ? 'POST' : (tweet.type || tweet.product || 'POST')
-                        return (
-                          <div key={`${idx}-${text.slice(0,20)}`} className={`border p-3 ${shell.panel}`}>
-                            <div className="flex items-center justify-between mb-2">
-                              <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>{label.toUpperCase()}</p>
-                              <p className={`text-[10px] ${shell.textSoft}`}>{text.length} chars</p>
-                            </div>
-                            <p className={`text-sm ${shell.textMuted} break-words`}>{text || 'No text available'}</p>
+                {(!xmaxWork?.recentTweets || xmaxWork.recentTweets.length === 0) && (
+                  <p className={`text-xs ${shell.textMuted}`}>No recent tweets found in xMax data yet. Run xMax or refresh.</p>
+                )}
+                {xmaxWork?.recentTweets && xmaxWork.recentTweets.length > 0 && (
+                  <div className="space-y-2">
+                    {xmaxWork.recentTweets.slice(0, 6).map((tweet, idx) => {
+                      const text = typeof tweet === 'string' ? tweet : (tweet.text || '')
+                      const label = typeof tweet === 'string' ? 'POST' : (tweet.type || tweet.product || 'POST')
+                      return (
+                        <div key={`${idx}-${text.slice(0,20)}`} className={`border p-3 ${shell.panel}`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>{label.toUpperCase()}</p>
+                            <p className={`text-[10px] ${shell.textSoft}`}>{text.length} chars</p>
                           </div>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
+                          <p className={`text-sm ${shell.textMuted} break-words`}>{text || 'No text available'}</p>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
 
-
-                <AnimatePresence>
-                  {selectedTopic && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      className={`border p-4 ${shell.panel}`}
-                    >
-                      <p className={`text-sm mb-4 ${shell.textMuted}`}>{trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text}</p>
-                      <a
-                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(trendingTopics.find(t => t.id === selectedTopic)?.tweets[0].text || '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em] hover:bg-zinc-300"
-                      >
-                        <Twitter className="w-4 h-4" /> POST TO X
-                      </a>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </section>
-
+              {/* MARKETING OPERATIONS */}
               <section className="space-y-4">
                 <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3">MARKETING OPERATIONS</h2>
+                <p className={`text-xs text-center ${shell.textSoft}`}>Content rotates daily</p>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {['MDIFY', 'GUARDSKILLS'].map(product => (
-                    <div key={product} className={`border p-4 ${shell.panel}`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h3 className="text-base font-semibold tracking-wide">{product}</h3>
-                          <p className={`text-[11px] ${shell.textSoft}`}>{product === 'MDIFY' ? 'Chrome Extension' : 'NPM Package'}</p>
+                  {['MDIFY', 'GUARDSKILLS'].map(product => {
+                    const productPosts = marketingPosts.filter(post => post.product === product)
+                    const postIndex = getDailyRotationIndex(productPosts.length, product === 'GUARDSKILLS' ? 2 : 0)
+                    const dailyPost = productPosts[postIndex]
+                    if (!dailyPost) return null
+                    const badge = getPostBadge(dailyPost.channel, dailyPost.text)
+                    const comments = commentTemplates[product.toLowerCase() as keyof typeof commentTemplates] || []
+                    
+                    return (
+                      <div key={product} className={`border p-4 ${shell.panel}`}>
+                        <div className="flex items-center justify-between mb-4">
+                          <div>
+                            <h3 className="text-base font-semibold tracking-wide">{product}</h3>
+                            <p className={`text-[11px] ${shell.textSoft}`}>{product === 'MDIFY' ? 'Chrome Extension' : 'NPM Package'}</p>
+                          </div>
+                          <a
+                            href={
+                              product === 'MDIFY'
+                                ? 'https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki'
+                                : 'https://www.npmjs.com/package/guardskills'
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em]"
+                          >
+                            VIEW
+                          </a>
                         </div>
-                        <a
-                          href={
-                            product === 'MDIFY'
-                              ? 'https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki'
-                              : 'https://www.npmjs.com/package/guardskills'
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em]"
-                        >
-                          VIEW
-                        </a>
+                        <div className={`border p-3 space-y-3 ${shell.panelMuted}`}>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft}`}>{dailyPost.channel} POST</p>
+                              <p className={`text-[10px] ${shell.textSoft}`}>Target: {dailyPost.target}</p>
+                            </div>
+                            <span className={`text-[10px] px-2 py-1 border tracking-[0.12em] ${badge.tone}`}>
+                              {badge.state} · {badge.label}
+                            </span>
+                          </div>
+                          <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{dailyPost.text}</p>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <button
+                              onClick={() => handleCopyPost(dailyPost.id, dailyPost.text)}
+                              className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                            >
+                              <Copy className="w-3.5 h-3.5" /> {copiedPostId === dailyPost.id ? 'COPIED' : 'COPY'}
+                            </button>
+                            {dailyPost.link && (
+                              <a
+                                href={dailyPost.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
+                              >
+                                <Twitter className="w-3.5 h-3.5" /> POST
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <div className="mt-4">
+                          <h4 className={`text-xs font-semibold tracking-[0.16em] mb-2 ${shell.textSoft}`}>Comments</h4>
+                          <div className="space-y-2">
+                            {comments.map((comment, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleCopyPost(`comment-${product}-${idx}`, comment)}
+                                className={`w-full text-left p-2 border text-xs hover:bg-zinc-800/20 transition-colors ${shell.panelMuted}`}
+                              >
+                                {comment}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
-
-                      <div className="space-y-3">
-                        {marketingPosts
-                          .filter(post => post.product === product)
-                          .map(post => {
-                            const badge = getPostBadge(post.channel, post.text)
-                            return (
-                              <div key={post.id} className={`border p-3 space-y-3 ${shell.panelMuted}`}>
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft}`}>{post.channel} POST</p>
-                                    <p className={`text-[10px] ${shell.textSoft}`}>Target: {post.target}</p>
-                                  </div>
-                                  <span className={`text-[10px] px-2 py-1 border tracking-[0.12em] ${badge.tone}`}>
-                                    {badge.state} · {badge.label}
-                                  </span>
-                                </div>
-
-                                <p className={`text-sm leading-relaxed ${shell.textMuted}`}>{post.text}</p>
-
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <button
-                                    onClick={() => handleCopyPost(post.id, post.text)}
-                                    className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
-                                  >
-                                    <Copy className="w-3.5 h-3.5" /> {copiedPostId === post.id ? 'COPIED' : 'COPY'}
-                                  </button>
-                                  {post.link && (
-                                    <a
-                                      href={post.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
-                                    >
-                                      <Twitter className="w-3.5 h-3.5" /> POST
-                                    </a>
-                                  )}
-                                </div>
-                              </div>
-                            )
-                          })}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
-                <p className={`text-xs tracking-[0.14em] text-center ${shell.textSoft}`}>SCHEDULE: 2 POSTS / DAY / PRODUCT (ROTATING)</p>
               </section>
             </motion.div>
           )}
