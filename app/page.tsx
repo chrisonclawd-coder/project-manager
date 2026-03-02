@@ -1018,7 +1018,6 @@ function MissionControlContent() {
     !researchAvailable && (researchReason.toUpperCase().includes('TAVILY') || researchReason.toUpperCase().includes('KEY'))
       ? 'TAVILY_API_KEY missing. Research feed unavailable.'
       : null,
-    teamFeedStale ? 'Team feed is stale (>30s).' : null,
     blockedWorkers > 0 ? `${blockedWorkers} worker${blockedWorkers > 1 ? 's' : ''} blocked.` : null,
   ].filter(Boolean) as string[]
 
