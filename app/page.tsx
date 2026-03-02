@@ -239,18 +239,46 @@ const marketingPosts = [
   },
   // Reddit posts (500+)
   {
-    id: 'mdify-reddit',
+    id: 'mdify-reddit1',
     product: 'MDIFY',
     channel: 'Reddit',
     target: '500+',
     text: "I've been using this Chrome extension called Mdify for the past few weeks and it's completely transformed my AI workflow. Before, I was manually copying and pasting articles, fighting with paywalls and bot protection, only to feed my AI agent bloated HTML with tracking pixels and ads. Now with one click, I get clean .md files that my AI agent can process instantly. No more wasted tokens on irrelevant content, no more copy-paste fatigue. My agent outputs have never been better. If you use AI agents professionally, you need this. It's free to try.",
   },
   {
-    id: 'guardskills-reddit',
+    id: 'mdify-reddit2',
+    product: 'MDIFY',
+    channel: 'Reddit',
+    target: '500+',
+    text: "If you're feeding links to LLMs, you're burning tokens. I ran a test: Web link → bloated HTML → 50-60% token waste. Mdify strips headers, ads, boilerplate before your AI sees it. Lower cost. Better reasoning. Safer agents. Try it: https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+  },
+  {
+    id: 'mdify-reddit3',
+    product: 'MDIFY',
+    channel: 'Reddit',
+    target: '500+',
+    text: "Every AI agent user needs this extension. Stop manually cleaning articles before feeding your AI. Mdify removes all the fluff - ads, tracking pixels, navigation bars, footers - everything your AI doesn't need. One click, clean markdown. Your tokens last longer, your outputs get better. Free browser extension. Game changer for AI workflows.",
+  },
+  {
+    id: 'guardskills-reddit1',
     product: 'GUARDSKILLS',
     channel: 'Reddit',
     target: '500+',
     text: "Worried about malicious AI skills? You should be. Every time you install an AI skill from GitHub, npm, or skills.sh, you're running arbitrary code with your API keys exposed. I built Guardskills to solve this problem. It's an NPM package that scans AI skills for suspicious patterns before you install them - credential access, network exfiltration, file system writes, shell execution. Run `npx guardskills scan <skill-url>` and get a security report in seconds. I've already caught 3 skills with hidden key exfiltration in my own projects. Don't trust, verify. Your AI workflow security depends on it.",
+  },
+  {
+    id: 'guardskills-reddit2',
+    product: 'GUARDSKILLS',
+    channel: 'Reddit',
+    target: '500+',
+    text: "You run `npm install` on AI skills without thinking twice? You're trusting random code with your API keys. I built Guardskills to scan AI skills before you install. It checks for: credential theft patterns, network exfiltration, shell execution, file writes. Run `npx guardskills scan <skill-url>` before installing. Your keys will thank you.",
+  },
+  {
+    id: 'guardskills-reddit3',
+    product: 'GUARDSKILLS',
+    channel: 'Reddit',
+    target: '500+',
+    text: "PSA for AI developers: That cool AI skill you just found? It might be stealing your keys. I analyze AI skills for a living and found multiple with hidden exfiltration. Guardskills is my solution - scans code for suspicious patterns before you run it. Don't be the person who learns about credential theft the hard way.",
   },
 ]
 
