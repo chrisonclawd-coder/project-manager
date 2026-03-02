@@ -713,18 +713,11 @@ function MissionControlContent() {
   }
 
   // Comment templates for Mdify and GuardSkills
-  const commentTemplates = {
-    mdify: [
-      "Show me your work - I'd love to see what you're building!",
-      "Show me your SaaS - always interested in what developers are shipping",
-      "What tools are you using to clean up content for AI?",
-    ],
-    guardskills: [
-      "Show me your work - security in AI skills is crucial!",
-      "Show me your SaaS - how are you handling AI skill security?",
-      "Do you scan AI skills before installing them?",
-    ],
-  }
+  const commentTemplates = [
+    "Show me your SaaS 🛠️ Built something cool? Turn any article into flashcards with Mdify - AI-powered learning. Try free → https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+    "Show me your work 🔧 Writing code? Guardskills scans AI skills for malicious code - keep your projects safe. Install now → https://www.npmjs.com/package/guardskills",
+    "Show me your product 🚀 Building something? Convert any article to flashcards with Mdify. AI that learns YOUR way → https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki",
+  ]
 
   const handleCopyPost = async (id: string, text: string) => {
     try {
@@ -1621,8 +1614,7 @@ function MissionControlContent() {
                     const dailyPost = productPosts[postIndex]
                     if (!dailyPost) return null
                     const badge = getPostBadge(dailyPost.channel, dailyPost.text)
-                    const comments = commentTemplates[product.toLowerCase() as keyof typeof commentTemplates] || []
-                    
+
                     return (
                       <div key={product} className={`border p-4 ${shell.panel}`}>
                         <div className="flex items-center justify-between mb-4">
@@ -1673,23 +1665,30 @@ function MissionControlContent() {
                             )}
                           </div>
                         </div>
-                        <div className="mt-4">
-                          <h4 className={`text-xs font-semibold tracking-[0.16em] mb-2 ${shell.textSoft}`}>Comments</h4>
-                          <div className="space-y-2">
-                            {comments.map((comment, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => handleCopyPost(`comment-${product}-${idx}`, comment)}
-                                className={`w-full text-left p-2 border text-xs hover:bg-zinc-800/20 transition-colors ${shell.panelMuted}`}
-                              >
-                                {comment}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
                       </div>
                     )
                   })}
+                </div>
+
+                {/* COMMENTS - Copy & Reply */}
+                <div className="mt-6">
+                  <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-4">COMMENTS - Copy & Reply</h3>
+                  <div className="space-y-3">
+                    {commentTemplates.map((comment, idx) => (
+                      <div key={`comment-${idx}`} className={`border p-3 ${shell.panelMuted}`}>
+                        <div className="flex items-start justify-between gap-3">
+                          <p className={`text-sm ${shell.textMuted} break-words flex-1`}>{comment}</p>
+                          <button
+                            onClick={() => handleCopyPost(`comment-${idx}`, comment)}
+                            className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30 shrink-0"
+                          >
+                            <Copy className="w-3.5 h-3.5" /> {copiedPostId === `comment-${idx}` ? 'COPIED' : 'COPY'}
+                          </button>
+                        </div>
+                        <p className={`text-[10px] mt-2 ${shell.textSoft}`}>{comment.length}/280 chars</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </section>
             </motion.div>
