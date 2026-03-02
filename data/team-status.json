@@ -2,49 +2,49 @@
   "manager": {
     "name": "Chrisly",
     "role": "Manager",
-    "status": "idle",
-    "currentTask": "Overseeing xMax automation and Mission Control",
+    "status": "active",
+    "currentTask": "Overseeing Mission Control",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   },
   "xmax": {
     "name": "xMax",
-    "role": "X Strategy Lead",
+    "role": "AI Agent",
     "status": "idle",
     "currentTask": "Content generation (4x daily)",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   },
   "developer": {
     "name": "Developer",
-    "role": "Developer",
+    "role": "AI Agent",
     "status": "idle",
-    "currentTask": "Feature development on hold",
+    "currentTask": "Feature development",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   },
   "qa": {
     "name": "QA",
-    "role": "QA Engineer",
+    "role": "AI Agent",
     "status": "idle",
-    "currentTask": "Awaiting new features",
+    "currentTask": "Testing features",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   },
   "devops": {
     "name": "DevOps",
-    "role": "DevOps Engineer",
+    "role": "AI Agent",
     "status": "idle",
     "currentTask": "CI/CD maintenance",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   },
   "tester": {
     "name": "Manual Test",
     "role": "Manual Tester",
     "status": "idle",
-    "currentTask": "ProgresX extension testing pending",
+    "currentTask": "ProgresX extension testing",
     "blocker": "",
-    "updatedAt": "2026-03-02T17:30:00.000Z"
+    "updatedAt": "2026-03-02T17:38:00.000Z"
   }
 }
