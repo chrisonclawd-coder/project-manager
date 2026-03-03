@@ -37,25 +37,12 @@ import {
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
-type PipelineStage = 'manager' | 'development' | 'qa' | 'devops' | 'manual-testing' | 'completed'
 
 interface Task {
   id: number
   title: string
   status: TaskStatus
   priority: TaskPriority
-}
-
-interface PipelineItem {
-  id: string
-  title: string
-  description: string
-  stage: PipelineStage
-  priority: 'high' | 'medium' | 'low'
-  deadline: string
-  assignee: string
-  createdAt: string
-  updatedAt: string
 }
 
 interface AgentStatusData {
@@ -359,10 +346,6 @@ function MissionControlContent() {
   const [tradingTicker, setTradingTicker] = useState('')
   const [stockData, setStockData] = useState<any>(null)
   const [optionsData, setOptionsData] = useState<any>(null)
-
-  // Pipeline state
-  const [pipelineData, setPipelineData] = useState<PipelineItem[]>([])
-  const [pipelineLoading, setPipelineLoading] = useState(false)
 
   // Agent status state
   const [agentData, setAgentData] = useState<AgentStatusData[]>([])
@@ -833,21 +816,6 @@ function MissionControlContent() {
       } catch { /* ignore */ }
     }
     loadBookmarks()
-  }, [])
-
-  // Load pipeline data
-  useEffect(() => {
-    const loadPipeline = async () => {
-      setPipelineLoading(true)
-      try {
-        const res = await fetch('/data/pipeline.json', { cache: 'no-store' })
-        if (!res.ok) return
-        const data = (await res.json()) as PipelineItem[]
-        setPipelineData(data)
-      } catch { /* ignore */ }
-      setPipelineLoading(false)
-    }
-    loadPipeline()
   }, [])
 
   // Load agent status data
@@ -1824,72 +1792,6 @@ function MissionControlContent() {
                 <p className={`text-xs mt-3 ${shell.textMuted}`}>
                   Product KPIs are now consolidated inside Projects to keep planning + distribution decisions in one view.
                 </p>
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'pipeline' && (
-            <motion.div key="pipeline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-              <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">SOFTWARE DEVELOPMENT PIPELINE</h2>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  KANBAN BOARD · MANAGER REVIEW → DEVELOPMENT → QA → DEVOPS → MANUAL TESTING → COMPLETED
-                </p>
-                <div className="flex items-center gap-4 mt-3">
-                  {pipelineLoading && (
-                    <span className="text-xs text-zinc-400">Loading pipeline...</span>
-                  )}
-                  {!pipelineLoading && (
-                    <span className={`text-xs ${shell.textMuted}`}>{pipelineData.length} tasks</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto pb-2">
-                {[
-                  { id: 'manager', label: 'MANAGER REVIEW', color: 'border-amber-500/40', bg: 'bg-amber-500/10' },
-                  { id: 'development', label: 'DEVELOPMENT', color: 'border-sky-500/40', bg: 'bg-sky-500/10' },
-                  { id: 'qa', label: 'QA TESTING', color: 'border-purple-500/40', bg: 'bg-purple-500/10' },
-                  { id: 'devops', label: 'DEVOPS', color: 'border-green-500/40', bg: 'bg-green-500/10' },
-                  { id: 'manual-testing', label: 'MANUAL TESTING', color: 'border-orange-500/40', bg: 'bg-orange-500/10' },
-                  { id: 'completed', label: 'COMPLETED', color: 'border-emerald-500/40', bg: 'bg-emerald-500/10' },
-                ].map(stage => (
-                  <div key={stage.id} className={`border ${stage.color} min-w-[280px] flex flex-col`}>
-                    <div className={`p-3 border-b ${stage.color} ${stage.bg}`}>
-                      <p className="text-xs font-semibold tracking-[0.14em]">{stage.label}</p>
-                      <p className={`text-[10px] mt-1 ${shell.textMuted}`}>
-                        {pipelineData.filter(p => p.stage === stage.id).length} tasks
-                      </p>
-                    </div>
-                    <div className="flex-1 p-2 space-y-2 max-h-[500px] overflow-y-auto">
-                      {pipelineData
-                        .filter(p => p.stage === stage.id)
-                        .map(task => (
-                          <div key={task.id} className={`border p-3 ${shell.panel} space-y-2`}>
-                            <div className="flex items-start justify-between">
-                              <h4 className="text-sm font-semibold flex-1">{task.title}</h4>
-                              <span className={`text-[10px] px-2 py-0.5 border ${
-                                task.priority === 'high' ? 'border-rose-500/40 text-rose-400' :
-                                task.priority === 'medium' ? 'border-amber-500/40 text-amber-400' :
-                                'border-zinc-500/40 text-zinc-400'
-                              }`}>
-                                {task.priority}
-                              </span>
-                            </div>
-                            <p className={`text-xs ${shell.textMuted}`}>{task.description}</p>
-                            <div className="flex items-center justify-between text-[10px]">
-                              <span className={`${shell.textSoft}`}>
-                                Due: {task.deadline}
-                              </span>
-                              <span className={`${shell.textMuted}`}>
-                                {task.assignee}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                ))}
               </div>
             </motion.div>
           )}
