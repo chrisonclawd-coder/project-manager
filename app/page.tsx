@@ -71,16 +71,6 @@ interface BookmarkItem {
   addedAt: string
 }
 
-interface TeamMember {
-  id: string
-  name: string
-  role: string
-  status: string
-  currentTask: string
-  blocker?: string
-  updatedAt?: string
-}
-
 interface TeamStatusEntry {
   name?: string
   role?: string
@@ -176,15 +166,6 @@ interface XmaxWorkData {
   topics?: Array<{ id?: number; name?: string; source?: string; lastWorked?: string }>
   recentTweets?: Array<XmaxRecentTweet | string>
 }
-
-const teamMembers: TeamMember[] = [
-  { id: 'manager', name: 'Chrisly', role: 'Manager', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
-  { id: 'xmax', name: 'xMax', role: 'X Strategy Lead', status: 'working', currentTask: 'Running X Strategy - creating tweets', blocker: '', updatedAt: '' },
-  { id: 'developer', name: 'Developer', role: 'Developer', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
-  { id: 'qa', name: 'QA', role: 'QA', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
-  { id: 'devops', name: 'DevOps', role: 'DevOps', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
-  { id: 'tester', name: 'Tester', role: 'Manual Tester', status: 'idle', currentTask: '', blocker: '', updatedAt: '' },
-]
 
 const defaultTasks: Task[] = [
   { id: 1, title: 'Complete InstaCards Chrome Extension', status: 'done', priority: 'high' },
@@ -318,11 +299,9 @@ function MissionControlContent() {
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([])
   const [trendingTopics] = useState(defaultTopics)
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
-  const [teamData, setTeamData] = useState(teamMembers)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
-  const [teamLastUpdated, setTeamLastUpdated] = useState<string>('')
   const [npmMetrics, setNpmMetrics] = useState<NpmMetrics | null>(null)
   const [chromeMetrics, setChromeMetrics] = useState<ChromeMetrics | null>(null)
   const [researchFeed, setResearchFeed] = useState<ResearchItem[]>([])
@@ -658,36 +637,6 @@ function MissionControlContent() {
   }
 
   useEffect(() => {
-    const loadTeamStatus = async () => {
-      try {
-        const res = await fetch('/api/status', { cache: 'no-store' })
-        const payload = (await res.json()) as StatusApiResponse
-        const data = payload.team || {}
-
-        const merged = teamMembers.map(m => ({
-          ...m,
-          name: data[m.id]?.name || m.name,
-          role: data[m.id]?.role || m.role,
-          status: data[m.id]?.status || m.status,
-          currentTask: data[m.id]?.currentTask || m.currentTask,
-          blocker: data[m.id]?.blocker || '',
-          updatedAt: data[m.id]?.updatedAt || '',
-        }))
-
-        setTeamData(merged)
-        setTeamLastUpdated(payload.lastUpdated || '')
-      } catch {
-        setTeamData(teamMembers)
-        setTeamLastUpdated('')
-      }
-    }
-
-    loadTeamStatus()
-    const interval = setInterval(loadTeamStatus, 10000)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
     const loadProductMetrics = async () => {
       try {
         const [npmRes, chromeRes] = await Promise.all([
@@ -719,7 +668,7 @@ function MissionControlContent() {
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
-    { id: 'software-team', label: 'TEAM', icon: Users },
+    { id: 'agents-gateway', label: 'AGENTS', icon: Users },
   ]
 
   const filteredTasks = tasks.filter(
@@ -1212,10 +1161,8 @@ function MissionControlContent() {
   const verseOfTheDay = verseRotation[utcDayIndex % verseRotation.length]
   const wordOfTheDay = wordRotation[utcDayIndex % wordRotation.length]
 
-  const blockedWorkers = teamData.filter(member => member.status === 'blocked' || Boolean(member.blocker)).length
-  const workingMembers = teamData.filter(member => member.status === 'working')
-  const activeRole = workingMembers[0]?.role || 'No active role'
-  const teamFeedStale = isStale(teamLastUpdated)
+  const activeAgents = agentData.filter(a => a.status === 'active').length
+  const recentAgents = agentData.filter(a => a.status === 'recent').length
 
   const xmaxLastRunCandidates = [
     ...(xmaxWork?.topics?.map(topic => topic.lastWorked).filter(Boolean) || []),
@@ -1319,17 +1266,17 @@ function MissionControlContent() {
         </div>
 
         <div className={`absolute bottom-0 w-full p-4 border-t ${shell.panel}`}>
-          <p className={`text-[10px] tracking-[0.2em] mb-2 ${shell.textSoft}`}>ACTIVE TEAM</p>
+          <p className={`text-[10px] tracking-[0.2em] mb-2 ${shell.textSoft}`}>ACTIVE AGENTS</p>
           <div className="space-y-2">
-            {teamData
-              .filter(m => m.status === 'working')
-              .map(member => (
-                <div key={member.id} className={`p-2 rounded border ${shell.panelMuted}`}>
+            {agentData
+              .filter(a => a.status === 'active')
+              .map(agent => (
+                <div key={agent.sessionId} className={`p-2 rounded border ${shell.panelMuted}`}>
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-emerald-500 animate-pulse rounded-full" />
-                    <span className="text-xs text-zinc-200">{member.name}</span>
+                    <span className="text-xs text-zinc-200">{agent.name}</span>
                   </div>
-                  <p className={`text-[11px] ml-4 mt-1 truncate ${shell.textMuted}`}>{member.currentTask || 'No active task'}</p>
+                  <p className={`text-[11px] ml-4 mt-1 truncate ${shell.textMuted}`}>{agent.currentTask}</p>
                 </div>
               ))}
           </div>
@@ -3152,91 +3099,90 @@ function MissionControlContent() {
             </motion.div>
           )}
 
-          {activeTab === 'software-team' && (
-            <motion.div key="team" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+          {activeTab === 'agents-gateway' && (
+            <motion.div key="agents-gateway" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">TEAM OPERATIONS</h2>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">GATEWAY AGENTS</h2>
                 <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  LIVE DELIVERY STATUS · MEMBER · ROLE · STATUS · TASK · BLOCKERS · LAST UPDATE
+                  REAL-TIME AGENT STATUS FROM OPENCLAW GATEWAY
                 </p>
                 <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
-                  FEED UPDATED: {formatUpdatedTimeIST(teamLastUpdated)}
+                  Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
                 </p>
               </div>
 
-
-              <div className={`border p-4 ${shell.panel}`}>
-                <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-3">SOFTWARE PIPELINE FLOW</h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                  <div className={`border p-3 ${shell.panelMuted}`}>
-                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 1</p>
-                    <p className="text-sm font-semibold mt-1">Developer</p>
-                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Implements feature/fix and hands off to QA.</p>
-                  </div>
-                  <div className={`border p-3 ${shell.panelMuted}`}>
-                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 2</p>
-                    <p className="text-sm font-semibold mt-1">QA</p>
-                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Tests and validates. If failed, loops back to Developer.</p>
-                  </div>
-                  <div className={`border p-3 ${shell.panelMuted}`}>
-                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 3</p>
-                    <p className="text-sm font-semibold mt-1">DevOps</p>
-                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Build + deployment after QA approval.</p>
-                  </div>
-                  <div className={`border p-3 ${shell.panelMuted}`}>
-                    <p className="text-xs tracking-[0.14em] text-zinc-400">STEP 4</p>
-                    <p className="text-sm font-semibold mt-1">Manual Tester</p>
-                    <p className={`text-xs mt-2 ${shell.textMuted}`}>Production validation. Issues loop to QA → Developer.</p>
-                  </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL</p>
+                  <p className="text-2xl mt-1 font-semibold">{agentData.length}</p>
                 </div>
-                <p className={`text-xs tracking-[0.12em] mt-3 ${shell.textSoft}`}>FLOW: Developer → QA → DevOps → Manual Tester · Loop back on failures</p>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">ACTIVE</p>
+                  <p className="text-2xl mt-1 font-semibold text-emerald-400">
+                    {agentData.filter(a => a.status === 'active').length}
+                  </p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">RECENT</p>
+                  <p className="text-2xl mt-1 font-semibold text-sky-400">
+                    {agentData.filter(a => a.status === 'recent').length}
+                  </p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOKENS</p>
+                  <p className="text-2xl mt-1 font-semibold">
+                    {(agentSummary.totalTokensToday / 1000).toFixed(1)}k
+                  </p>
+                </div>
               </div>
+
               <div className={`border p-3 ${shell.panelMuted}`}>
-                <div className="hidden md:grid md:grid-cols-[1.2fr_1fr_0.8fr_1.8fr_1.3fr_1.3fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
-                  <span>Member</span>
-                  <span>Role</span>
-                  <span>Status</span>
+                <div className="hidden md:grid md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
+                  <span>Agent</span>
                   <span>Current Task</span>
-                  <span>Blocker</span>
-                  <span>Updated At</span>
+                  <span>Status</span>
+                  <span>Tokens</span>
+                  <span>Last Active</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                {teamData.map(member => {
-                  const stale = isStale(member.updatedAt)
-                  return (
-                    <div key={member.id} className={`border p-4 ${shell.panel}`}>
-                      <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_0.8fr_1.8fr_1.3fr_1.3fr] gap-3 items-start">
+                {agentData.length === 0 ? (
+                  <div className={`border p-8 ${shell.panel} text-center`}>
+                    <p className={`text-lg ${shell.textMuted}`}>No active agents</p>
+                    <p className={`text-sm mt-2 ${shell.textSoft}`}>Start a sub-agent to see it here</p>
+                  </div>
+                ) : (
+                  agentData.map(agent => (
+                    <div key={agent.sessionId} className={`border p-4 ${shell.panel}`}>
+                      <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 items-start">
                         <div>
-                          <p className="text-sm font-semibold">{member.name}</p>
-                          <p className={`text-[11px] ${shell.textSoft}`}>ID: {member.id}</p>
+                          <p className="text-sm font-semibold">{agent.name}</p>
+                          <p className={`text-[11px] ${shell.textSoft}`}>{agent.sessionId.slice(0, 8)}</p>
                         </div>
-                        <div className="text-sm">{member.role}</div>
+                        <div className="text-sm">{agent.currentTask}</div>
                         <div>
-                          <p
-                            className={`text-xs inline-flex items-center gap-2 capitalize ${
-                              member.status === 'working' ? 'text-emerald-400' : member.status === 'blocked' ? 'text-rose-400' : shell.textMuted
-                            }`}
-                          >
-                            <span
-                              className={`w-2 h-2 rounded-full ${
-                                member.status === 'working' ? 'bg-emerald-500 animate-pulse' : member.status === 'blocked' ? 'bg-rose-500' : 'bg-zinc-500'
-                              }`}
-                            />
-                            {member.status}
+                          <p className={`text-xs inline-flex items-center gap-2 capitalize ${
+                            agent.status === 'active' ? 'text-emerald-400' :
+                            agent.status === 'recent' ? 'text-sky-400' :
+                            agent.status === 'away' ? 'text-amber-400' :
+                            shell.textMuted
+                          }`}>
+                            <span className={`w-2 h-2 rounded-full ${
+                              agent.status === 'active' ? 'bg-emerald-500 animate-pulse' :
+                              agent.status === 'recent' ? 'bg-sky-500' :
+                              agent.status === 'away' ? 'bg-amber-500' :
+                              'bg-zinc-500'
+                            }`} />
+                            {agent.status}
                           </p>
                         </div>
-                        <div className="text-sm">{member.currentTask || 'No task assigned'}</div>
-                        <div className={`text-sm ${member.blocker ? 'text-amber-400' : shell.textMuted}`}>{member.blocker || 'None'}</div>
-                        <div className="space-y-1">
-                          <p className={`text-xs ${shell.textMuted}`}>{formatUpdatedTimeIST(member.updatedAt)}</p>
-                          {stale && <span className="inline-block text-[10px] px-2 py-0.5 border border-amber-500/40 text-amber-400">STALE</span>}
-                        </div>
+                        <div className="text-sm">{(agent.tokensUsed / 1000).toFixed(1)}k</div>
+                        <div className={`text-sm ${shell.textMuted}`}>{formatUpdatedTimeIST(agent.lastActive)}</div>
                       </div>
                     </div>
-                  )
-                })}
+                  ))
+                )}
               </div>
             </motion.div>
           )}
