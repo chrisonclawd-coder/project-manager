@@ -506,8 +506,8 @@ function MissionControlContent() {
   const shell = darkMode
     ? {
         page: 'bg-[#090909] text-zinc-100',
-        panel: 'bg-[#111111] border-zinc-800',
-        panelMuted: 'bg-[#0d0d0d] border-zinc-800',
+        panel: 'bg-[#111111] border-zinc-800 rounded-xl',
+        panelMuted: 'bg-[#0d0d0d] border-zinc-800 rounded-lg',
         textMuted: 'text-zinc-400',
         textSoft: 'text-zinc-500',
         borderStrong: 'border-zinc-700',
@@ -520,8 +520,8 @@ function MissionControlContent() {
     : {
         // NEW: Emerald Green Light Theme - Calm, Operational, Data-dense
         page: 'bg-zinc-100 text-zinc-900',
-        panel: 'bg-white border-zinc-200',
-        panelMuted: 'bg-zinc-50 border-zinc-200',
+        panel: 'bg-white border-zinc-200 rounded-2xl shadow-sm',
+        panelMuted: 'bg-zinc-50 border-zinc-200 rounded-xl',
         textMuted: 'text-zinc-600',
         textSoft: 'text-zinc-500',
         borderStrong: 'border-zinc-300',
