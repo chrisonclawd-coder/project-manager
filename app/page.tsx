@@ -732,8 +732,7 @@ function MissionControlContent() {
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
     { id: 'pipeline', label: 'PIPELINE', icon: GitBranch },
-    { id: 'agents', label: 'AGENTS', icon: Activity },
-    { id: 'costs', label: 'COSTS', icon: DollarSign },
+    { id: 'operations', label: 'OPERATIONS', icon: Activity },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
@@ -1895,20 +1894,20 @@ function MissionControlContent() {
             </motion.div>
           )}
 
-          {activeTab === 'agents' && (
-            <motion.div key="agents" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+          {activeTab === 'operations' && (
+            <motion.div key="operations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
               <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">ACTIVE AGENTS</h2>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">OPERATIONS</h2>
                 <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  REAL-TIME MONITORING · SUB-AGENTS · TOKEN USAGE · STATUS
+                  AGENTS · TOKENS · COSTS · STATUS · MODEL: GLM-4.7
                 </p>
                 <div className="flex items-center gap-4 mt-3">
                   {agentLoading && (
-                    <span className="text-xs text-zinc-400">Loading agents...</span>
+                    <span className="text-xs text-zinc-400">Loading...</span>
                   )}
                   {!agentLoading && (
                     <span className={`text-xs ${shell.textMuted}`}>
-                      {agentData.length} active · Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
+                      {agentData.length} agents · Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
                     </span>
                   )}
                 </div>
@@ -1916,20 +1915,20 @@ function MissionControlContent() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL AGENTS</p>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">AGENTS</p>
                   <p className="text-2xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
                 </div>
                 <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOKENS TODAY</p>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOKENS</p>
                   <p className="text-2xl mt-1 font-semibold">{(agentSummary.totalTokensToday / 1000).toFixed(1)}k</p>
                 </div>
                 <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">COST ESTIMATE</p>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">COST</p>
                   <p className="text-2xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
                 </div>
                 <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">MODEL</p>
-                  <p className="text-sm mt-1 font-semibold">{agentSummary.model}</p>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">RATE</p>
+                  <p className="text-sm mt-1 font-semibold">$0.001/1k</p>
                 </div>
               </div>
 
@@ -1973,77 +1972,6 @@ function MissionControlContent() {
                     </div>
                   </div>
                 ))}
-              </div>
-            </motion.div>
-          )}
-
-          {activeTab === 'costs' && (
-            <motion.div key="costs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-              <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">COST TRACKING</h2>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  TOKEN USAGE · AGENT BREAKDOWN · COST ESTIMATES · MODEL: GLM-4.7
-                </p>
-                <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
-                  RATE: $0.001 per 1,000 tokens
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL TOKENS TODAY</p>
-                  <p className="text-3xl mt-1 font-semibold">{(agentSummary.totalTokensToday / 1000).toFixed(1)}k</p>
-                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Tokens processed</p>
-                </div>
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL COST ESTIMATE</p>
-                  <p className="text-3xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
-                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Based on $0.001/1k tokens</p>
-                </div>
-                <div className={`border p-4 ${shell.panel}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">ACTIVE AGENTS</p>
-                  <p className="text-3xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
-                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Currently tracked</p>
-                </div>
-              </div>
-
-              <div className={`border p-4 ${shell.panel}`}>
-                <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-3">TOKEN USAGE BY AGENT</h3>
-                <div className="space-y-3">
-                  {agentData.map(agent => {
-                    const tokenPercentage = agentSummary.totalTokensToday > 0 
-                      ? (agent.tokensUsed / agentSummary.totalTokensToday) * 100 
-                      : 0
-                    return (
-                      <div key={agent.sessionId} className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-medium">{agent.name}</span>
-                          <span className={`${shell.textSoft}`}>
-                            {(agent.tokensUsed / 1000).toFixed(1)}k tokens
-                            <span className="ml-2">(${tokenPercentage.toFixed(1)}%)</span>
-                          </span>
-                        </div>
-                        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${tokenPercentage}%` }}
-                            transition={{ duration: 0.5 }}
-                            className="h-full bg-gradient-to-r from-sky-500 to-sky-400"
-                          />
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-
-              <div className={`border p-4 ${shell.panelMuted}`}>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  COST NOTES · Token counts are approximate based on OpenClaw session data. GLM-4.7 model assumed at $0.001/1k tokens.
-                </p>
-                <p className={`text-xs mt-2 ${shell.textMuted}`}>
-                  Last updated: {formatUpdatedTimeIST(agentsLastUpdated)}
-                </p>
               </div>
             </motion.div>
           )}
