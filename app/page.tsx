@@ -512,15 +512,25 @@ function MissionControlContent() {
         textSoft: 'text-zinc-500',
         borderStrong: 'border-zinc-700',
         navHover: 'hover:bg-zinc-800/60',
+        primary: 'text-emerald-400',
+        primaryBg: 'bg-emerald-500',
+        primaryBorder: 'border-emerald-500',
+        accent: 'text-emerald-300',
       }
     : {
-        page: 'bg-zinc-50 text-zinc-900',
+        // NEW: Emerald Green Light Theme - Calm, Operational, Data-dense
+        page: 'bg-zinc-100 text-zinc-900',
         panel: 'bg-white border-zinc-200',
-        panelMuted: 'bg-zinc-100 border-zinc-200',
+        panelMuted: 'bg-zinc-50 border-zinc-200',
         textMuted: 'text-zinc-600',
         textSoft: 'text-zinc-500',
-        borderStrong: 'border-zinc-400',
+        borderStrong: 'border-zinc-300',
         navHover: 'hover:bg-zinc-200/80',
+        // Emerald Green accents
+        primary: 'text-emerald-700',
+        primaryBg: 'bg-emerald-600',
+        primaryBorder: 'border-emerald-500',
+        accent: 'text-emerald-600',
       }
 
   // Home page data
@@ -1198,7 +1208,7 @@ function MissionControlContent() {
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
       <aside
-        className={`fixed top-0 left-0 w-64 h-full z-50 transform transition-colors duration-200 border-r ${shell.panel} ${
+        className={`fixed top-0 left-0 w-64 h-full z-50 transform transition-colors duration-200 border-r ${shell.panel} rounded-none lg:rounded-none ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0`}
       >
@@ -1237,7 +1247,7 @@ function MissionControlContent() {
                 activeTab === item.id
                   ? darkMode
                     ? 'bg-zinc-800/70 border-zinc-300 text-zinc-100'
-                    : 'bg-zinc-200 border-zinc-700 text-zinc-900'
+                    : 'bg-emerald-100 border-emerald-500 text-emerald-800'
                   : `border-transparent ${shell.navHover} ${shell.textMuted}`
               }`}
             >
@@ -1392,9 +1402,10 @@ function MissionControlContent() {
       )}
 
       <main className="lg:ml-64 min-h-screen p-4 md:p-8 pt-16 lg:pt-8">
+        <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
-            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="max-w-4xl mx-auto space-y-4">
+            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
                   {getGreeting().greeting} <span className="text-zinc-400">CHRIS</span>
@@ -1606,7 +1617,7 @@ function MissionControlContent() {
                     <button
                       onClick={addProject}
                       disabled={!newProjectTitle}
-                      className="px-4 py-2 bg-zinc-200 text-black text-xs tracking-wider font-semibold hover:bg-zinc-300 disabled:opacity-50"
+                      className="px-4 py-2 bg-emerald-600 text-white text-xs tracking-wider font-semibold hover:bg-emerald-700 disabled:opacity-50"
                     >
                       ADD PROJECT
                     </button>
@@ -1781,7 +1792,7 @@ function MissionControlContent() {
                     <button
                       onClick={addBookmark}
                       disabled={!newBookmarkUrl || !newBookmarkTitle}
-                      className="px-4 py-2 bg-zinc-200 text-black text-xs tracking-wider font-semibold hover:bg-zinc-300 disabled:opacity-50"
+                      className="px-4 py-2 bg-emerald-600 text-white text-xs tracking-wider font-semibold hover:bg-emerald-700 disabled:opacity-50"
                     >
                       ADD BOOKMARK
                     </button>
@@ -3074,6 +3085,7 @@ function MissionControlContent() {
           )}
 
         </AnimatePresence>
+        </div>
       </main>
 
       <div
