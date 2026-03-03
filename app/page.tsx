@@ -1218,8 +1218,8 @@ function MissionControlContent() {
       >
         <div className={`h-14 flex items-center justify-between px-4 border-b ${shell.panel}`}>
           <div className="flex items-center">
-            <Zap className="w-6 h-6 text-zinc-300" />
-            <span className="font-semibold tracking-[0.2em] ml-2 text-zinc-200">MISSION</span>
+            <Zap className={`w-6 h-6 ${darkMode ? 'text-zinc-300' : 'text-emerald-600'}`} />
+            <span className={`font-semibold tracking-[0.2em] ml-2 ${darkMode ? 'text-zinc-200' : 'text-emerald-700'}`}>MISSION</span>
           </div>
           <div className="flex items-center gap-1">
             <button
@@ -1412,7 +1412,7 @@ function MissionControlContent() {
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-                  {getGreeting().greeting} <span className="text-zinc-400">CHRIS</span>
+                  {getGreeting().greeting} <span className={darkMode ? 'text-zinc-400' : 'text-emerald-600'}>CHRIS</span>
                 </h1>
                 <p className={`text-xs tracking-[0.18em] mt-2 ${shell.textSoft}`}>{formatDate(new Date())}</p>
                 <p className={`text-xs mt-4 border-l-2 pl-4 tracking-[0.16em] ${shell.textMuted} ${shell.borderStrong}`}>
