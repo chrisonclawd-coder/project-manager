@@ -1915,6 +1915,13 @@ function MissionControlContent() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">GATEWAY</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <p className="text-sm font-semibold">Connected</p>
+                  </div>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
                   <p className="text-xs tracking-[0.14em] text-zinc-400">AGENTS</p>
                   <p className="text-2xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
                 </div>
@@ -1926,9 +1933,16 @@ function MissionControlContent() {
                   <p className="text-xs tracking-[0.14em] text-zinc-400">COST</p>
                   <p className="text-2xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div className={`border p-3 ${shell.panelMuted}`}>
                   <p className="text-xs tracking-[0.14em] text-zinc-400">RATE</p>
-                  <p className="text-sm mt-1 font-semibold">$0.001/1k</p>
+                  <p className="text-sm mt-1 font-semibold">$0.001/1k tokens</p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">GATEWAY URL</p>
+                  <p className="text-sm mt-1 font-semibold">ws://127.0.0.1:18789</p>
                 </div>
               </div>
 
