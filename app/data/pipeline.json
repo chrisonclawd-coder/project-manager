@@ -1,0 +1,68 @@
+[
+  {
+    "id": "1",
+    "title": "User Authentication System",
+    "description": "Implement OAuth2 and JWT authentication for the platform",
+    "stage": "development",
+    "priority": "high",
+    "deadline": "2026-03-10",
+    "assignee": "developer",
+    "createdAt": "2026-03-01",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "2",
+    "title": "API Rate Limiting",
+    "description": "Add rate limiting middleware to prevent abuse",
+    "stage": "qa",
+    "priority": "high",
+    "deadline": "2026-03-08",
+    "assignee": "qa",
+    "createdAt": "2026-02-28",
+    "updatedAt": "2026-03-02"
+  },
+  {
+    "id": "3",
+    "title": "Database Optimization",
+    "description": "Add indexes and optimize slow queries",
+    "stage": "devops",
+    "priority": "medium",
+    "deadline": "2026-03-15",
+    "assignee": "devops",
+    "createdAt": "2026-03-01",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "4",
+    "title": "Mobile Responsive UI",
+    "description": "Ensure all pages work on mobile devices",
+    "stage": "manual-testing",
+    "priority": "medium",
+    "deadline": "2026-03-12",
+    "assignee": "tester",
+    "createdAt": "2026-02-25",
+    "updatedAt": "2026-03-01"
+  },
+  {
+    "id": "5",
+    "title": "Dashboard Analytics",
+    "description": "Real-time analytics dashboard with charts",
+    "stage": "completed",
+    "priority": "high",
+    "deadline": "2026-03-05",
+    "assignee": "developer",
+    "createdAt": "2026-02-20",
+    "updatedAt": "2026-03-01"
+  },
+  {
+    "id": "6",
+    "title": "Payment Integration",
+    "description": "Stripe payment gateway integration",
+    "stage": "manager",
+    "priority": "high",
+    "deadline": "2026-03-20",
+    "assignee": "manager",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  }
+]

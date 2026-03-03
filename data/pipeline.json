@@ -1,0 +1,57 @@
+[
+  {
+    "id": "1",
+    "title": "Agent Status Panel",
+    "description": "Show real-time sub-agent status in Mission Control",
+    "stage": "development",
+    "priority": "high",
+    "deadline": "2026-03-05",
+    "assignee": "developer",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "2",
+    "title": "Cost Tracking",
+    "description": "Track token usage and cost estimates per agent",
+    "stage": "development",
+    "priority": "high",
+    "deadline": "2026-03-05",
+    "assignee": "developer",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "3",
+    "title": "Task Deadlines",
+    "description": "Add due dates and priority to all tasks",
+    "stage": "qa",
+    "priority": "medium",
+    "deadline": "2026-03-07",
+    "assignee": "developer",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "4",
+    "title": "Live Activity Feed",
+    "description": "Real-time feed of agent completions",
+    "stage": "devops",
+    "priority": "medium",
+    "deadline": "2026-03-10",
+    "assignee": "devops",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  },
+  {
+    "id": "5",
+    "title": "Decision History",
+    "description": "Track decisions made per task",
+    "stage": "todo",
+    "priority": "low",
+    "deadline": "2026-03-15",
+    "assignee": "",
+    "createdAt": "2026-03-03",
+    "updatedAt": "2026-03-03"
+  }
+]

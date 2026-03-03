@@ -30,16 +30,50 @@ import {
   Bell,
   Wallet,
   ExternalLink,
+  GitBranch,
+  DollarSign,
+  Activity,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
+type PipelineStage = 'manager' | 'development' | 'qa' | 'devops' | 'manual-testing' | 'completed'
 
 interface Task {
   id: number
   title: string
   status: TaskStatus
   priority: TaskPriority
+}
+
+interface PipelineItem {
+  id: string
+  title: string
+  description: string
+  stage: PipelineStage
+  priority: 'high' | 'medium' | 'low'
+  deadline: string
+  assignee: string
+  createdAt: string
+  updatedAt: string
+}
+
+interface AgentStatusData {
+  name: string
+  currentTask: string
+  tokensUsed: number
+  status: string
+  lastActive: string
+  sessionId: string
+  model: string
+}
+
+interface AgentSummary {
+  totalAgents: number
+  totalTokensToday: number
+  costEstimate: number
+  currency: string
+  model: string
 }
 
 interface BookmarkItem {
@@ -325,6 +359,22 @@ function MissionControlContent() {
   const [tradingTicker, setTradingTicker] = useState('')
   const [stockData, setStockData] = useState<any>(null)
   const [optionsData, setOptionsData] = useState<any>(null)
+
+  // Pipeline state
+  const [pipelineData, setPipelineData] = useState<PipelineItem[]>([])
+  const [pipelineLoading, setPipelineLoading] = useState(false)
+
+  // Agent status state
+  const [agentData, setAgentData] = useState<AgentStatusData[]>([])
+  const [agentSummary, setAgentSummary] = useState<AgentSummary>({
+    totalAgents: 0,
+    totalTokensToday: 0,
+    costEstimate: 0,
+    currency: 'USD',
+    model: 'GLM-4.7'
+  })
+  const [agentLoading, setAgentLoading] = useState(false)
+  const [agentsLastUpdated, setAgentsLastUpdated] = useState<string>('')
   const [selectedExpiration, setSelectedExpiration] = useState<string | null>(null)
   const [watchlist, setWatchlist] = useState<string[]>([])
   const [journalEntries, setJournalEntries] = useState<any[]>([])
@@ -681,6 +731,9 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
+    { id: 'pipeline', label: 'PIPELINE', icon: GitBranch },
+    { id: 'agents', label: 'AGENTS', icon: Activity },
+    { id: 'costs', label: 'COSTS', icon: DollarSign },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
@@ -781,6 +834,43 @@ function MissionControlContent() {
       } catch { /* ignore */ }
     }
     loadBookmarks()
+  }, [])
+
+  // Load pipeline data
+  useEffect(() => {
+    const loadPipeline = async () => {
+      setPipelineLoading(true)
+      try {
+        const res = await fetch('/data/pipeline.json', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = (await res.json()) as PipelineItem[]
+        setPipelineData(data)
+      } catch { /* ignore */ }
+      setPipelineLoading(false)
+    }
+    loadPipeline()
+  }, [])
+
+  // Load agent status data
+  useEffect(() => {
+    const loadAgentStatus = async () => {
+      setAgentLoading(true)
+      try {
+        const res = await fetch('/api/agents/status', { cache: 'no-store' })
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.success) {
+          setAgentData(data.agents)
+          setAgentSummary(data.summary)
+          setAgentsLastUpdated(data.lastUpdated)
+        }
+      } catch { /* ignore */ }
+      setAgentLoading(false)
+    }
+    loadAgentStatus()
+    // Refresh agent status every 30 seconds
+    const interval = setInterval(loadAgentStatus, 30000)
+    return () => clearInterval(interval)
   }, [])
 
   const refreshTopics = async () => {
@@ -1734,6 +1824,225 @@ function MissionControlContent() {
                 </div>
                 <p className={`text-xs mt-3 ${shell.textMuted}`}>
                   Product KPIs are now consolidated inside Projects to keep planning + distribution decisions in one view.
+                </p>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'pipeline' && (
+            <motion.div key="pipeline" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              <div className={`border p-4 ${shell.panel}`}>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">SOFTWARE DEVELOPMENT PIPELINE</h2>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                  KANBAN BOARD · MANAGER REVIEW → DEVELOPMENT → QA → DEVOPS → MANUAL TESTING → COMPLETED
+                </p>
+                <div className="flex items-center gap-4 mt-3">
+                  {pipelineLoading && (
+                    <span className="text-xs text-zinc-400">Loading pipeline...</span>
+                  )}
+                  {!pipelineLoading && (
+                    <span className={`text-xs ${shell.textMuted}`}>{pipelineData.length} tasks</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto pb-2">
+                {[
+                  { id: 'manager', label: 'MANAGER REVIEW', color: 'border-amber-500/40', bg: 'bg-amber-500/10' },
+                  { id: 'development', label: 'DEVELOPMENT', color: 'border-sky-500/40', bg: 'bg-sky-500/10' },
+                  { id: 'qa', label: 'QA TESTING', color: 'border-purple-500/40', bg: 'bg-purple-500/10' },
+                  { id: 'devops', label: 'DEVOPS', color: 'border-green-500/40', bg: 'bg-green-500/10' },
+                  { id: 'manual-testing', label: 'MANUAL TESTING', color: 'border-orange-500/40', bg: 'bg-orange-500/10' },
+                  { id: 'completed', label: 'COMPLETED', color: 'border-emerald-500/40', bg: 'bg-emerald-500/10' },
+                ].map(stage => (
+                  <div key={stage.id} className={`border ${stage.color} min-w-[280px] flex flex-col`}>
+                    <div className={`p-3 border-b ${stage.color} ${stage.bg}`}>
+                      <p className="text-xs font-semibold tracking-[0.14em]">{stage.label}</p>
+                      <p className={`text-[10px] mt-1 ${shell.textMuted}`}>
+                        {pipelineData.filter(p => p.stage === stage.id).length} tasks
+                      </p>
+                    </div>
+                    <div className="flex-1 p-2 space-y-2 max-h-[500px] overflow-y-auto">
+                      {pipelineData
+                        .filter(p => p.stage === stage.id)
+                        .map(task => (
+                          <div key={task.id} className={`border p-3 ${shell.panel} space-y-2`}>
+                            <div className="flex items-start justify-between">
+                              <h4 className="text-sm font-semibold flex-1">{task.title}</h4>
+                              <span className={`text-[10px] px-2 py-0.5 border ${
+                                task.priority === 'high' ? 'border-rose-500/40 text-rose-400' :
+                                task.priority === 'medium' ? 'border-amber-500/40 text-amber-400' :
+                                'border-zinc-500/40 text-zinc-400'
+                              }`}>
+                                {task.priority}
+                              </span>
+                            </div>
+                            <p className={`text-xs ${shell.textMuted}`}>{task.description}</p>
+                            <div className="flex items-center justify-between text-[10px]">
+                              <span className={`${shell.textSoft}`}>
+                                Due: {task.deadline}
+                              </span>
+                              <span className={`${shell.textMuted}`}>
+                                {task.assignee}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'agents' && (
+            <motion.div key="agents" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              <div className={`border p-4 ${shell.panel}`}>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">ACTIVE AGENTS</h2>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                  REAL-TIME MONITORING · SUB-AGENTS · TOKEN USAGE · STATUS
+                </p>
+                <div className="flex items-center gap-4 mt-3">
+                  {agentLoading && (
+                    <span className="text-xs text-zinc-400">Loading agents...</span>
+                  )}
+                  {!agentLoading && (
+                    <span className={`text-xs ${shell.textMuted}`}>
+                      {agentData.length} active · Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL AGENTS</p>
+                  <p className="text-2xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOKENS TODAY</p>
+                  <p className="text-2xl mt-1 font-semibold">{(agentSummary.totalTokensToday / 1000).toFixed(1)}k</p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">COST ESTIMATE</p>
+                  <p className="text-2xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
+                </div>
+                <div className={`border p-3 ${shell.panelMuted}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">MODEL</p>
+                  <p className="text-sm mt-1 font-semibold">{agentSummary.model}</p>
+                </div>
+              </div>
+
+              <div className={`border p-3 ${shell.panelMuted}`}>
+                <div className="hidden md:grid md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
+                  <span>Agent</span>
+                  <span>Current Task</span>
+                  <span>Status</span>
+                  <span>Tokens</span>
+                  <span>Last Active</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {agentData.map(agent => (
+                  <div key={agent.sessionId} className={`border p-4 ${shell.panel}`}>
+                    <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 items-start">
+                      <div>
+                        <p className="text-sm font-semibold">{agent.name}</p>
+                        <p className={`text-[11px] ${shell.textSoft}`}>{agent.sessionId.slice(0, 8)}</p>
+                      </div>
+                      <div className="text-sm">{agent.currentTask}</div>
+                      <div>
+                        <p className={`text-xs inline-flex items-center gap-2 capitalize ${
+                          agent.status === 'active' ? 'text-emerald-400' :
+                          agent.status === 'recent' ? 'text-sky-400' :
+                          agent.status === 'away' ? 'text-amber-400' :
+                          shell.textMuted
+                        }`}>
+                          <span className={`w-2 h-2 rounded-full ${
+                            agent.status === 'active' ? 'bg-emerald-500 animate-pulse' :
+                            agent.status === 'recent' ? 'bg-sky-500' :
+                            agent.status === 'away' ? 'bg-amber-500' :
+                            'bg-zinc-500'
+                          }`} />
+                          {agent.status}
+                        </p>
+                      </div>
+                      <div className="text-sm">{(agent.tokensUsed / 1000).toFixed(1)}k</div>
+                      <div className={`text-sm ${shell.textMuted}`}>{formatUpdatedTimeIST(agent.lastActive)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'costs' && (
+            <motion.div key="costs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              <div className={`border p-4 ${shell.panel}`}>
+                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">COST TRACKING</h2>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                  TOKEN USAGE · AGENT BREAKDOWN · COST ESTIMATES · MODEL: GLM-4.7
+                </p>
+                <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
+                  RATE: $0.001 per 1,000 tokens
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL TOKENS TODAY</p>
+                  <p className="text-3xl mt-1 font-semibold">{(agentSummary.totalTokensToday / 1000).toFixed(1)}k</p>
+                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Tokens processed</p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOTAL COST ESTIMATE</p>
+                  <p className="text-3xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
+                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Based on $0.001/1k tokens</p>
+                </div>
+                <div className={`border p-4 ${shell.panel}`}>
+                  <p className="text-xs tracking-[0.14em] text-zinc-400">ACTIVE AGENTS</p>
+                  <p className="text-3xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
+                  <p className={`text-sm mt-2 ${shell.textMuted}`}>Currently tracked</p>
+                </div>
+              </div>
+
+              <div className={`border p-4 ${shell.panel}`}>
+                <h3 className="text-sm font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-3">TOKEN USAGE BY AGENT</h3>
+                <div className="space-y-3">
+                  {agentData.map(agent => {
+                    const tokenPercentage = agentSummary.totalTokensToday > 0 
+                      ? (agent.tokensUsed / agentSummary.totalTokensToday) * 100 
+                      : 0
+                    return (
+                      <div key={agent.sessionId} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-medium">{agent.name}</span>
+                          <span className={`${shell.textSoft}`}>
+                            {(agent.tokensUsed / 1000).toFixed(1)}k tokens
+                            <span className="ml-2">(${tokenPercentage.toFixed(1)}%)</span>
+                          </span>
+                        </div>
+                        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{ width: `${tokenPercentage}%` }}
+                            transition={{ duration: 0.5 }}
+                            className="h-full bg-gradient-to-r from-sky-500 to-sky-400"
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className={`border p-4 ${shell.panelMuted}`}>
+                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                  COST NOTES · Token counts are approximate based on OpenClaw session data. GLM-4.7 model assumed at $0.001/1k tokens.
+                </p>
+                <p className={`text-xs mt-2 ${shell.textMuted}`}>
+                  Last updated: {formatUpdatedTimeIST(agentsLastUpdated)}
                 </p>
               </div>
             </motion.div>
