@@ -1176,12 +1176,11 @@ function MissionControlContent() {
     .filter(date => !Number.isNaN(date.getTime()))
     .sort((a, b) => b.getTime() - a.getTime())[0]
 
-  const xmaxReady = researchAvailable && !researchError && blockedWorkers === 0
+  const xmaxReady = researchAvailable && !researchError
   const alerts = [
     !researchAvailable && (researchReason.toUpperCase().includes('TAVILY') || researchReason.toUpperCase().includes('KEY'))
       ? 'TAVILY_API_KEY missing. Research feed unavailable.'
       : null,
-    blockedWorkers > 0 ? `${blockedWorkers} worker${blockedWorkers > 1 ? 's' : ''} blocked.` : null,
   ].filter(Boolean) as string[]
 
   const guardskillsTotalLabel = npmMetrics?.totalLabel || 'Total (30d proxy)'
