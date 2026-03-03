@@ -3,13 +3,119 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 3, 7, 18;
-  --background-end-rgb: 3, 7, 18;
+  --apple-bg: #000000;
+  --apple-surface: #1c1c1e;
+  --apple-surface-elevated: #2c2c2e;
+  --apple-border: #38383a;
+  --apple-text: #ffffff;
+  --apple-text-secondary: #8e8e93;
+  --apple-accent: #0a84ff;
+  --apple-green: #30d158;
+  --apple-orange: #ff9f0a;
+  --apple-red: #ff453a;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: var(--font-poppins), sans-serif;
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-start-rgb));
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  background: var(--apple-bg);
+  color: var(--apple-text);
+}
+
+/* Apple-like card */
+.apple-card {
+  background: var(--apple-surface);
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.apple-card-elevated {
+  background: var(--apple-surface-elevated);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* Apple-like button */
+.apple-btn {
+  background: var(--apple-accent);
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.apple-btn:hover {
+  opacity: 0.9;
+}
+
+/* Apple-like input */
+.apple-input {
+  background: var(--apple-surface);
+  border: 1px solid var(--apple-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  color: var(--apple-text);
+  font-size: 14px;
+}
+
+.apple-input:focus {
+  outline: none;
+  border-color: var(--apple-accent);
+}
+
+/* Apple-like status dot */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.status-active {
+  background: var(--apple-green);
+  box-shadow: 0 0 8px var(--apple-green);
+}
+
+.status-away {
+  background: var(--apple-orange);
+}
+
+.status-idle {
+  background: var(--apple-text-secondary);
+}
+
+/* Smooth transitions */
+.smooth-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glass effect */
+.glass {
+  background: rgba(28, 28, 30, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #fff 0%, #8e8e93 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

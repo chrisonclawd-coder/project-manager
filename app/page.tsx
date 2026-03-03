@@ -517,34 +517,32 @@ function MissionControlContent() {
 
   const shell = darkMode
     ? {
-        page: 'bg-[#090909] text-zinc-100',
-        panel: 'bg-[#111111] border-zinc-800 rounded-xl',
-        panelMuted: 'bg-[#0d0d0d] border-zinc-800 rounded-lg',
-        textMuted: 'text-zinc-400',
-        textSoft: 'text-zinc-500',
-        borderStrong: 'border-zinc-700',
-        navHover: 'hover:bg-zinc-800/60',
-        primary: 'text-emerald-400',
-        primaryBg: 'bg-emerald-500',
-        primaryBorder: 'border-emerald-500',
-        accent: 'text-emerald-300',
+        page: 'bg-black text-white',
+        panel: 'bg-[#1c1c1e] border-[#38383a] rounded-2xl',
+        panelMuted: 'bg-[#2c2c2e] border-none rounded-xl',
+        textMuted: 'text-[#8e8e93]',
+        textSoft: 'text-[#636366]',
+        borderStrong: 'border-[#38383a]',
+        navHover: 'hover:bg-[#2c2c2e]',
+        primary: 'text-[#0a84ff]',
+        primaryBg: 'bg-[#0a84ff]',
+        primaryBorder: 'border-[#0a84ff]',
+        accent: 'text-[#64d2ff]',
         card: 'rounded-2xl',
         container: 'rounded-3xl',
       }
     : {
-        // NEW: Emerald Green Light Theme - Calm, Operational, Data-dense
-        page: 'bg-zinc-50 text-zinc-900',
-        panel: 'bg-white border-zinc-200 rounded-2xl shadow-lg shadow-emerald-900/5',
-        panelMuted: 'bg-zinc-50 border-zinc-200 rounded-xl shadow-md shadow-emerald-900/5',
-        textMuted: 'text-zinc-600',
-        textSoft: 'text-zinc-500',
-        borderStrong: 'border-zinc-300',
-        navHover: 'hover:bg-zinc-200/80',
-        // Emerald Green accents
-        primary: 'text-emerald-700',
-        primaryBg: 'bg-emerald-600',
-        primaryBorder: 'border-emerald-400',
-        accent: 'text-emerald-600',
+        page: 'bg-[#f5f5f7] text-[#1d1d1f]',
+        panel: 'bg-white border-gray-200 rounded-2xl shadow-sm',
+        panelMuted: 'bg-gray-50 border-gray-200 rounded-xl',
+        textMuted: 'text-[#86868b]',
+        textSoft: 'text-[#a1a1a6]',
+        borderStrong: 'border-gray-300',
+        navHover: 'hover:bg-gray-100',
+        primary: 'text-[#0066cc]',
+        primaryBg: 'bg-[#0066cc]',
+        primaryBorder: 'border-[#0066cc]',
+        accent: 'text-[#5e5ce6]',
         card: 'rounded-2xl',
         container: 'rounded-3xl',
       }
@@ -1191,13 +1189,9 @@ function MissionControlContent() {
     researchFeed.length > 0 ? `${researchFeed.length} fresh research signal(s) ready for xMax` : 'No fresh research signals loaded',
   ]
 
-  const bottleneck = blockedWorkers > 0
-    ? `${blockedWorkers} blocked worker${blockedWorkers > 1 ? 's' : ''} in pipeline`
-    : teamFeedStale
-      ? 'Team status feed stale (>30s)'
-      : !researchAvailable
-        ? 'Research feed unavailable'
-        : 'No immediate operational bottleneck'
+  const bottleneck = !researchAvailable
+    ? 'Research feed unavailable'
+    : 'Operations normal'
 
   const nextPostRecommendation =
     researchFeed[0]?.title
@@ -1207,42 +1201,22 @@ function MissionControlContent() {
         : `Use prepared angle: ${trendingTopics[0]?.title || 'AI Breakthroughs 2026'}`
 
   const immediateActions = [
-    blockedWorkers > 0 ? 'Unblock blocked owner(s) before next deploy cycle.' : null,
     !researchAvailable ? 'Restore Tavily key so xMax has live research input.' : null,
-    npmMetrics?.available ? 'Ship one GuardSkills growth post using latest download proof.' : 'Restore npm metrics endpoint before growth reporting.',
+    npmMetrics?.available ? 'Ship one GuardSkills growth post using latest download proof.' : null,
   ].filter(Boolean) as string[]
 
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
       <aside
-        className={`fixed top-0 left-0 w-64 h-full z-50 transform transition-colors duration-200 border-r ${shell.panel} rounded-none lg:rounded-none ${
+        className={`fixed top-0 left-0 w-20 h-full z-50 transform transition-colors duration-200 lg:w-20 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0`}
+        } lg:translate-x-0 bg-[#1c1c1e]`}
       >
-        <div className={`h-14 flex items-center justify-between px-4 border-b ${shell.panel}`}>
-          <div className="flex items-center">
-            <Zap className={`w-6 h-6 ${darkMode ? 'text-zinc-300' : 'text-emerald-600'}`} />
-            <span className={`font-semibold tracking-[0.2em] ml-2 ${darkMode ? 'text-zinc-200' : 'text-emerald-700'}`}>MISSION</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className={`p-2 rounded-md transition-colors relative ${shell.navHover}`}
-            >
-              <Bell className="w-5 h-5 text-zinc-300" />
-              {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                  {unreadCount > 9 ? '9+' : unreadCount}
-                </span>
-              )}
-            </button>
-            <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-md transition-colors ${shell.navHover}`}>
-              {darkMode ? <Sun className="w-5 h-5 text-zinc-300" /> : <Moon className="w-5 h-5 text-zinc-700" />}
-            </button>
-          </div>
+        <div className={`h-16 flex items-center justify-center border-b border-[#38383a]`}>
+          <Zap className="w-7 h-7 text-[#0a84ff]" />
         </div>
 
-        <div className="p-3 space-y-1.5">
+        <div className="p-2 space-y-1">
           {menuItems.map(item => (
             <button
               key={item.id}
@@ -1250,41 +1224,40 @@ function MissionControlContent() {
                 setActiveTab(item.id)
                 setSidebarOpen(false)
               }}
-              className={`w-full p-3 flex items-center gap-3 transition-colors border-l-2 ${
+              className={`w-full p-3 flex items-center justify-center rounded-xl transition-all ${
                 activeTab === item.id
-                  ? darkMode
-                    ? 'bg-zinc-800/70 border-zinc-300 text-zinc-100'
-                    : 'bg-emerald-100 border-emerald-500 text-emerald-800'
-                  : `border-transparent ${shell.navHover} ${shell.textMuted}`
+                  ? 'bg-[#0a84ff] text-white'
+                  : 'text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white'
               }`}
+              title={item.label}
             >
-              <item.icon className="w-4 h-4" />
-              <span className="text-xs font-semibold tracking-[0.16em]">{item.label}</span>
+              <item.icon className="w-5 h-5" />
             </button>
           ))}
         </div>
 
-        <div className={`absolute bottom-0 w-full p-4 border-t ${shell.panel}`}>
-          <p className={`text-[10px] tracking-[0.2em] mb-2 ${shell.textSoft}`}>ACTIVE AGENTS</p>
-          <div className="space-y-2">
-            {agentData
-              .filter(a => a.status === 'active')
-              .map(agent => (
-                <div key={agent.sessionId} className={`p-2 rounded border ${shell.panelMuted}`}>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-500 animate-pulse rounded-full" />
-                    <span className="text-xs text-zinc-200">{agent.name}</span>
+        <div className="absolute bottom-4 w-full px-2">
+          <div className="p-3 bg-[#2c2c2e] rounded-xl">
+            <p className="text-[10px] text-[#8e8e93] mb-2 text-center">AGENTS</p>
+            <div className="space-y-2">
+              {agentData.filter(a => a.status === 'active').length === 0 ? (
+                <p className="text-[10px] text-[#8e8e93] text-center">None</p>
+              ) : (
+                agentData.filter(a => a.status === 'active').slice(0, 2).map(agent => (
+                  <div key={agent.sessionId} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-[#30d158] rounded-full animate-pulse" />
+                    <span className="text-xs truncate">{agent.name}</span>
                   </div>
-                  <p className={`text-[11px] ml-4 mt-1 truncate ${shell.textMuted}`}>{agent.currentTask}</p>
-                </div>
-              ))}
+                ))
+              )}
+            </div>
           </div>
         </div>
       </aside>
 
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded border transition-colors duration-200 ${shell.panel}`}
+        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl transition-colors duration-200 bg-[#1c1c1e] border border-[#38383a]`}
       >
         {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -1293,11 +1266,11 @@ function MissionControlContent() {
       <div className="lg:hidden fixed top-4 right-4 z-50">
         <button
           onClick={() => setShowNotifications(!showNotifications)}
-          className={`p-2 rounded border transition-colors duration-200 ${shell.panel} relative`}
+          className="p-2 rounded-xl bg-[#1c1c1e] border border-[#38383a] relative"
         >
-          <Bell className="w-5 h-5" />
+          <Bell className="w-5 h-5 text-white" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+            <span className="absolute -top-1 -right-1 bg-[#ff453a] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
@@ -1408,7 +1381,7 @@ function MissionControlContent() {
         </div>
       )}
 
-      <main className="lg:ml-64 min-h-screen p-4 md:p-8 pt-16 lg:pt-8">
+      <main className="lg:ml-20 min-h-screen p-4 md:p-6 pt-16 lg:pt-6">
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
@@ -1460,7 +1433,7 @@ function MissionControlContent() {
 
                     <div>
                       <p className={`text-[10px] tracking-[0.14em] mb-1 ${shell.textSoft}`}>BOTTLENECK</p>
-                      <p className={`text-sm ${blockedWorkers > 0 || teamFeedStale || !researchAvailable ? 'text-amber-400' : 'text-emerald-400'}`}>{bottleneck}</p>
+                      <p className={`text-sm ${!researchAvailable ? 'text-amber-400' : 'text-emerald-400'}`}>{bottleneck}</p>
                     </div>
 
                     <div>
@@ -1489,19 +1462,19 @@ function MissionControlContent() {
                 </div>
 
                 <div className={`border p-5 ${shell.panel}`}>
-                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>PIPELINE LIVE SNAPSHOT</h2>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>AGENTS SNAPSHOT</h2>
                   <div className="grid grid-cols-3 gap-2">
                     <div className={`border p-3 ${shell.panelMuted}`}>
-                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>ACTIVE ROLE</p>
-                      <p className="text-sm mt-1">{activeRole}</p>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>ACTIVE</p>
+                      <p className="text-sm mt-1">{agentData.filter(a => a.status === 'active').length}</p>
                     </div>
                     <div className={`border p-3 ${shell.panelMuted}`}>
-                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL WORKING</p>
-                      <p className="text-sm mt-1">{workingMembers.length}</p>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>RECENT</p>
+                      <p className="text-sm mt-1">{agentData.filter(a => a.status === 'recent').length}</p>
                     </div>
                     <div className={`border p-3 ${shell.panelMuted}`}>
-                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>BLOCKERS</p>
-                      <p className="text-sm mt-1 {blockedWorkers > 0 ? 'text-rose-400' : 'text-emerald-400'}">{blockedWorkers}</p>
+                      <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL TOKENS</p>
+                      <p className="text-sm mt-1">{Math.round(agentSummary.totalTokensToday / 1000)}k</p>
                     </div>
                   </div>
                 </div>
