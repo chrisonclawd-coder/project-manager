@@ -29,6 +29,7 @@ import {
   Calendar,
   Bell,
   Wallet,
+  ExternalLink,
 } from 'lucide-react'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
@@ -292,7 +293,7 @@ function MissionControlContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
-  const [tasks] = useState<Task[]>(defaultTasks)
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks)
   const [bookmarks, setBookmarks] = useState<BookmarkItem[]>([])
   const [trendingTopics] = useState(defaultTopics)
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
@@ -308,6 +309,17 @@ function MissionControlContent() {
   const [researchReason, setResearchReason] = useState('')
   const [researchLoading, setResearchLoading] = useState(false)
   const [researchError, setResearchError] = useState('')
+
+  // Bookmark form state
+  const [newBookmarkTitle, setNewBookmarkTitle] = useState('')
+  const [newBookmarkUrl, setNewBookmarkUrl] = useState('')
+  const [bookmarkSearch, setBookmarkSearch] = useState('')
+
+  // Project form state
+  const [newProjectTitle, setNewProjectTitle] = useState('')
+  const [newProjectPriority, setNewProjectPriority] = useState<TaskPriority>('medium')
+  const [showAddProjectForm, setShowAddProjectForm] = useState(false)
+  const [showAddBookmarkForm, setShowAddBookmarkForm] = useState(false)
 
   // Trading Center state
   const [tradingTicker, setTradingTicker] = useState('')
@@ -665,6 +677,10 @@ function MissionControlContent() {
     t => (filterStatus === 'all' || t.status === filterStatus) && t.title.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
+  const filteredBookmarks = bookmarks.filter(
+    b => b.title.toLowerCase().includes(bookmarkSearch.toLowerCase()) || b.url.toLowerCase().includes(bookmarkSearch.toLowerCase())
+  )
+
   const stats = {
     total: tasks.length,
     done: tasks.filter(t => t.status === 'done').length,
@@ -672,6 +688,14 @@ function MissionControlContent() {
     todo: tasks.filter(t => t.status === 'todo').length,
   }
 
+  // Get domain from URL for favicon
+  const getDomain = (url: string) => {
+    try {
+      return new URL(url).hostname
+    } catch {
+      return ''
+    }
+  }
 
   const loadXmaxWork = useCallback(async () => {
     try {
@@ -749,6 +773,53 @@ function MissionControlContent() {
     setIsRefreshing(true)
     await Promise.all([loadResearchFeed(), loadXmaxWork()])
     setTimeout(() => setIsRefreshing(false), 500)
+  }
+
+  // Add bookmark function
+  const addBookmark = () => {
+    if (!newBookmarkTitle || !newBookmarkUrl) return
+
+    const newBookmark: BookmarkItem = {
+      id: Date.now(),
+      title: newBookmarkTitle,
+      url: newBookmarkUrl,
+      category: 'Uncategorized',
+      addedAt: new Date().toISOString().split('T')[0],
+    }
+
+    setBookmarks([...bookmarks, newBookmark])
+    setNewBookmarkTitle('')
+    setNewBookmarkUrl('')
+    setShowAddBookmarkForm(false)
+
+    // Try to save to API
+    fetch('/api/bookmarks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newBookmark),
+    }).catch(() => {
+      // Fallback to localStorage if API fails
+      const saved = localStorage.getItem('bookmarks')
+      const current = saved ? JSON.parse(saved) : []
+      localStorage.setItem('bookmarks', JSON.stringify([...current, newBookmark]))
+    })
+  }
+
+  // Add project function
+  const addProject = () => {
+    if (!newProjectTitle) return
+
+    const newProject: Task = {
+      id: Date.now(),
+      title: newProjectTitle,
+      status: 'todo',
+      priority: newProjectPriority,
+    }
+
+    setTasks([...tasks, newProject])
+    setNewProjectTitle('')
+    setNewProjectPriority('medium')
+    setShowAddProjectForm(false)
   }
 
   const getPostBadge = (channel: string, text: string) => {
@@ -1137,8 +1208,8 @@ function MissionControlContent() {
             <span className="font-semibold tracking-[0.2em] ml-2 text-zinc-200">MISSION</span>
           </div>
           <div className="flex items-center gap-1">
-            <button 
-              onClick={() => setShowNotifications(!showNotifications)} 
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
               className={`p-2 rounded-md transition-colors relative ${shell.navHover}`}
             >
               <Bell className="w-5 h-5 text-zinc-300" />
@@ -1338,6 +1409,7 @@ function MissionControlContent() {
                   </span>
                   <span id="update-badge" className="hidden text-[10px] tracking-[0.1em] px-2 py-1 rounded bg-amber-500/20 text-amber-400">
                     Update Available
+
                   </span>
                   <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft} flex items-center gap-1`}>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1411,7 +1483,7 @@ function MissionControlContent() {
                     </div>
                     <div className={`border p-3 ${shell.panelMuted}`}>
                       <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>BLOCKERS</p>
-                      <p className={`text-sm mt-1 ${blockedWorkers > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>{blockedWorkers}</p>
+                      <p className="text-sm mt-1 {blockedWorkers > 0 ? 'text-rose-400' : 'text-emerald-400'}">{blockedWorkers}</p>
                     </div>
                   </div>
                 </div>
@@ -1487,6 +1559,7 @@ function MissionControlContent() {
                 ))}
               </div>
 
+              {/* Search Bar */}
               <div className="relative">
                 <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${shell.textSoft}`} />
                 <input
@@ -1498,6 +1571,50 @@ function MissionControlContent() {
                 />
               </div>
 
+              {/* Add Project Button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowAddProjectForm(!showAddProjectForm)}
+                  className={`px-4 py-2 border text-xs tracking-[0.14em] hover:bg-zinc-800/40 ${shell.panel} flex items-center gap-2`}
+                >
+                  <Plus className="w-4 h-4" />
+                  ADD PROJECT
+                </button>
+              </div>
+
+              {/* Add Project Form */}
+              {showAddProjectForm && (
+                <div className={`border p-4 ${shell.panel}`}>
+                  <h3 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>NEW PROJECT</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      placeholder="Project title..."
+                      value={newProjectTitle}
+                      onChange={e => setNewProjectTitle(e.target.value)}
+                      className={`px-3 py-2 border bg-transparent text-sm ${shell.panelMuted} focus:outline-none`}
+                    />
+                    <select
+                      value={newProjectPriority}
+                      onChange={e => setNewProjectPriority(e.target.value as TaskPriority)}
+                      className={`px-3 py-2 border bg-transparent text-sm ${shell.panelMuted} focus:outline-none`}
+                    >
+                      <option value="high" className="bg-zinc-900">HIGH PRIORITY</option>
+                      <option value="medium" className="bg-zinc-900">MEDIUM PRIORITY</option>
+                      <option value="low" className="bg-zinc-900">LOW PRIORITY</option>
+                    </select>
+                    <button
+                      onClick={addProject}
+                      disabled={!newProjectTitle}
+                      className="px-4 py-2 bg-zinc-200 text-black text-xs tracking-wider font-semibold hover:bg-zinc-300 disabled:opacity-50"
+                    >
+                      ADD PROJECT
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Filter Buttons */}
               <div className="flex flex-wrap gap-2">
                 {(['all', 'in-progress', 'todo', 'done'] as const).map(status => (
                   <button
@@ -1516,11 +1633,12 @@ function MissionControlContent() {
                 ))}
               </div>
 
+              {/* Project List */}
               <div className="space-y-2">
                 {filteredTasks.map(task => (
                   <div
                     key={task.id}
-                    className={`border p-4 flex items-center justify-between ${
+                    className={`border p-4 flex items-center justify-between transition-all ${
                       task.status === 'done'
                         ? darkMode
                           ? 'border-emerald-900/30 opacity-70 bg-[#0f1110]'
@@ -1532,7 +1650,7 @@ function MissionControlContent() {
                           : shell.panel
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-1">
                       {task.status === 'done' ? (
                         <CheckCircle className="w-5 h-5 text-emerald-500" />
                       ) : task.status === 'in-progress' ? (
@@ -1540,19 +1658,39 @@ function MissionControlContent() {
                       ) : (
                         <Circle className={`w-5 h-5 ${shell.textSoft}`} />
                       )}
-                      <span className={task.status === 'done' ? `line-through ${shell.textSoft}` : ''}>{task.title}</span>
+                      <span className={`text-sm ${task.status === 'done' ? `line-through ${shell.textSoft}` : 'font-medium'}`}>{task.title}</span>
                     </div>
-                    <span
-                      className={`text-xs px-2 py-1 border ${
-                        task.priority === 'high'
-                          ? 'text-rose-400 border-rose-500/30'
-                          : task.priority === 'medium'
-                            ? 'text-zinc-300 border-zinc-600'
-                            : `${shell.textMuted} ${darkMode ? 'border-zinc-700' : 'border-zinc-300'}`
-                      }`}
-                    >
-                      {task.priority.toUpperCase()}
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`text-xs px-2 py-1 border ${
+                          task.priority === 'high'
+                            ? 'text-rose-400 border-rose-500/30'
+                            : task.priority === 'medium'
+                              ? 'text-zinc-300 border-zinc-600'
+                              : `${shell.textMuted} ${darkMode ? 'border-zinc-700' : 'border-zinc-300'}`
+                        }`}
+                      >
+                        {task.priority.toUpperCase()}
+                      </span>
+                      <button
+                        onClick={() => {
+                          if (task.status === 'todo') {
+                            setTasks(tasks.map(t => t.id === task.id ? { ...t, status: 'in-progress' } : t))
+                          } else if (task.status === 'in-progress') {
+                            setTasks(tasks.map(t => t.id === task.id ? { ...t, status: 'done' } : t))
+                          } else {
+                            setTasks(tasks.map(t => t.id === task.id ? { ...t, status: 'todo' } : t))
+                          }
+                        }}
+                        className={`text-[10px] px-2 py-1 border transition-colors ${
+                          task.status === 'done'
+                            ? 'text-zinc-500 border-zinc-600'
+                            : 'text-zinc-300 border-zinc-500 hover:bg-zinc-800/30'
+                        }`}
+                      >
+                        {task.status === 'done' ? 'REOPEN' : task.status === 'in-progress' ? 'COMPLETE' : 'START'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1570,7 +1708,7 @@ function MissionControlContent() {
                   </div>
                   <div className={`border p-4 ${shell.panelMuted}`}>
                     <p className={`text-[10px] tracking-[0.16em] ${shell.textSoft}`}>MDIFY · CHROME METRIC</p>
-                    <p className={`text-sm font-semibold mt-3 ${chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    <p className="text-sm font-semibold mt-3 {chromeMetrics?.available ? 'text-emerald-400' : 'text-amber-400'}">
                       {chromeMetrics?.available ? 'AVAILABLE' : 'UNAVAILABLE'}
                     </p>
                   </div>
@@ -1582,6 +1720,120 @@ function MissionControlContent() {
                 <p className={`text-xs mt-3 ${shell.textMuted}`}>
                   Product KPIs are now consolidated inside Projects to keep planning + distribution decisions in one view.
                 </p>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'bookmarks' && (
+            <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
+              {/* Page Header */}
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+                <h2 className="text-2xl font-semibold tracking-[0.14em]">BOOKMARKS</h2>
+                <div className="flex items-center gap-2">
+                  {filteredBookmarks.length > 0 && (
+                    <span className={`text-xs ${shell.textSoft}`}>{filteredBookmarks.length} bookmark{filteredBookmarks.length !== 1 ? 's' : ''}</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${shell.textSoft}`} />
+                <input
+                  type="text"
+                  placeholder="Search bookmarks..."
+                  value={bookmarkSearch}
+                  onChange={e => setBookmarkSearch(e.target.value)}
+                  className={`w-full border pl-10 pr-4 py-2.5 text-sm tracking-[0.08em] focus:outline-none ${shell.panel}`}
+                />
+              </div>
+
+              {/* Add Bookmark Button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowAddBookmarkForm(!showAddBookmarkForm)}
+                  className={`px-4 py-2 border text-xs tracking-[0.14em] hover:bg-zinc-800/40 ${shell.panel} flex items-center gap-2`}
+                >
+                  <Plus className="w-4 h-4" />
+                  ADD BOOKMARK
+                </button>
+              </div>
+
+              {/* Add Bookmark Form */}
+              {showAddBookmarkForm && (
+                <div className={`border p-4 ${shell.panel}`}>
+                  <h3 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>NEW BOOKMARK</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      placeholder="URL..."
+                      value={newBookmarkUrl}
+                      onChange={e => setNewBookmarkUrl(e.target.value)}
+                      className={`px-3 py-2 border bg-transparent text-sm ${shell.panelMuted} focus:outline-none`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Title..."
+                      value={newBookmarkTitle}
+                      onChange={e => setNewBookmarkTitle(e.target.value)}
+                      className={`px-3 py-2 border bg-transparent text-sm ${shell.panelMuted} focus:outline-none`}
+                    />
+                    <button
+                      onClick={addBookmark}
+                      disabled={!newBookmarkUrl || !newBookmarkTitle}
+                      className="px-4 py-2 bg-zinc-200 text-black text-xs tracking-wider font-semibold hover:bg-zinc-300 disabled:opacity-50"
+                    >
+                      ADD BOOKMARK
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Bookmarks List */}
+              <div className="space-y-2">
+                {filteredBookmarks.length === 0 ? (
+                  <div className={`border p-8 ${shell.panel} text-center`}>
+                    <p className={`text-sm ${shell.textMuted}`}>
+                      {bookmarkSearch ? 'No bookmarks match your search.' : 'No bookmarks yet. Add your first bookmark above.'}
+                    </p>
+                  </div>
+                ) : (
+                  filteredBookmarks.map(b => (
+                    <a
+                      key={b.id}
+                      href={b.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`border p-4 flex items-center gap-4 transition-colors ${shell.panel} hover:border-zinc-400 group`}
+                    >
+                      {/* Favicon */}
+                      <div className="flex-shrink-0">
+                        <img
+                          src={`https://www.google.com/s2/favicons?domain=${encodeURIComponent(getDomain(b.url))}&sz=32`}
+                          alt=""
+                          className="w-8 h-8 rounded"
+                          onError={e => {
+                            e.currentTarget.style.display = 'none'
+                          }}
+                        />
+                      </div>
+
+                      {/* Bookmark Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{b.title}</p>
+                        <p className={`text-xs truncate ${shell.textSoft}`}>{b.url}</p>
+                        {b.category && b.category !== 'Uncategorized' && (
+                          <span className={`text-[10px] inline-block mt-1 px-2 py-0.5 rounded ${shell.panelMuted} ${shell.textSoft}`}>
+                            {b.category}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* External Link Icon */}
+                      <ExternalLink className={`w-5 h-5 ${shell.textSoft} group-hover:text-zinc-300 transition-colors flex-shrink-0`} />
+                    </a>
+                  ))
+                )}
               </div>
             </motion.div>
           )}
@@ -1689,7 +1941,7 @@ function MissionControlContent() {
                             VIEW
                           </a>
                         </div>
-                        
+
                         {/* X POSTS - All 3 */}
                         <div className="mb-4">
                           <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft} mb-2`}>X POSTS (3)</p>
@@ -1723,7 +1975,7 @@ function MissionControlContent() {
                             </div>
                           ))}
                         </div>
-                        
+
                         {/* REDDIT POSTS - All 3 */}
                         <div>
                           <p className={`text-[11px] tracking-[0.18em] ${shell.textSoft} mb-2`}>REDDIT POSTS (3)</p>
@@ -1756,26 +2008,6 @@ function MissionControlContent() {
                 <div className="mt-6">
                 </div>
               </section>
-            </motion.div>
-          )}
-
-          {activeTab === 'bookmarks' && (
-            <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-2">
-              {bookmarks.map(b => (
-                <a
-                  key={b.id}
-                  href={b.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`border p-4 flex items-center justify-between transition-colors ${shell.panel} hover:border-zinc-400`}
-                >
-                  <div>
-                    <p className="text-sm font-medium">{b.title}</p>
-                    <p className={`text-xs ${shell.textSoft}`}>{b.url}</p>
-                  </div>
-                  <Bookmark className={`w-5 h-5 ${shell.textSoft}`} />
-                </a>
-              ))}
             </motion.div>
           )}
 
@@ -2246,6 +2478,7 @@ function MissionControlContent() {
                 {journalEntries.filter(e => !e.exitPrice).length > 0 && (
                   <div className={`border p-4 ${shell.panel}`}>
                     <h3 className="text-sm font-semibold mb-4">EXPOSURE BY STOCK</h3>
+
                     <div className="space-y-2">
                       {Array.from(
                         new Set(
@@ -2378,7 +2611,7 @@ function MissionControlContent() {
                     <div className={`mt-4 p-3 border ${shell.panelMuted}`}>
                       <p className={`text-[10px] tracking-[0.14em] ${shell.textSoft}`}>NOTE</p>
                       <p className={`text-xs ${shell.textMuted}`}>
-                        Technical indicators require historical price data. This section shows placeholder calculations based on current and previous close price. 
+                        Technical indicators require historical price data. This section shows placeholder calculations based on current and previous close price.
                         For accurate indicators, integrate with a historical price API (e.g., TwelveData time series endpoint).
                       </p>
                     </div>
