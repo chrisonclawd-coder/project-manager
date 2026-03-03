@@ -516,12 +516,14 @@ function MissionControlContent() {
         primaryBg: 'bg-emerald-500',
         primaryBorder: 'border-emerald-500',
         accent: 'text-emerald-300',
+        card: 'rounded-2xl',
+        container: 'rounded-3xl',
       }
     : {
         // NEW: Emerald Green Light Theme - Calm, Operational, Data-dense
-        page: 'bg-zinc-100 text-zinc-900',
-        panel: 'bg-white border-zinc-200 rounded-2xl shadow-sm',
-        panelMuted: 'bg-zinc-50 border-zinc-200 rounded-xl',
+        page: 'bg-zinc-50 text-zinc-900',
+        panel: 'bg-white border-zinc-200 rounded-2xl shadow-lg shadow-emerald-900/5',
+        panelMuted: 'bg-zinc-50 border-zinc-200 rounded-xl shadow-md shadow-emerald-900/5',
         textMuted: 'text-zinc-600',
         textSoft: 'text-zinc-500',
         borderStrong: 'border-zinc-300',
@@ -529,8 +531,10 @@ function MissionControlContent() {
         // Emerald Green accents
         primary: 'text-emerald-700',
         primaryBg: 'bg-emerald-600',
-        primaryBorder: 'border-emerald-500',
+        primaryBorder: 'border-emerald-400',
         accent: 'text-emerald-600',
+        card: 'rounded-2xl',
+        container: 'rounded-3xl',
       }
 
   // Home page data
