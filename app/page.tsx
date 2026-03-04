@@ -763,8 +763,42 @@ function MissionControlContent() {
     loadBookmarks()
   }, [])
 
-  // Load agent status data
+  // Load agent status data - Real-time via SSE
   useEffect(() => {
+    let eventSource: EventSource | null = null
+    
+    const initEventSource = () => {
+      eventSource = new EventSource('/api/status/stream')
+      
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data)
+          if (data.gateway) {
+            // Update from real-time stream
+            setAgentData(data.agents || [])
+            setAgentSummary({
+              totalAgents: data.gateway.totalAgents || 0,
+              totalTokensToday: data.gateway.totalTokens || 0,
+              costEstimate: (data.gateway.totalTokens || 0) * 0.001 / 1000,
+              currency: 'USD',
+              model: 'GLM-4.7'
+            })
+            setAgentsLastUpdated(data.timestamp)
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+      
+      eventSource.onerror = () => {
+        // Fallback to polling on error
+        eventSource?.close()
+        loadAgentStatus()
+        const interval = setInterval(loadAgentStatus, 30000)
+        return () => clearInterval(interval)
+      }
+    }
+    
     const loadAgentStatus = async () => {
       setAgentLoading(true)
       try {
@@ -779,10 +813,18 @@ function MissionControlContent() {
       } catch { /* ignore */ }
       setAgentLoading(false)
     }
-    loadAgentStatus()
-    // Refresh agent status every 30 seconds
-    const interval = setInterval(loadAgentStatus, 30000)
-    return () => clearInterval(interval)
+    
+    // Try SSE first, fallback to polling
+    try {
+      initEventSource()
+    } catch {
+      loadAgentStatus()
+      const interval = setInterval(loadAgentStatus, 30000)
+    }
+    
+    return () => {
+      eventSource?.close()
+    }
   }, [])
 
   const refreshTopics = async () => {
