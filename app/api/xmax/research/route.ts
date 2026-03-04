@@ -15,11 +15,15 @@ async function getApiKey(): Promise<string | null> {
       cachedSecrets = await getAllSecrets()
       cacheTime = now
       console.log('Fetched secrets from AWS Parameter Store or Environment')
+      console.log('Cached keys:', Object.keys(cachedSecrets))
+      console.log('TAVILY_API_KEY in cache:', !!cachedSecrets.TAVILY_API_KEY)
     } catch (error) {
       console.error('Failed to fetch secrets:', error)
     }
   }
-  return cachedSecrets.TAVILY_API_KEY || null
+  const apiKey = cachedSecrets.TAVILY_API_KEY || null
+  console.log('Returning API key:', apiKey ? 'PRESENT' : 'MISSING')
+  return apiKey
 }
 
 const TAVILY_URL = 'https://api.tavily.com/search'
