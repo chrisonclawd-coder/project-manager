@@ -680,11 +680,22 @@ export default function AgentsView() {
   }
 
   // Filter agents by team
-  const filteredAgents = selectedTeam === 'all' 
-    ? agents 
+  const filteredAgents = selectedTeam === 'all'
+    ? agents
     : Object.entries(agents || {})
         .filter(([_, agent]) => agent.team === selectedTeam)
         .reduce((acc, [id, agent]) => ({ ...acc, [id]: agent }), {})
+
+  // Only render top-level managers to avoid duplicates
+  // When showing all teams, show main's children (managers)
+  // When showing specific team, show only the manager of that team
+  const topLevelAgents = selectedTeam === 'all'
+    ? (agents?.main?.children || [])  // software-dev, analysis, marketing
+    : Object.keys(filteredAgents).filter(id => {
+        // Find the manager for this team
+        const agent = agents?.[id]
+        return agent?.role === 'Manager'
+      })
 
   // Calculate team stats
   const teamStats = {
@@ -694,7 +705,7 @@ export default function AgentsView() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" key="agents-view">
       {/* Header */}
       <div className="border p-4 bg-zinc-800/50">
         <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">
@@ -771,7 +782,7 @@ export default function AgentsView() {
         <div className="space-y-4">
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 to-white/0 border border-white/10">
             <div className="relative p-4 space-y-2">
-              {Object.keys(filteredAgents || {}).map(id => renderAgentNode(id, 0))}
+              {topLevelAgents.map(id => renderAgentNode(id, 0))}
             </div>
           </div>
 
