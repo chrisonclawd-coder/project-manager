@@ -39,15 +39,20 @@ export async function getAllSecrets(): Promise<Record<string, string>> {
 
   // First check environment variables (for Vercel)
   for (const [param, envVar] of Object.entries(PARAM_TO_ENV)) {
-    if (process.env[envVar]) {
+    const value = process.env[envVar]
+    if (value !== undefined && value !== null && value !== '') {
       // Store with env var name for consistent key access
-      secrets[envVar] = process.env[envVar]!
+      secrets[envVar] = value
+      console.log(`Env var ${envVar}: FOUND`)
+    } else {
+      console.log(`Env var ${envVar}: NOT FOUND`)
     }
   }
 
   // If we have env vars, return those (Vercel mode)
   if (Object.keys(secrets).length > 0) {
     console.log('Using environment variables for secrets')
+    console.log('Secrets found:', Object.keys(secrets))
     return secrets
   }
 
