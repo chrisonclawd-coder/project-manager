@@ -304,6 +304,8 @@ function MissionControlContent() {
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
+  const [touchStartX, setTouchStartX] = useState(0)
+  const [touchStartY, setTouchStartY] = useState(0)
   const [darkMode, setDarkMode] = useState(true)
   const [greetingData, setGreetingData] = useState({ greeting: 'WELCOME', motivational: 'READY TO WORK.' })
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
@@ -1280,6 +1282,69 @@ function MissionControlContent() {
     setSidebarOpen(false)
   }
 
+  // Touch event handlers for swipe gestures
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX)
+    setTouchStartY(e.touches[0].clientY)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartX || !touchStartY) return
+
+    const touchEndX = e.touches[0].clientX
+    const touchEndY = e.touches[0].clientY
+
+    const deltaX = touchEndX - touchStartX
+    const deltaY = touchEndY - touchStartY
+
+    // Only trigger swipe if horizontal movement is greater than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      // Swipe left to close sidebar
+      if (deltaX < -50) {
+        setSidebarOpen(false)
+        setTouchStartX(0)
+        setTouchStartY(0)
+      }
+    }
+  }
+
+  const handleTouchEnd = () => {
+    setTouchStartX(0)
+    setTouchStartY(0)
+  }
+
+  // Handle right-edge swipe to open sidebar
+  const handleMainTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX)
+    setTouchStartY(e.touches[0].clientY)
+  }
+
+  const handleMainTouchMove = (e: React.TouchEvent) => {
+    if (!touchStartX || !touchStartY || sidebarOpen) return
+
+    const touchEndX = e.touches[0].clientX
+    const touchEndY = e.touches[0].clientY
+
+    const deltaX = touchEndX - touchStartX
+    const deltaY = touchEndY - touchStartY
+
+    // Only trigger swipe if horizontal movement is greater than vertical
+    // and if swipe started from left edge (within 20px)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && touchStartX < 20) {
+      // Swipe right from left edge to open sidebar
+      if (deltaX > 50) {
+        setSidebarOpen(true)
+        setTouchStartX(0)
+        setTouchStartY(0)
+      }
+    }
+  }
+
+  const handleMainTouchEnd = () => {
+    setTouchStartX(0)
+    setTouchStartY(0)
+  }
+
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
       {/* Mobile Sidebar (Off-canvas Drawer) */}
@@ -1299,36 +1364,54 @@ function MissionControlContent() {
             
             {/* Mobile Sidebar Drawer */}
             <motion.aside
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
+              initial={{ x: '-100%', width: sidebarExpanded ? 288 : 80 }}
+              animate={{ x: 0, width: sidebarExpanded ? 288 : 80 }}
+              exit={{ x: '-100%', width: sidebarExpanded ? 288 : 80 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed top-0 left-0 h-full w-72 bg-[#1c1c1e] border-r border-[#38383a] z-[60] shadow-2xl"
+              className="lg:hidden fixed top-0 left-0 h-full bg-[#1c1c1e] border-r border-[#38383a] z-[60] shadow-2xl overflow-hidden"
               role="navigation"
               aria-label="Main navigation"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
               {/* Mobile Sidebar Header */}
-              <div className="h-16 flex items-center justify-between px-5 border-b border-[#38383a]">
+              <div className={`h-16 flex items-center justify-between ${sidebarExpanded ? 'px-5' : 'px-2'} border-b border-[#38383a]`}>
                 <div className="flex items-center gap-3">
                   <Zap className="w-7 h-7 text-[#0a84ff]" />
-                  <span className="text-white font-semibold tracking-tight text-lg">MC</span>
+                  {sidebarExpanded && <span className="text-white font-semibold tracking-tight text-lg">MC</span>}
                 </div>
-                <button
-                  onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-xl hover:bg-[#2c2c2e] transition-colors"
-                  aria-label="Close navigation"
-                >
-                  <X className="w-5 h-5 text-[#8e8e93]" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Expand/Collapse Button for Mobile */}
+                  <button
+                    onClick={() => setSidebarExpanded(!sidebarExpanded)}
+                    className="p-2.5 rounded-xl hover:bg-[#2c2c2e] transition-colors active:scale-95 touch-manipulation"
+                    aria-label={sidebarExpanded ? 'Collapse navigation' : 'Expand navigation'}
+                  >
+                    {sidebarExpanded ? (
+                      <ChevronLeft className="w-5 h-5 text-[#8e8e93]" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-[#8e8e93]" />
+                    )}
+                  </button>
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-2.5 rounded-xl hover:bg-[#2c2c2e] transition-colors active:scale-95 touch-manipulation"
+                    aria-label="Close navigation"
+                  >
+                    <X className="w-5 h-5 text-[#8e8e93]" />
+                  </button>
+                </div>
               </div>
 
               {/* Mobile Menu Items */}
-              <div className="p-3 space-y-2">
+              <div className={`p-3 space-y-2 overflow-y-auto flex-1`}>
                 {menuItems.map(item => (
                   <button
                     key={item.id}
                     onClick={() => handleMenuItemClick(item.id)}
-                    className={`w-full p-4 flex items-center gap-4 rounded-xl transition-all active:scale-95 touch-manipulation ${
+                    className={`w-full min-h-[48px] flex items-center ${sidebarExpanded ? 'justify-start px-4 gap-4' : 'justify-center'} rounded-xl transition-all active:scale-95 touch-manipulation ${
                       activeTab === item.id
                         ? 'bg-[#0a84ff] text-white'
                         : 'text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white'
@@ -1337,23 +1420,25 @@ function MissionControlContent() {
                     aria-current={activeTab === item.id ? 'page' : undefined}
                   >
                     <item.icon className="w-6 h-6 flex-shrink-0" />
-                    <span className="text-base font-medium">{item.label}</span>
+                    {sidebarExpanded && <span className="text-base font-medium">{item.label}</span>}
                   </button>
                 ))}
               </div>
 
               {/* Mobile Footer - Active Agents */}
-              <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#38383a]">
+              <div className={`p-3 border-t border-[#38383a]`}>
                 <div className="p-3 bg-[#2c2c2e] rounded-xl">
-                  <p className="text-[10px] text-[#8e8e93] mb-2 tracking-wide">ACTIVE AGENTS</p>
+                  {sidebarExpanded && (
+                    <p className="text-[10px] text-[#8e8e93] mb-2 tracking-wide">ACTIVE AGENTS</p>
+                  )}
                   <div className="space-y-2">
                     {agentData.filter(a => a.status === 'active').length === 0 ? (
-                      <p className="text-xs text-[#8e8e93]">None</p>
+                      <p className={`text-xs text-[#8e8e93] ${sidebarExpanded ? '' : 'text-center'}`}>None</p>
                     ) : (
                       agentData.filter(a => a.status === 'active').slice(0, 2).map(agent => (
                         <div key={agent.sessionId} className="flex items-center gap-2">
                           <div className="w-2 h-2 bg-[#30d158] rounded-full animate-pulse" />
-                          <span className="text-sm truncate">{agent.name}</span>
+                          <span className={`text-sm truncate ${sidebarExpanded ? '' : 'sr-only'}`}>{agent.name}</span>
                         </div>
                       ))
                     )}
@@ -1526,7 +1611,12 @@ function MissionControlContent() {
       </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className={`min-h-screen p-4 md:p-6 lg:p-6 pt-20 lg:pt-6 transition-all duration-300 lg:ml-20 ${sidebarExpanded ? 'lg:ml-64' : ''}`}>
+      <main
+        className={`min-h-screen p-4 md:p-6 lg:p-6 pt-20 lg:pt-6 transition-all duration-300 lg:ml-20 ${sidebarExpanded ? 'lg:ml-64' : ''}`}
+        onTouchStart={handleMainTouchStart}
+        onTouchMove={handleMainTouchMove}
+        onTouchEnd={handleMainTouchEnd}
+      >
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
