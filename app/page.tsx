@@ -28,6 +28,8 @@ import {
   AlertCircle,
   Calendar,
   Bell,
+  ChevronLeft,
+  ChevronRight,
   Wallet,
   ExternalLink,
   GitBranch,
@@ -300,6 +302,7 @@ function MissionControlContent() {
   const [trendingTopics] = useState(defaultTopics)
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [greetingData, setGreetingData] = useState({ greeting: 'WELCOME', motivational: 'READY TO WORK.' })
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
@@ -1267,15 +1270,16 @@ function MissionControlContent() {
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
       <aside
-        className={`fixed top-0 left-0 w-20 h-full z-50 transform transition-colors duration-200 lg:w-20 ${
+        className={`fixed top-0 left-0 w-20 h-full z-50 transform transition-all duration-300 lg:w-20 lg:transition-all ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 bg-[#1c1c1e]`}
+        } lg:translate-x-0 bg-[#1c1c1e] ${sidebarExpanded ? 'lg:w-64' : 'lg:w-20'}`}
       >
-        <div className={`h-16 flex items-center justify-center border-b border-[#38383a]`}>
+        <div className={`h-16 flex items-center justify-center border-b border-[#38383a] ${sidebarExpanded ? 'justify-start px-6 gap-3' : ''}`}>
           <Zap className="w-7 h-7 text-[#0a84ff]" />
+          {sidebarExpanded && <span className="text-white font-semibold tracking-tight">MC</span>}
         </div>
 
-        <div className="p-2 space-y-1">
+        <div className={`p-2 space-y-1`}>
           {menuItems.map(item => (
             <button
               key={item.id}
@@ -1283,20 +1287,33 @@ function MissionControlContent() {
                 setActiveTab(item.id)
                 setSidebarOpen(false)
               }}
-              className={`w-full p-3 flex items-center justify-center rounded-xl transition-all ${
+              className={`w-full p-3 flex items-center rounded-xl transition-all ${
                 activeTab === item.id
                   ? 'bg-[#0a84ff] text-white'
                   : 'text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white'
-              }`}
+              } ${sidebarExpanded ? 'justify-start px-4 gap-3' : 'justify-center'}`}
               title={item.label}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className="w-5 h-5 flex-shrink-0" />
+              {sidebarExpanded && <span className="text-sm whitespace-nowrap">{item.label}</span>}
             </button>
           ))}
         </div>
 
+        <div className="absolute bottom-20 w-full px-2">
+          <button
+            onClick={() => setSidebarExpanded(!sidebarExpanded)}
+            className={`w-full p-3 flex items-center rounded-xl transition-all text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white ${
+              sidebarExpanded ? 'justify-start px-4 gap-3' : 'justify-center'
+            }`}
+          >
+            {sidebarExpanded ? <ChevronLeft className="w-5 h-5 flex-shrink-0" /> : <ChevronRight className="w-5 h-5 flex-shrink-0" />}
+            {sidebarExpanded && <span className="text-sm whitespace-nowrap">Collapse</span>}
+          </button>
+        </div>
+
         <div className="absolute bottom-4 w-full px-2">
-          <div className="p-3 bg-[#2c2c2e] rounded-xl">
+          <div className={`p-3 bg-[#2c2c2e] rounded-xl ${sidebarExpanded ? '' : 'hidden'}`}>
             <p className="text-[10px] text-[#8e8e93] mb-2 text-center">AGENTS</p>
             <div className="space-y-2">
               {agentData.filter(a => a.status === 'active').length === 0 ? (
@@ -1440,7 +1457,7 @@ function MissionControlContent() {
         </div>
       )}
 
-      <main className="lg:ml-20 min-h-screen p-4 md:p-6 pt-16 lg:pt-6">
+      <main className={`min-h-screen p-4 md:p-6 pt-16 lg:pt-6 transition-all duration-300 lg:ml-20 ${sidebarExpanded ? 'lg:ml-64' : ''}`}>
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
