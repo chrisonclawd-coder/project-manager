@@ -301,6 +301,7 @@ function MissionControlContent() {
   const [xmaxWork, setXmaxWork] = useState<XmaxWorkData | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
+  const [greetingData, setGreetingData] = useState({ greeting: 'WELCOME', motivational: 'READY TO WORK.' })
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null)
   const [npmMetrics, setNpmMetrics] = useState<NpmMetrics | null>(null)
   const [chromeMetrics, setChromeMetrics] = useState<ChromeMetrics | null>(null)
@@ -633,6 +634,24 @@ function MissionControlContent() {
     const months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']
     return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()} ${date.getFullYear()}`
   }
+
+  useEffect(() => {
+    // Set greeting on client-side only to avoid hydration mismatch
+    const now = new Date()
+    const hours = now.getHours()
+    let greeting, motivational
+    if (hours >= 5 && hours < 12) {
+      greeting = 'GOOD MORNING'
+      motivational = motivationalLines.morning
+    } else if (hours >= 12 && hours < 17) {
+      greeting = 'GOOD AFTERNOON'
+      motivational = motivationalLines.afternoon
+    } else {
+      greeting = 'GOOD EVENING'
+      motivational = motivationalLines.evening
+    }
+    setGreetingData({ greeting, motivational })
+  }, [])
 
   useEffect(() => {
     const loadProductMetrics = async () => {
@@ -1428,11 +1447,11 @@ function MissionControlContent() {
             <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-semibold tracking-tight">
-                  {getGreeting().greeting} <span className={darkMode ? 'text-zinc-400' : 'text-emerald-600'}>CHRIS</span>
+                  {greetingData.greeting} <span className={darkMode ? 'text-zinc-400' : 'text-emerald-600'}>CHRIS</span>
                 </h1>
                 <p className={`text-xs tracking-[0.18em] mt-2 ${shell.textSoft}`}>{formatDate(new Date())}</p>
                 <p className={`text-xs mt-4 border-l-2 pl-4 tracking-[0.16em] ${shell.textMuted} ${shell.borderStrong}`}>
-                  {getGreeting().motivational}
+                  {greetingData.motivational}
                 </p>
                 <div className="mt-4 flex items-center gap-3">
                   <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft}`}>
