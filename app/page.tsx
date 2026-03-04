@@ -685,12 +685,18 @@ function MissionControlContent() {
   }, [])
 
   const menuItems = [
-    { id: 'home', label: 'HOME', icon: HomeIcon },
-    { id: 'projects', label: 'PROJECTS', icon: BookOpen },
-    { id: 'agents', label: 'AGENTS', icon: Activity },
-    { id: 'expenses', label: 'EXPENSES', icon: Wallet },
-    { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
-    { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
+    { id: 'home', label: '1 HOME', icon: HomeIcon },
+    { id: 'products', label: '2 PRODUCTS', icon: BookOpen },
+    { id: 'team', label: '3 TEAM', icon: Users },
+    { id: 'x-growth', label: '4 X GROWTH', icon: TrendingUp },
+    { id: 'kpis', label: '5 KPIS', icon: BarChart3 },
+    { id: 'roadmap', label: '6 ROADMAP', icon: Target },
+    { id: 'feedback', label: '7 FEEDBACK', icon: Bell },
+    { id: 'news', label: '8 NEWS', icon: Calendar },
+    { id: 'goals', label: '9 GOALS', icon: Zap },
+    { id: 'activity', label: '10 ACTIVITY', icon: Activity },
+    { id: 'security', label: '11 SECURITY', icon: AlertCircle },
+    { id: 'expense', label: '12 EXPENSE', icon: Wallet },
   ]
 
   const filteredTasks = tasks.filter(
@@ -1620,9 +1626,9 @@ function MissionControlContent() {
       >
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
-          {activeTab === 'home' && (
-            <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <MissionControlV2 shell={shell} />
+          {['home','products','team','x-growth','kpis','roadmap','feedback','news','goals','activity','security','expense'].includes(activeTab) && (
+            <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <MissionControlV2 shell={shell} section={activeTab} />
             </motion.div>
           )}
 
