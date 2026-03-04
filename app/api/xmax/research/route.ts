@@ -30,8 +30,7 @@ type TavilyResponse = {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const topic = searchParams.get('topic') || trendQuery
-  const secrets = await getAllSecrets()
-  const apiKey = secrets.TAVILY_API_KEY || null
+  const apiKey = process.env.TAVILY_API_KEY || null
 
   if (!apiKey) {
     return NextResponse.json(
