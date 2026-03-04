@@ -4,17 +4,14 @@ cd /home/clawdonaws/.openclaw/workspace
 # Run security audit
 OUTPUT=$(openclaw security audit --deep 2>&1)
 
-# Send to Telegram
-TELEGRAM_TEXT=$(cat <<EOF
-🔒 Daily Security Audit - 2026-02-16 IST
+# Send to user's Telegram chat
+TELEGRAM_TEXT="🔒 Daily Security Audit - $(date '+%Y-%m-%d %H:%M IST')
 
-$OUTPUT
+$OUTPUT"
 
----
-Security scan sent from @singsecurity_bot
-EOF
-)
-
+# Send to user (not channel)
 curl -s -X POST "https://api.telegram.org/bot7766991760:AAEbC0j9j8G-iZxumu_WOTRK9rSv8Wzg3tU/sendMessage" \
-    -d "chat_id=-5205543469" \
+    -d "chat_id=7065433847" \
     -d "text=$TELEGRAM_TEXT" > /dev/null
+
+echo "Security audit sent to user"

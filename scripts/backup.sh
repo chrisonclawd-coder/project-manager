@@ -71,18 +71,24 @@ for file in $(find "$BACKUP_DIR" -type f -name "*.md" -o -name "*.json" -o -name
     done
 done
 
-# Add GitHub token from environment if present (for push)
-export GIT_TOKEN="${GITHUB_TOKEN:-}"
+# Add GitHub token from AWS Parameter Store if present (for push)
+export GIT_TOKEN=""
+if [ -f /home/clawdonaws/.openclaw/workspace/scripts/get-github-token.py ]; then
+    GIT_TOKEN=$(python3 /home/clawdonaws/.openclaw/workspace/scripts/get-github-token.py 2>/dev/null || echo "")
+fi
 
 # Clone or update private repo
 echo "Setting up GitHub backup repo..."
 cd /tmp
 rm -rf openclaw-backup-repo 2>/dev/null || true
 
-if [ -n "$GIT_TOKEN" ]; then
-    git clone "https://$GIT_TOKEN@github.com/chrisonclawd-coder/openclaw.git" openclaw-backup-repo 2>/dev/null || git clone "https://github.com/chrisonclawd-coder/openclaw.git" openclaw-backup-repo
+if [ -n "$GIT_TOKEN" ] && [ "$GIT_TOKEN" != "Error" ]; then
+    echo "Using GitHub token from Parameter Store..."
+    git clone "https://${GIT_TOKEN}@github.com/chrisonclawd-coder/openclaw.git" openclaw-backup-repo 2>/dev/null || git clone "https://github.com/chrisonclawd-coder/openclaw.git" openclaw-backup-repo
 else
-    git clone "https://github.com/chrisonclawd-coder/openclaw.git" openclaw-backup-repo 2>/dev/null || echo "No GitHub token - skipping push"
+    echo "No GitHub token - skipping push"
+    echo "Backup complete: files prepared but not pushed to GitHub"
+    rm -rf "$BACKUP_DIR"
     exit 0
 fi
 

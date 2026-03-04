@@ -1,0 +1,152 @@
+{
+  "agents": {
+    "list": [
+      {
+        "id": "main",
+        "model": {
+          "fallbacks": ["zai/glm-4.7"]
+        }
+      },
+      {
+        "id": "software-dev",
+        "label": "Software Development",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free",
+          "fallbacks": ["zai/glm-4.7-flash"]
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev",
+        "subagents": {
+          "maxConcurrent": 6
+        }
+      },
+      {
+        "id": "analysis",
+        "label": "Analysis",
+        "model": {
+          "primary": "zai/glm-4.7",
+          "fallbacks": ["kilocode/minimax/minimax-m2.5:free"]
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/analysis",
+        "subagents": {
+          "maxConcurrent": 4
+        }
+      },
+      {
+        "id": "marketing",
+        "label": "Marketing (xMax)",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free",
+          "fallbacks": ["zai/glm-4.7-flash"]
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/marketing",
+        "subagents": {
+          "maxConcurrent": 4
+        }
+      },
+      {
+        "id": "developer",
+        "label": "Developer",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev"
+      },
+      {
+        "id": "qa",
+        "label": "QA Engineer",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev"
+      },
+      {
+        "id": "devops",
+        "label": "DevOps Engineer",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev"
+      },
+      {
+        "id": "manual-tester",
+        "label": "Manual Tester",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev"
+      },
+      {
+        "id": "product-architect",
+        "label": "Product Architect",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/software-dev"
+      },
+      {
+        "id": "performance-analyst",
+        "label": "Performance Analyst",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/analysis"
+      },
+      {
+        "id": "code-reviewer",
+        "label": "Code Reviewer",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/analysis"
+      },
+      {
+        "id": "security-auditor",
+        "label": "Security Auditor",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/analysis"
+      },
+      {
+        "id": "data-analyst",
+        "label": "Data Analyst",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/analysis"
+      },
+      {
+        "id": "social-media-manager",
+        "label": "Social Media Manager",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/marketing"
+      },
+      {
+        "id": "content-creator",
+        "label": "Content Creator",
+        "model": {
+          "primary": "kilocode/minimax/minimax-m2.5:free"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/marketing"
+      },
+      {
+        "id": "growth-strategist",
+        "label": "Growth Strategist",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/marketing"
+      },
+      {
+        "id": "brand-manager",
+        "label": "Brand Manager",
+        "model": {
+          "primary": "zai/glm-4.7"
+        },
+        "workspace": "/home/clawdonaws/.openclaw/workspace/marketing"
+      }
+    ]
+  }
+}

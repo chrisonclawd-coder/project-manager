@@ -711,3 +711,155 @@ Main chat: Updates memory
 - Vercel: https://project-manager-blue-three.vercel.app
 - VPS: http://65.2.33.27:3000 (DOWN - needs restart)
 
+---
+
+## 2026-03-04
+
+**OpenClaw Agent Hierarchy Setup** ✅
+
+Robin requested a multi-tier agent system with specialized domains and sub-agents.
+
+**Structure Created:**
+
+```
+CHRISLY (CEO - Main Agent)
+    │
+    ├── Software Development Agent (Manager)
+    │       ├── Developer (code implementation)
+    │       ├── QA Engineer (testing & validation)
+    │       ├── DevOps Engineer (CI/CD & deployment)
+    │       ├── Manual Tester (production validation)
+    │       └── Product Architect (specs & requirements)
+    │
+    ├── Analysis Agent (Manager)
+    │       ├── Performance Analyst (metrics & optimization)
+    │       ├── Code Reviewer (code quality & patterns)
+    │       ├── Security Auditor (vulnerability scanning)
+    │       └── Data Analyst (data processing & insights)
+    │
+    └── Marketing Agent (xMax - Manager)
+            ├── Social Media Manager (X/Twitter, Reddit, LinkedIn)
+            ├── Content Creator (blogs, articles, tutorials)
+            ├── Growth Strategist (growth hacking, viral mechanics)
+            └── Brand Manager (brand voice, guidelines, positioning)
+```
+
+**Total Agents:** 17 (1 main + 3 managers + 13 sub-agents)
+
+**Model Assignments:**
+- **Fast tasks (MiniMax M2.5 Free):** Software Dev Agent, Developer, QA, DevOps, Manual Tester, Social Media Manager, Content Creator
+- **Deep reasoning (GLM-4.7):** Analysis Agent, Performance Analyst, Code Reviewer, Security Auditor, Data Analyst, Product Architect, Growth Strategist, Brand Manager
+
+**Workspaces:**
+- `/home/clawdonaws/.openclaw/workspace/software-dev`
+- `/home/clawdonaws/.openclaw/workspace/analysis`
+- `/home/clawdonaws/.openclaw/workspace/marketing`
+
+**Files Created:**
+- `AGENT-HIERARCHY.md` - Full design document with workflows
+- `AGENT-CONFIG.md` - Detailed configuration guide
+- `agent-config-patch.json` - Config patch ready to apply
+- `AGENT-QUICK-START.md` - Usage guide for Robin
+- `setup-agents.sh` - Setup script (executed)
+- Workspace READMEs for each team
+
+**Status:** Config ready, waiting for Robin to approve and apply
+
+**Workflow Example:**
+```
+User: "Build a Chrome extension"
+  ↓
+Chrisly (CEO) receives task
+  ↓
+Classifies: Software Development
+  ↓
+Forwards to: Software Development Agent
+  ↓
+Software Dev Agent (Manager):
+  1. Product Architect → Specs & Requirements
+  2. Developer → Write code
+  3. QA → Test code
+  4. DevOps → Deploy
+  5. Manual Tester → Production validation
+  ↓
+Reports back to Chrisly
+  ↓
+Chrisly reports to user
+```
+
+**Benefits:**
+✅ Specialization - Each agent is expert in their domain
+✅ Parallelization - Multiple agents can work simultaneously
+✅ Scalability - Easy to add more sub-agents
+✅ Organization - Each team has their own workspace
+✅ Efficiency - Right tool for the right job
+
+**Status:** ✅ **COMPLETE** - Config applied and verified
+
+**All 17 agents active:**
+- Main: Chrisly (CEO)
+- Software Dev: software-dev (manager) + 5 sub-agents
+- Analysis: analysis (manager) + 4 sub-agents
+- Marketing: marketing (manager/xMax) + 4 sub-agents
+
+**Verified:** `openclaw agents list` shows all agents with correct models and workspaces
+
+**Usage Example:**
+```
+User: "Tell the software dev team to build a Chrome extension"
+→ Chrisly classifies → Spawns software-dev manager
+→ Manager delegates: Product Architect → Developer → QA → DevOps → Manual Tester
+→ Reports back to Chrisly → Reports to user
+```
+
+---
+
+## 2026-03-04
+
+**Agent Hierarchy Visualization** ✅
+
+**Mission Control Update:**
+- Added `/agents` route with interactive tree view
+- Color-coded by team (dev: blue, analysis: purple, marketing: orange)
+- Expandable/collapsible tree structure
+- Shows agent details: ID, model, workspace, role
+- Team stats dashboard (6 dev, 5 analysis, 5 marketing)
+- Link from main AGENTS tab to hierarchy view
+
+**Files:**
+- `app/agents/page.tsx` - Agent hierarchy component
+- `app/api/agents/route.ts` - API route
+- `data/agents.json` - Agent configuration
+
+**Live:** https://project-manager-blue-three.vercel.app/agents
+
+---
+
+## 2026-03-04
+
+**Interactive Agent Management** ✅
+
+**Added to Mission Control:**
+- Real-time agent status (idle, working, done, blocked)
+- Current task tracking
+- Todo list management (add, toggle, delete)
+- Interdepartmental messaging
+- Agent details panel
+- Status selection dropdown
+- Message history view
+
+**API Routes:**
+- `/api/agents-status` - Get/Update agent status and todos
+- `/api/agent-messages` - Get/Send messages between agents
+
+**Interdepartmental Communications:**
+- Software Dev ↔ Marketing: Coordinate campaigns, features
+- Analysis ↔ Marketing: Share insights, content
+- All teams ↔ Chrisly: Status reports, approvals
+
+**Data:**
+- `data/agents-status.json` - Agent status and todos
+- `data/agent-messages.json` - Interdepartmental messages
+
+**Live:** https://project-manager-blue-three.vercel.app/agents
+
