@@ -3019,13 +3019,24 @@ function MissionControlContent() {
           {activeTab === 'agents-gateway' && (
             <motion.div key="agents-gateway" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">GATEWAY AGENTS</h2>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  REAL-TIME AGENT STATUS FROM OPENCLAW GATEWAY
-                </p>
-                <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
-                  Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
-                </p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">GATEWAY AGENTS</h2>
+                    <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
+                      REAL-TIME AGENT STATUS FROM OPENCLAW GATEWAY
+                    </p>
+                    <p className={`text-[11px] mt-2 ${shell.textSoft}`}>
+                      Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
+                    </p>
+                  </div>
+                  <a
+                    href="/agents"
+                    className="flex items-center gap-2 px-3 py-2 border border-zinc-600 hover:border-zinc-400 transition-colors text-sm text-zinc-300 hover:text-zinc-100"
+                  >
+                    <Activity size={16} />
+                    View Hierarchy
+                  </a>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

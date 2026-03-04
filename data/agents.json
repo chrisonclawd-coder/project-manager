@@ -1,0 +1,141 @@
+{
+  "main": {
+    "id": "main",
+    "name": "CHRISLY",
+    "role": "CEO",
+    "model": "github-copilot/claude-haiku-4.5",
+    "workspace": "~/.openclaw/workspace",
+    "children": ["software-dev", "analysis", "marketing"]
+  },
+  "software-dev": {
+    "id": "software-dev",
+    "name": "Software Development",
+    "role": "Manager",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev",
+    "children": ["developer", "qa", "devops", "manual-tester", "product-architect"]
+  },
+  "analysis": {
+    "id": "analysis",
+    "name": "Analysis",
+    "role": "Manager",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/analysis",
+    "team": "analysis",
+    "children": ["performance-analyst", "code-reviewer", "security-auditor", "data-analyst"]
+  },
+  "marketing": {
+    "id": "marketing",
+    "name": "Marketing (xMax)",
+    "role": "Manager",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/marketing",
+    "team": "marketing",
+    "children": ["social-media-manager", "content-creator", "growth-strategist", "brand-manager"]
+  },
+  "developer": {
+    "id": "developer",
+    "name": "Developer",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev"
+  },
+  "qa": {
+    "id": "qa",
+    "name": "QA Engineer",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev"
+  },
+  "devops": {
+    "id": "devops",
+    "name": "DevOps Engineer",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev"
+  },
+  "manual-tester": {
+    "id": "manual-tester",
+    "name": "Manual Tester",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev"
+  },
+  "product-architect": {
+    "id": "product-architect",
+    "name": "Product Architect",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/software-dev",
+    "team": "dev"
+  },
+  "performance-analyst": {
+    "id": "performance-analyst",
+    "name": "Performance Analyst",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/analysis",
+    "team": "analysis"
+  },
+  "code-reviewer": {
+    "id": "code-reviewer",
+    "name": "Code Reviewer",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/analysis",
+    "team": "analysis"
+  },
+  "security-auditor": {
+    "id": "security-auditor",
+    "name": "Security Auditor",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/analysis",
+    "team": "analysis"
+  },
+  "data-analyst": {
+    "id": "data-analyst",
+    "name": "Data Analyst",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/analysis",
+    "team": "analysis"
+  },
+  "social-media-manager": {
+    "id": "social-media-manager",
+    "name": "Social Media Manager",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/marketing",
+    "team": "marketing"
+  },
+  "content-creator": {
+    "id": "content-creator",
+    "name": "Content Creator",
+    "role": "Sub-Agent",
+    "model": "kilocode/minimax/minimax-m2.5:free",
+    "workspace": "~/.openclaw/workspace/marketing",
+    "team": "marketing"
+  },
+  "growth-strategist": {
+    "id": "growth-strategist",
+    "name": "Growth Strategist",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/marketing",
+    "team": "marketing"
+  },
+  "brand-manager": {
+    "id": "brand-manager",
+    "name": "Brand Manager",
+    "role": "Sub-Agent",
+    "model": "zai/glm-4.7",
+    "workspace": "~/.openclaw/workspace/marketing",
+    "team": "marketing"
+  }
+}
