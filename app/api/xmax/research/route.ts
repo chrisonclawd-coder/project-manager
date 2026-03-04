@@ -14,7 +14,7 @@ async function getApiKey(): Promise<string | null> {
     try {
       cachedSecrets = await getAllSecrets()
       cacheTime = now
-      console.log('Fetched secrets from AWS Parameter Store')
+      console.log('Fetched secrets from AWS Parameter Store or Environment')
     } catch (error) {
       console.error('Failed to fetch secrets:', error)
     }
@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         available: false,
-        reason: 'TAVILY_API_KEY missing from AWS Parameter Store',
+        reason: 'TAVILY_API_KEY missing. Add it in Vercel Environment Variables (TAVILY_API_KEY) or AWS Parameter Store.',
         results: [],
       },
       {

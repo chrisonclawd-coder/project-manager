@@ -1,9 +1,26 @@
-// AWS Secrets Helper - Fetch from Parameter Store
+// AWS Secrets Helper - Fetch from Parameter Store or Environment Variables
 import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm'
 
-const client = new SSMClient({ region: 'ap-south-1' }) // Adjust region as needed
+const client = new SSMClient({ region: 'ap-south-1' })
+
+// Map parameter names to environment variable names
+const PARAM_TO_ENV: Record<string, string> = {
+  '/mission-control/TWELVEDATA_API_KEY': 'TWELVEDATA_API_KEY',
+  '/mission-control/FYERS_API_KEY': 'FYERS_API_KEY',
+  '/mission-control/FYERS_APP_ID': 'FYERS_APP_ID',
+  '/mission-control/FYERS_ACCESS_TOKEN': 'FYERS_ACCESS_TOKEN',
+  '/mission-control/TAVILY_API_KEY': 'TAVILY_API_KEY',
+  '/mission-control/EXA_API_KEY': 'EXA_API_KEY',
+}
 
 export async function getSecret(paramName: string): Promise<string | null> {
+  // First try environment variable (for Vercel)
+  const envVar = PARAM_TO_ENV[paramName]
+  if (envVar && process.env[envVar]) {
+    return process.env[envVar] || null
+  }
+
+  // Fall back to AWS Parameter Store (for VPS)
   try {
     const command = new GetParameterCommand({
       Name: paramName,
@@ -18,17 +35,22 @@ export async function getSecret(paramName: string): Promise<string | null> {
 }
 
 export async function getAllSecrets(): Promise<Record<string, string>> {
-  const params = [
-    '/mission-control/TWELVEDATA_API_KEY',
-    '/mission-control/FYERS_API_KEY',
-    '/mission-control/FYERS_APP_ID',
-    '/mission-control/FYERS_ACCESS_TOKEN',
-    '/mission-control/TAVILY_API_KEY',
-    '/mission-control/EXA_API_KEY',
-  ]
-  
   const secrets: Record<string, string> = {}
   
+  // First check environment variables (for Vercel)
+  for (const [param, envVar] of Object.entries(PARAM_TO_ENV)) {
+    if (process.env[envVar]) {
+      secrets[envVar] = process.env[envVar]!
+    }
+  }
+  
+  // If we have env vars, return those (Vercel mode)
+  if (Object.keys(secrets).length > 0) {
+    return secrets
+  }
+  
+  // Otherwise, fall back to AWS Parameter Store (VPS mode)
+  const params = Object.keys(PARAM_TO_ENV)
   for (const param of params) {
     const value = await getSecret(param)
     if (value) {
