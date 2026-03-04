@@ -1,0 +1,114 @@
+{
+  "main": {
+    "status": "idle",
+    "currentTask": "Managing all teams and coordinating tasks",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": [
+      { id: 1, text: "Review agent requests", done: false },
+      { id: 2, text: "Coordinate software dev tasks", done: false },
+      { id: 3, text: "Coordinate marketing campaigns", done: false }
+    ]
+  },
+  "software-dev": {
+    "status": "idle",
+    "currentTask": "Ready to receive development tasks",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": [
+      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+    ]
+  },
+  "analysis": {
+    "status": "idle",
+    "currentTask": "Ready to receive analysis tasks",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": [
+      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+    ]
+  },
+  "marketing": {
+    "status": "idle",
+    "currentTask": "Ready to receive marketing tasks",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": [
+      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+    ]
+  },
+  "developer": {
+    "status": "idle",
+    "currentTask": "Ready to code",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "qa": {
+    "status": "idle",
+    "currentTask": "Ready to test",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "devops": {
+    "status": "idle",
+    "currentTask": "Ready to deploy",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "manual-tester": {
+    "status": "idle",
+    "currentTask": "Ready to validate",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "product-architect": {
+    "status": "idle",
+    "currentTask": "Ready to write specs",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "performance-analyst": {
+    "status": "idle",
+    "currentTask": "Ready to analyze performance",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "code-reviewer": {
+    "status": "idle",
+    "currentTask": "Ready to review code",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "security-auditor": {
+    "status": "idle",
+    "currentTask": "Ready to audit security",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "data-analyst": {
+    "status": "idle",
+    "currentTask": "Ready to analyze data",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "social-media-manager": {
+    "status": "idle",
+    "currentTask": "Ready to manage social media",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "content-creator": {
+    "status": "idle",
+    "currentTask": "Ready to create content",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "growth-strategist": {
+    "status": "idle",
+    "currentTask": "Ready to plan growth strategies",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  },
+  "brand-manager": {
+    "status": "idle",
+    "currentTask": "Ready to manage brand",
+    "lastUpdated": "2026-03-04T04:20:00Z",
+    "todos": []
+  }
+}
