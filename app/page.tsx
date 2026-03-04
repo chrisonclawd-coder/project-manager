@@ -36,6 +36,7 @@ import {
   DollarSign,
   Activity,
 } from 'lucide-react'
+import AgentsView from '@/components/AgentsView'
 
 type TaskStatus = 'todo' | 'in-progress' | 'done'
 type TaskPriority = 'low' | 'medium' | 'high'
@@ -683,7 +684,7 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
-    { id: 'agents-gateway', label: 'AGENTS', icon: Activity },
+    { id: 'agents', label: 'AGENTS', icon: Activity },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
@@ -3065,13 +3066,6 @@ function MissionControlContent() {
                       Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
                     </p>
                   </div>
-                  <a
-                    href="/agents"
-                    className="flex items-center gap-2 px-3 py-2 border border-zinc-600 hover:border-zinc-400 transition-colors text-sm text-zinc-300 hover:text-zinc-100"
-                  >
-                    <Activity size={16} />
-                    View Hierarchy
-                  </a>
                 </div>
               </div>
 
@@ -3148,6 +3142,12 @@ function MissionControlContent() {
                   ))
                 )}
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'agents' && (
+            <motion.div key="agents" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <AgentsView />
             </motion.div>
           )}
 
