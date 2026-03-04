@@ -4,9 +4,9 @@
     "currentTask": "Managing all teams and coordinating tasks",
     "lastUpdated": "2026-03-04T04:20:00Z",
     "todos": [
-      { id: 1, text: "Review agent requests", done: false },
-      { id: 2, text: "Coordinate software dev tasks", done: false },
-      { id: 3, text: "Coordinate marketing campaigns", done: false }
+      { "id": 1, "text": "Review agent requests", "done": false },
+      { "id": 2, "text": "Coordinate software dev tasks", "done": false },
+      { "id": 3, "text": "Coordinate marketing campaigns", "done": false }
     ]
   },
   "software-dev": {
@@ -14,7 +14,7 @@
     "currentTask": "Ready to receive development tasks",
     "lastUpdated": "2026-03-04T04:20:00Z",
     "todos": [
-      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+      { "id": 1, "text": "Wait for tasks from Chrisly", "done": false }
     ]
   },
   "analysis": {
@@ -22,7 +22,7 @@
     "currentTask": "Ready to receive analysis tasks",
     "lastUpdated": "2026-03-04T04:20:00Z",
     "todos": [
-      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+      { "id": 1, "text": "Wait for tasks from Chrisly", "done": false }
     ]
   },
   "marketing": {
@@ -30,7 +30,7 @@
     "currentTask": "Ready to receive marketing tasks",
     "lastUpdated": "2026-03-04T04:20:00Z",
     "todos": [
-      { id: 1, text: "Wait for tasks from Chrisly", done: false }
+      { "id": 1, "text": "Wait for tasks from Chrisly", "done": false }
     ]
   },
   "developer": {
