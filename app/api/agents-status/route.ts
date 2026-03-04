@@ -1,52 +1,44 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { get, getAll } from '@vercel/edge-config'
+import { sql } from '@vercel/postgres'
 
 // ============================================================================
-// INITIALIZATION - Load agents from JSON to Edge Config
+// INITIALIZATION - Create tables if not exist
 // ============================================================================
 
-async function initializeAgents() {
+async function initializeTables() {
   try {
-    // Check if agents are already in Edge Config
-    const initialized = await get('agents-initialized')
-    if (initialized === 'true') {
-      return
-    }
-
-    // Load from JSON file (only runs once)
-    const fs = await import('fs/promises')
-    const path = await import('path')
-
-    const agentsStatus = JSON.parse(
-      await fs.readFile(
-        path.join(process.cwd(), 'data', 'agents-status.json'),
-        'utf-8'
+    // Create agents_status table
+    await sql`
+      CREATE TABLE IF NOT EXISTS agents_status (
+        agent_id VARCHAR(255) PRIMARY KEY,
+        status VARCHAR(50),
+        current_task TEXT,
+        todos JSONB,
+        last_updated TIMESTAMP WITH TIME ZONE DEFAULT NOW()
       )
-    )
+    `
 
-    // Store each agent in Edge Config
-    for (const [agentId, agentData] of Object.entries(agentsStatus)) {
-      await set(`agent-${agentId}`, JSON.stringify(agentData))
-    }
+    // Create agent_messages table
+    await sql`
+      CREATE TABLE IF NOT EXISTS agent_messages (
+        id VARCHAR(255) PRIMARY KEY,
+        from_agent VARCHAR(255),
+        to_agent VARCHAR(255),
+        message TEXT,
+        type VARCHAR(50),
+        read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+      )
+    `
 
-    // Mark as initialized
-    await set('agents-initialized', 'true')
-
-    console.log('✅ Agents initialized in Vercel Edge Config')
+    console.log('✅ Tables initialized in Vercel Postgres')
   } catch (error) {
-    console.error('Error initializing agents:', error)
+    console.error('Error initializing tables:', error)
   }
 }
 
-// Helper function to set values in Edge Config
-async function set(key: string, value: string) {
-  // Using localStorage-like API from @vercel/edge-config
-  const config = await getAll()
-  config[key] = value
-}
-
 // ============================================================================
-// GET - Read agent status from Edge Config
+// GET - Read agent status from Postgres
 // ============================================================================
 
 export async function GET(request: NextRequest) {
@@ -54,28 +46,47 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const agentId = searchParams.get('agentId')
 
-    // Initialize agents if not done (one-time setup)
-    await initializeAgents()
+    await initializeTables()
 
     if (agentId) {
       // Get single agent
-      const allConfig = await getAll()
-      const agentData = allConfig[`agent-${agentId}`]
-      if (agentData) {
-        return NextResponse.json(JSON.parse(agentData as string))
+      const result = await sql`
+        SELECT
+          agent_id as "agentId",
+          status,
+          current_task as "currentTask",
+          todos,
+          last_updated as "lastUpdated"
+        FROM agents_status
+        WHERE agent_id = ${agentId}
+      `
+
+      if (result.rows.length > 0) {
+        return NextResponse.json(result.rows[0])
       }
+
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
     }
 
     // Get all agents
-    const allConfig = await getAll()
+    const result = await sql`
+      SELECT
+        agent_id as "agentId",
+        status,
+        current_task as "currentTask",
+        todos,
+        last_updated as "lastUpdated"
+      FROM agents_status
+    `
 
     // Convert to object
     const agentsObj: Record<string, any> = {}
-    for (const [key, value] of Object.entries(allConfig)) {
-      if (key.startsWith('agent-')) {
-        const agentId = key.replace('agent-', '')
-        agentsObj[agentId] = JSON.parse(value as string)
+    for (const row of result.rows) {
+      agentsObj[row.agentId] = {
+        status: row.status,
+        currentTask: row.currentTask,
+        todos: row.todos || [],
+        lastUpdated: row.lastUpdated
       }
     }
 
@@ -87,7 +98,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================================================
-// PUT - Update agent status in Edge Config
+// PUT - Update agent status in Postgres
 // ============================================================================
 
 export async function PUT(request: NextRequest) {
@@ -99,36 +110,50 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'agentId required' }, { status: 400 })
     }
 
-    // Initialize if needed
-    await initializeAgents()
+    await initializeTables()
 
-    // Get current agent data
-    const allConfig = await getAll()
-    const agentDataStr = allConfig[`agent-${agentId}`]
-    let agentData: any = {}
+    // Check if agent exists
+    const existing = await sql`
+      SELECT agent_id FROM agents_status WHERE agent_id = ${agentId}
+    `
 
-    if (agentDataStr) {
-      agentData = JSON.parse(agentDataStr as string)
+    if (existing.rows.length > 0) {
+      // Update existing agent
+      await sql`
+        UPDATE agents_status
+        SET
+          status = ${status},
+          current_task = ${currentTask},
+          todos = ${JSON.stringify(todos)},
+          last_updated = NOW()
+        WHERE agent_id = ${agentId}
+      `
     } else {
-      // Create new agent if doesn't exist
-      agentData = {
-        status: 'idle',
-        currentTask: 'New agent',
-        lastUpdated: new Date().toISOString(),
-        todos: []
-      }
+      // Create new agent
+      await sql`
+        INSERT INTO agents_status (agent_id, status, current_task, todos)
+        VALUES (
+          ${agentId},
+          ${status},
+          ${currentTask},
+          ${JSON.stringify(todos || [])}
+        )
+      `
     }
 
-    // Update fields
-    if (status !== undefined) agentData.status = status
-    if (currentTask !== undefined) agentData.currentTask = currentTask
-    if (todos !== undefined) agentData.todos = todos
-    agentData.lastUpdated = new Date().toISOString()
+    // Get updated agent
+    const result = await sql`
+      SELECT
+        agent_id as "agentId",
+        status,
+        current_task as "currentTask",
+        todos,
+        last_updated as "lastUpdated"
+      FROM agents_status
+      WHERE agent_id = ${agentId}
+    `
 
-    // Store in Edge Config
-    await set(`agent-${agentId}`, JSON.stringify(agentData))
-
-    return NextResponse.json(agentData)
+    return NextResponse.json(result.rows[0])
   } catch (error) {
     console.error('Error updating agent status:', error)
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 })
@@ -148,36 +173,50 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'agentId required' }, { status: 400 })
     }
 
-    // Initialize if needed
-    await initializeAgents()
+    await initializeTables()
 
-    // Get current agent data
-    const allConfig = await getAll()
-    const agentDataStr = allConfig[`agent-${agentId}`]
-    let agentData: any = {}
+    // Check if agent exists
+    const existing = await sql`
+      SELECT agent_id FROM agents_status WHERE agent_id = ${agentId}
+    `
 
-    if (agentDataStr) {
-      agentData = JSON.parse(agentDataStr as string)
+    if (existing.rows.length > 0) {
+      // Update existing agent
+      await sql`
+        UPDATE agents_status
+        SET
+          status = COALESCE(${status}, status),
+          current_task = COALESCE(${currentTask}, current_task),
+          todos = COALESCE(${JSON.stringify(todos)}, todos),
+          last_updated = NOW()
+        WHERE agent_id = ${agentId}
+      `
     } else {
       // Create new agent
-      agentData = {
-        status: 'idle',
-        currentTask: 'New agent',
-        lastUpdated: new Date().toISOString(),
-        todos: []
-      }
+      await sql`
+        INSERT INTO agents_status (agent_id, status, current_task, todos)
+        VALUES (
+          ${agentId},
+          ${status || 'idle'},
+          ${currentTask || 'New agent'},
+          ${JSON.stringify(todos || [])}
+        )
+      `
     }
 
-    // Update fields
-    if (status !== undefined) agentData.status = status
-    if (currentTask !== undefined) agentData.currentTask = currentTask
-    if (todos !== undefined) agentData.todos = todos
-    agentData.lastUpdated = new Date().toISOString()
+    // Get updated agent
+    const result = await sql`
+      SELECT
+        agent_id as "agentId",
+        status,
+        current_task as "currentTask",
+        todos,
+        last_updated as "lastUpdated"
+      FROM agents_status
+      WHERE agent_id = ${agentId}
+    `
 
-    // Store in Edge Config
-    await set(`agent-${agentId}`, JSON.stringify(agentData))
-
-    return NextResponse.json(agentData)
+    return NextResponse.json(result.rows[0])
   } catch (error) {
     console.error('Error creating/updating agent:', error)
     return NextResponse.json({ error: 'Failed to update' }, { status: 500 })

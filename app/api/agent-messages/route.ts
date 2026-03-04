@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { get, getAll } from '@vercel/edge-config'
+import { sql } from '@vercel/postgres'
 
 interface AgentMessage {
   id: string
@@ -11,14 +11,8 @@ interface AgentMessage {
   read: boolean
 }
 
-// Helper function to set values in Edge Config
-async function set(key: string, value: string) {
-  const config = await getAll()
-  config[key] = value
-}
-
 // ============================================================================
-// GET - Get messages from Edge Config
+// GET - Get messages from Postgres
 // ============================================================================
 
 export async function GET(request: NextRequest) {
@@ -28,28 +22,34 @@ export async function GET(request: NextRequest) {
     const toAgent = searchParams.get('to')
     const agentId = searchParams.get('agentId')
 
-    // Get all messages from Edge Config
-    const messagesData = await get('agent-messages')
-    let messages: AgentMessage[] = []
+    // Get all messages
+    const result = await sql`
+      SELECT
+        id,
+        from_agent as "from",
+        to_agent as "to",
+        message,
+        type,
+        read,
+        created_at as "timestamp"
+      FROM agent_messages
+      ORDER BY created_at DESC
+    `
 
-    if (messagesData) {
-      messages = JSON.parse(messagesData)
-    }
-
-    let filtered = messages
+    let messages: AgentMessage[] = result.rows
 
     if (agentId) {
       // Get all messages for this agent (both sent and received)
-      filtered = messages.filter((m: AgentMessage) => m.from === agentId || m.to === agentId)
+      messages = messages.filter((m: AgentMessage) => m.from === agentId || m.to === agentId)
     } else if (fromAgent && toAgent) {
       // Get conversation between two agents
-      filtered = messages.filter((m: AgentMessage) =>
+      messages = messages.filter((m: AgentMessage) =>
         (m.from === fromAgent && m.to === toAgent) ||
         (m.from === toAgent && m.to === fromAgent)
       )
     }
 
-    return NextResponse.json(filtered)
+    return NextResponse.json(messages)
   } catch (error) {
     console.error('Error loading messages:', error)
     return NextResponse.json([], { status: 200 })
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================================================
-// POST - Send message to Edge Config
+// POST - Send message to Postgres
 // ============================================================================
 
 export async function POST(request: NextRequest) {
@@ -69,37 +69,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'from, to, and message required' }, { status: 400 })
     }
 
-    // Get existing messages from Edge Config
-    const messagesData = await get('agent-messages')
-    let messages: AgentMessage[] = []
-
-    if (messagesData) {
-      messages = JSON.parse(messagesData)
-    }
-
     // Create new message
-    const newMessage: AgentMessage = {
-      id: Date.now().toString(),
-      from,
-      to,
-      message,
-      type,
-      timestamp: new Date().toISOString(),
-      read: false
-    }
+    const messageId = Date.now().toString()
 
-    // Add to messages
-    messages.push(newMessage)
+    await sql`
+      INSERT INTO agent_messages (id, from_agent, to_agent, message, type)
+      VALUES (${messageId}, ${from}, ${to}, ${message}, ${type})
+    `
 
-    // Keep only last 100 messages (Edge Config has size limits)
-    if (messages.length > 100) {
-      messages = messages.slice(-100)
-    }
+    // Get created message
+    const result = await sql`
+      SELECT
+        id,
+        from_agent as "from",
+        to_agent as "to",
+        message,
+        type,
+        read,
+        created_at as "timestamp"
+      FROM agent_messages
+      WHERE id = ${messageId}
+    `
 
-    // Store in Edge Config
-    await set('agent-messages', JSON.stringify(messages))
-
-    return NextResponse.json(newMessage)
+    return NextResponse.json(result.rows[0])
   } catch (error) {
     console.error('Error sending message:', error)
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
@@ -119,19 +111,9 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'messageId required' }, { status: 400 })
     }
 
-    // Get existing messages
-    const messagesData = await get('agent-messages')
-    let messages: AgentMessage[] = []
-
-    if (messagesData) {
-      messages = JSON.parse(messagesData)
-    }
-
-    // Delete message by ID
-    messages = messages.filter((m: AgentMessage) => m.id !== messageId)
-
-    // Store updated messages
-    await set('agent-messages', JSON.stringify(messages))
+    await sql`
+      DELETE FROM agent_messages WHERE id = ${messageId}
+    `
 
     return NextResponse.json({ success: true })
   } catch (error) {
