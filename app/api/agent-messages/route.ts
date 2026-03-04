@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+interface AgentMessage {
+  from: string
+  to: string
+  message: string
+  type: string
+  timestamp: string
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -15,16 +23,16 @@ export async function GET(request: NextRequest) {
         path.join(process.cwd(), 'data', 'agent-messages.json'),
         'utf-8'
       )
-    )
+    ) as AgentMessage[]
 
     let filtered = messages
 
     if (agentId) {
       // Get all messages for this agent (both sent and received)
-      filtered = messages.filter(m => m.from === agentId || m.to === agentId)
+      filtered = messages.filter((m: AgentMessage) => m.from === agentId || m.to === agentId)
     } else if (fromAgent && toAgent) {
       // Get conversation between two agents
-      filtered = messages.filter(m => 
+      filtered = messages.filter((m: AgentMessage) =>
         (m.from === fromAgent && m.to === toAgent) ||
         (m.from === toAgent && m.to === fromAgent)
       )
