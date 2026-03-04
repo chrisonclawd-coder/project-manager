@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       ORDER BY created_at DESC
     `
 
-    let messages: AgentMessage[] = result.rows
+    let messages = result.rows as AgentMessage[]
 
     if (agentId) {
       // Get all messages for this agent (both sent and received)
