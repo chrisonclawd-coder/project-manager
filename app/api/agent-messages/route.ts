@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { kv } from '@vercel/kv'
+import { get, set } from '@vercel/edge-config'
 
 interface AgentMessage {
   id: string
@@ -12,7 +12,7 @@ interface AgentMessage {
 }
 
 // ============================================================================
-// GET - Get messages from KV
+// GET - Get messages from Edge Config
 // ============================================================================
 
 export async function GET(request: NextRequest) {
@@ -22,12 +22,12 @@ export async function GET(request: NextRequest) {
     const toAgent = searchParams.get('to')
     const agentId = searchParams.get('agentId')
 
-    // Get all messages from KV
-    const messagesData = await kv.get('agent-messages')
+    // Get all messages from Edge Config
+    const messagesData = await get('agent-messages')
     let messages: AgentMessage[] = []
 
     if (messagesData) {
-      messages = JSON.parse(messagesData as string)
+      messages = JSON.parse(messagesData)
     }
 
     let filtered = messages
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================================================
-// POST - Send message to KV
+// POST - Send message to Edge Config
 // ============================================================================
 
 export async function POST(request: NextRequest) {
@@ -63,12 +63,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'from, to, and message required' }, { status: 400 })
     }
 
-    // Get existing messages from KV
-    const messagesData = await kv.get('agent-messages')
+    // Get existing messages from Edge Config
+    const messagesData = await get('agent-messages')
     let messages: AgentMessage[] = []
 
     if (messagesData) {
-      messages = JSON.parse(messagesData as string)
+      messages = JSON.parse(messagesData)
     }
 
     // Create new message
@@ -85,13 +85,13 @@ export async function POST(request: NextRequest) {
     // Add to messages
     messages.push(newMessage)
 
-    // Keep only last 1000 messages (KV limit)
-    if (messages.length > 1000) {
-      messages = messages.slice(-1000)
+    // Keep only last 100 messages (Edge Config has 64KB limit)
+    if (messages.length > 100) {
+      messages = messages.slice(-100)
     }
 
-    // Store in KV
-    await kv.set('agent-messages', JSON.stringify(messages))
+    // Store in Edge Config
+    await set('agent-messages', JSON.stringify(messages))
 
     return NextResponse.json(newMessage)
   } catch (error) {
@@ -114,18 +114,18 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Get existing messages
-    const messagesData = await kv.get('agent-messages')
+    const messagesData = await get('agent-messages')
     let messages: AgentMessage[] = []
 
     if (messagesData) {
-      messages = JSON.parse(messagesData as string)
+      messages = JSON.parse(messagesData)
     }
 
     // Delete message by ID
     messages = messages.filter((m: AgentMessage) => m.id !== messageId)
 
     // Store updated messages
-    await kv.set('agent-messages', JSON.stringify(messages))
+    await set('agent-messages', JSON.stringify(messages))
 
     return NextResponse.json({ success: true })
   } catch (error) {

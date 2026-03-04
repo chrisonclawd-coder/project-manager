@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { kv } from '@vercel/kv'
+import { get, set, getAll } from '@vercel/edge-config'
 
 // ============================================================================
-// INITIALIZATION - Load agents from JSON to KV
+// INITIALIZATION - Load agents from JSON to Edge Config
 // ============================================================================
 
 async function initializeAgents() {
   try {
-    // Check if agents are already in KV
-    const cached = await kv.get('agents-initialized')
-    if (cached === 'true') {
+    // Check if agents are already in Edge Config
+    const initialized = await get('agents-initialized')
+    if (initialized === 'true') {
       return
     }
 
-    // Load from JSON file (only runs once)
+    // Load from JSON file (one-time only)
     const fs = await import('fs/promises')
     const path = await import('path')
 
@@ -24,22 +24,22 @@ async function initializeAgents() {
       )
     )
 
-    // Store each agent in KV
+    // Store each agent in Edge Config
     for (const [agentId, agentData] of Object.entries(agentsStatus)) {
-      await kv.hset('agents-status', agentId, JSON.stringify(agentData))
+      await set(`agent-${agentId}`, JSON.stringify(agentData))
     }
 
     // Mark as initialized
-    await kv.set('agents-initialized', 'true')
+    await set('agents-initialized', 'true')
 
-    console.log('✅ Agents initialized in Vercel KV')
+    console.log('✅ Agents initialized in Vercel Edge Config')
   } catch (error) {
     console.error('Error initializing agents:', error)
   }
 }
 
 // ============================================================================
-// GET - Read agent status from KV
+// GET - Read agent status from Edge Config
 // ============================================================================
 
 export async function GET(request: NextRequest) {
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
 
     if (agentId) {
       // Get single agent
-      const agentData = await kv.hget('agents-status', agentId)
+      const agentData = await get(`agent-${agentId}`)
       if (agentData) {
         return NextResponse.json(JSON.parse(agentData))
       }
@@ -60,13 +60,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all agents
-    const allAgents = await kv.hgetall('agents-status')
+    const allConfig = await getAll()
 
-    // Convert to object (Vercel KV returns as Map)
+    // Filter agent keys
     const agentsObj: Record<string, any> = {}
-    if (allAgents) {
-      for (const [key, value] of allAgents.entries()) {
-        agentsObj[key] = JSON.parse(value as string)
+    for (const [key, value] of Object.entries(allConfig)) {
+      if (key.startsWith('agent-')) {
+        const agentId = key.replace('agent-', '')
+        agentsObj[agentId] = JSON.parse(value as string)
       }
     }
 
@@ -78,7 +79,7 @@ export async function GET(request: NextRequest) {
 }
 
 // ============================================================================
-// PUT - Update agent status in KV
+// PUT - Update agent status in Edge Config
 // ============================================================================
 
 export async function PUT(request: NextRequest) {
@@ -94,7 +95,7 @@ export async function PUT(request: NextRequest) {
     await initializeAgents()
 
     // Get current agent data
-    const agentDataStr = await kv.hget('agents-status', agentId)
+    const agentDataStr = await get(`agent-${agentId}`)
     let agentData: any = {}
 
     if (agentDataStr) {
@@ -115,8 +116,8 @@ export async function PUT(request: NextRequest) {
     if (todos !== undefined) agentData.todos = todos
     agentData.lastUpdated = new Date().toISOString()
 
-    // Store in KV
-    await kv.hset('agents-status', agentId, JSON.stringify(agentData))
+    // Store in Edge Config
+    await set(`agent-${agentId}`, JSON.stringify(agentData))
 
     return NextResponse.json(agentData)
   } catch (error) {
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     await initializeAgents()
 
     // Get current agent data
-    const agentDataStr = await kv.hget('agents-status', agentId)
+    const agentDataStr = await get(`agent-${agentId}`)
     let agentData: any = {}
 
     if (agentDataStr) {
@@ -163,8 +164,8 @@ export async function POST(request: NextRequest) {
     if (todos !== undefined) agentData.todos = todos
     agentData.lastUpdated = new Date().toISOString()
 
-    // Store in KV
-    await kv.hset('agents-status', agentId, JSON.stringify(agentData))
+    // Store in Edge Config
+    await set(`agent-${agentId}`, JSON.stringify(agentData))
 
     return NextResponse.json(agentData)
   } catch (error) {

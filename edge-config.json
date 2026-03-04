@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "key": "agents-initialized",
+      "value": "false"
+    },
+    {
+      "key": "agent-messages",
+      "value": "[]"
+    }
+  ]
+}
