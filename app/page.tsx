@@ -954,6 +954,7 @@ function MissionControlContent() {
         textArea.value = text
         textArea.style.position = 'fixed'
         textArea.style.left = '-9999px'
+        textArea.style.top = '-9999px'
         document.body.appendChild(textArea)
         textArea.select()
         document.execCommand('copy')
@@ -1268,32 +1269,127 @@ function MissionControlContent() {
     npmMetrics?.available ? 'Ship one GuardSkills growth post using latest download proof.' : null,
   ].filter(Boolean) as string[]
 
+  // Handle sidebar close on mobile when clicking backdrop
+  const handleBackdropClick = () => {
+    setSidebarOpen(false)
+  }
+
+  // Close sidebar on mobile when clicking a menu item
+  const handleMenuItemClick = (tabId: string) => {
+    setActiveTab(tabId)
+    setSidebarOpen(false)
+  }
+
   return (
     <div className={`min-h-screen font-sans transition-colors duration-200 ${shell.page}`}>
+      {/* Mobile Sidebar (Off-canvas Drawer) */}
+      <AnimatePresence>
+        {sidebarOpen && (
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              onClick={handleBackdropClick}
+              className="lg:hidden fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+              aria-hidden="true"
+            />
+            
+            {/* Mobile Sidebar Drawer */}
+            <motion.aside
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="lg:hidden fixed top-0 left-0 h-full w-72 bg-[#1c1c1e] border-r border-[#38383a] z-[60] shadow-2xl"
+              role="navigation"
+              aria-label="Main navigation"
+            >
+              {/* Mobile Sidebar Header */}
+              <div className="h-16 flex items-center justify-between px-5 border-b border-[#38383a]">
+                <div className="flex items-center gap-3">
+                  <Zap className="w-7 h-7 text-[#0a84ff]" />
+                  <span className="text-white font-semibold tracking-tight text-lg">MC</span>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="p-2 rounded-xl hover:bg-[#2c2c2e] transition-colors"
+                  aria-label="Close navigation"
+                >
+                  <X className="w-5 h-5 text-[#8e8e93]" />
+                </button>
+              </div>
+
+              {/* Mobile Menu Items */}
+              <div className="p-3 space-y-2">
+                {menuItems.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleMenuItemClick(item.id)}
+                    className={`w-full p-4 flex items-center gap-4 rounded-xl transition-all active:scale-95 touch-manipulation ${
+                      activeTab === item.id
+                        ? 'bg-[#0a84ff] text-white'
+                        : 'text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white'
+                    }`}
+                    aria-label={item.label}
+                    aria-current={activeTab === item.id ? 'page' : undefined}
+                  >
+                    <item.icon className="w-6 h-6 flex-shrink-0" />
+                    <span className="text-base font-medium">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Footer - Active Agents */}
+              <div className="absolute bottom-0 left-0 right-0 p-3 border-t border-[#38383a]">
+                <div className="p-3 bg-[#2c2c2e] rounded-xl">
+                  <p className="text-[10px] text-[#8e8e93] mb-2 tracking-wide">ACTIVE AGENTS</p>
+                  <div className="space-y-2">
+                    {agentData.filter(a => a.status === 'active').length === 0 ? (
+                      <p className="text-xs text-[#8e8e93]">None</p>
+                    ) : (
+                      agentData.filter(a => a.status === 'active').slice(0, 2).map(agent => (
+                        <div key={agent.sessionId} className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-[#30d158] rounded-full animate-pulse" />
+                          <span className="text-sm truncate">{agent.name}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Desktop Sidebar */}
       <aside
-        className={`fixed top-0 left-0 w-20 h-full z-50 transform transition-all duration-300 lg:w-20 lg:transition-all ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } lg:translate-x-0 bg-[#1c1c1e] ${sidebarExpanded ? 'lg:w-64' : 'lg:w-20'}`}
+        className={`hidden lg:flex flex-col top-0 left-0 h-full z-40 transition-all duration-300 ${
+          sidebarExpanded ? 'w-64' : 'w-20'
+        } bg-[#1c1c1e] border-r border-[#38383a]`}
+        role="navigation"
+        aria-label="Main navigation"
       >
-        <div className={`h-16 flex items-center justify-center border-b border-[#38383a] ${sidebarExpanded ? 'justify-start px-6 gap-3' : ''}`}>
+        <div className={`h-16 flex items-center ${sidebarExpanded ? 'justify-start px-6 gap-3' : 'justify-center'} border-b border-[#38383a]`}>
           <Zap className="w-7 h-7 text-[#0a84ff]" />
           {sidebarExpanded && <span className="text-white font-semibold tracking-tight">MC</span>}
         </div>
 
-        <div className={`p-2 space-y-1`}>
+        <div className={`p-2 flex-1 space-y-1 overflow-y-auto`}>
           {menuItems.map(item => (
             <button
               key={item.id}
-              onClick={() => {
-                setActiveTab(item.id)
-                setSidebarOpen(false)
-              }}
+              onClick={() => setActiveTab(item.id)}
               className={`w-full p-3 flex items-center rounded-xl transition-all ${
                 activeTab === item.id
                   ? 'bg-[#0a84ff] text-white'
                   : 'text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white'
               } ${sidebarExpanded ? 'justify-start px-4 gap-3' : 'justify-center'}`}
               title={item.label}
+              aria-label={item.label}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
               {sidebarExpanded && <span className="text-sm whitespace-nowrap">{item.label}</span>}
@@ -1301,21 +1397,20 @@ function MissionControlContent() {
           ))}
         </div>
 
-        <div className="absolute bottom-20 w-full px-2">
+        <div className="p-2 space-y-2">
           <button
             onClick={() => setSidebarExpanded(!sidebarExpanded)}
             className={`w-full p-3 flex items-center rounded-xl transition-all text-[#8e8e93] hover:bg-[#2c2c2e] hover:text-white ${
               sidebarExpanded ? 'justify-start px-4 gap-3' : 'justify-center'
             }`}
+            aria-label={sidebarExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {sidebarExpanded ? <ChevronLeft className="w-5 h-5 flex-shrink-0" /> : <ChevronRight className="w-5 h-5 flex-shrink-0" />}
             {sidebarExpanded && <span className="text-sm whitespace-nowrap">Collapse</span>}
           </button>
-        </div>
 
-        <div className="absolute bottom-4 w-full px-2">
           <div className={`p-3 bg-[#2c2c2e] rounded-xl ${sidebarExpanded ? '' : 'hidden'}`}>
-            <p className="text-[10px] text-[#8e8e93] mb-2 text-center">AGENTS</p>
+            <p className="text-[10px] text-[#8e8e93] mb-2 text-center">ACTIVE AGENTS</p>
             <div className="space-y-2">
               {agentData.filter(a => a.status === 'active').length === 0 ? (
                 <p className="text-[10px] text-[#8e8e93] text-center">None</p>
@@ -1332,133 +1427,106 @@ function MissionControlContent() {
         </div>
       </aside>
 
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`lg:hidden fixed top-4 left-4 z-50 p-2 rounded-xl transition-colors duration-200 bg-[#1c1c1e] border border-[#38383a]`}
-      >
-        {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
+      {/* Mobile Header with Hamburger Menu */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#1c1c1e] border-b border-[#38383a] z-40 flex items-center justify-between px-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="p-2.5 rounded-xl hover:bg-[#2c2c2e] transition-colors active:scale-95 touch-manipulation"
+            aria-label="Open navigation menu"
+            aria-expanded={sidebarOpen}
+            aria-controls="mobile-navigation"
+          >
+            <Menu className="w-6 h-6 text-white" />
+          </button>
+          <div className="flex items-center gap-2">
+            <Zap className="w-6 h-6 text-[#0a84ff]" />
+            <span className="text-white font-semibold tracking-tight">MC</span>
+          </div>
+        </div>
 
-      {/* Notification Bell */}
-      <div className="lg:hidden fixed top-4 right-4 z-50">
+        {/* Mobile Notification Button */}
         <button
           onClick={() => setShowNotifications(!showNotifications)}
-          className="p-2 rounded-xl bg-[#1c1c1e] border border-[#38383a] relative"
+          className="relative p-2.5 rounded-xl hover:bg-[#2c2c2e] transition-colors active:scale-95 touch-manipulation"
+          aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ''}`}
         >
           <Bell className="w-5 h-5 text-white" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[#ff453a] text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-[#ff453a] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
               {unreadCount > 9 ? '9+' : unreadCount}
             </span>
           )}
         </button>
-      </div>
-
-      {sidebarOpen && <div className="lg:hidden fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)} />}
+      </header>
 
       {/* Notification Panel */}
-      {showNotifications && (
-        <div className="fixed inset-0 z-50 lg:z-40 lg:hidden">
-          <div className="fixed inset-0 bg-black/50" onClick={() => setShowNotifications(false)} />
-          <div className={`fixed right-0 top-0 h-full w-80 max-w-full ${shell.panel} border-l overflow-hidden flex flex-col`}>
-            <div className="p-4 border-b border-zinc-700/40 flex items-center justify-between">
-              <h3 className="text-sm font-semibold tracking-wider">NOTIFICATIONS</h3>
-              <button onClick={() => setShowNotifications(false)}>
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2">
-              {notifications.length === 0 ? (
-                <p className={`text-center py-8 ${shell.textMuted} text-sm`}>No notifications yet</p>
-              ) : (
-                <div className="space-y-2">
-                  {notifications.map(n => (
-                    <div
-                      key={n.id}
-                      className={`p-3 border rounded cursor-pointer transition-colors ${
-                        n.read ? 'opacity-50' : ''
-                      } ${n.type === 'error' ? 'border-red-500/30 bg-red-500/5' : n.type === 'warning' ? 'border-amber-500/30 bg-amber-500/5' : n.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-700/40'}`}
-                      onClick={() => markAsRead(n.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <p className="text-sm font-medium">{n.title}</p>
-                        {!n.read && <span className="w-2 h-2 bg-blue-400 rounded-full" />}
-                      </div>
-                      <p className={`text-xs mt-1 ${shell.textMuted}`}>{n.message}</p>
-                      <p className={`text-[10px] mt-2 ${shell.textSoft}`}>
-                        {new Date(n.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  ))}
+      <AnimatePresence>
+        {showNotifications && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-50 lg:z-40"
+          >
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowNotifications(false)}
+              className="fixed inset-0 bg-black/50 lg:bg-transparent backdrop-blur-sm lg:backdrop-blur-none"
+            />
+            <div className={`fixed right-0 top-0 h-full w-full max-w-sm lg:max-w-xs ${shell.panel} border-l overflow-hidden flex flex-col shadow-2xl`}>
+              <div className="p-4 border-b border-zinc-700/40 flex items-center justify-between">
+                <h3 className="text-sm font-semibold tracking-wider">NOTIFICATIONS</h3>
+                <button onClick={() => setShowNotifications(false)} aria-label="Close notifications">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-2">
+                {notifications.length === 0 ? (
+                  <p className={`text-center py-8 ${shell.textMuted} text-sm`}>No notifications yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {notifications.map(n => (
+                      <button
+                        key={n.id}
+                        onClick={() => markAsRead(n.id)}
+                        className={`w-full p-3 border rounded cursor-pointer transition-colors text-left ${
+                          n.read ? 'opacity-50' : ''
+                        } ${n.type === 'error' ? 'border-red-500/30 bg-red-500/5' : n.type === 'warning' ? 'border-amber-500/30 bg-amber-500/5' : n.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-700/40'}`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <p className="text-sm font-medium">{n.title}</p>
+                          {!n.read && <span className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0" />}
+                        </div>
+                        <p className={`text-xs mt-1 ${shell.textMuted}`}>{n.message}</p>
+                        <p className={`text-[10px] mt-2 ${shell.textSoft}`}>
+                          {new Date(n.timestamp).toLocaleString()}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {notifications.length > 0 && (
+                <div className="p-3 border-t border-zinc-700/40 flex gap-2">
+                  <button onClick={markAllAsRead} className={`flex-1 text-xs py-2.5 border ${shell.panel} hover:bg-zinc-800/40 active:scale-95 transition-transform touch-manipulation`}>
+                    Mark All Read
+                  </button>
+                  <button onClick={clearNotifications} className={`flex-1 text-xs py-2.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 active:scale-95 transition-transform touch-manipulation`}>
+                    Clear All
+                  </button>
                 </div>
               )}
             </div>
-            {notifications.length > 0 && (
-              <div className="p-3 border-t border-zinc-700/40 flex gap-2">
-                <button onClick={markAllAsRead} className={`flex-1 text-xs py-2 border ${shell.panel} hover:bg-zinc-800/40`}>
-                  Mark All Read
-                </button>
-                <button onClick={clearNotifications} className={`flex-1 text-xs py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10`}>
-                  Clear All
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Desktop Notification Panel */}
-      {showNotifications && (
-        <div className="hidden lg:block fixed inset-0 z-40">
-          <div className="fixed inset-0" onClick={() => setShowNotifications(false)} />
-          <div className={`fixed right-4 top-14 w-96 max-w-full ${shell.panel} border shadow-xl overflow-hidden flex flex-col`}>
-            <div className="p-4 border-b border-zinc-700/40 flex items-center justify-between">
-              <h3 className="text-sm font-semibold tracking-wider">NOTIFICATIONS</h3>
-              <button onClick={() => setShowNotifications(false)}>
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto p-2 max-h-[60vh]">
-              {notifications.length === 0 ? (
-                <p className={`text-center py-8 ${shell.textMuted} text-sm`}>No notifications yet</p>
-              ) : (
-                <div className="space-y-2">
-                  {notifications.map(n => (
-                    <div
-                      key={n.id}
-                      className={`p-3 border rounded cursor-pointer transition-colors ${
-                        n.read ? 'opacity-50' : ''
-                      } ${n.type === 'error' ? 'border-red-500/30 bg-red-500/5' : n.type === 'warning' ? 'border-amber-500/30 bg-amber-500/5' : n.type === 'success' ? 'border-emerald-500/30 bg-emerald-500/5' : 'border-zinc-700/40'}`}
-                      onClick={() => markAsRead(n.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <p className="text-sm font-medium">{n.title}</p>
-                        {!n.read && <span className="w-2 h-2 bg-blue-400 rounded-full" />}
-                      </div>
-                      <p className={`text-xs mt-1 ${shell.textMuted}`}>{n.message}</p>
-                      <p className={`text-[10px] mt-2 ${shell.textSoft}`}>
-                        {new Date(n.timestamp).toLocaleString()}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            {notifications.length > 0 && (
-              <div className="p-3 border-t border-zinc-700/40 flex gap-2">
-                <button onClick={markAllAsRead} className={`flex-1 text-xs py-2 border ${shell.panel} hover:bg-zinc-800/40`}>
-                  Mark All Read
-                </button>
-                <button onClick={clearNotifications} className={`flex-1 text-xs py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10`}>
-                  Clear All
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      <main className={`min-h-screen p-4 md:p-6 pt-16 lg:pt-6 transition-all duration-300 lg:ml-20 ${sidebarExpanded ? 'lg:ml-64' : ''}`}>
+      {/* Main Content Area */}
+      <main className={`min-h-screen p-4 md:p-6 lg:p-6 pt-20 lg:pt-6 transition-all duration-300 lg:ml-20 ${sidebarExpanded ? 'lg:ml-64' : ''}`}>
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'home' && (
@@ -1471,13 +1539,12 @@ function MissionControlContent() {
                 <p className={`text-xs mt-4 border-l-2 pl-4 tracking-[0.16em] ${shell.textMuted} ${shell.borderStrong}`}>
                   {greetingData.motivational}
                 </p>
-                <div className="mt-4 flex items-center gap-3">
+                <div className="mt-4 flex items-center gap-3 flex-wrap">
                   <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft}`}>
                     v<span id="version">2026-02-26</span>
                   </span>
                   <span id="update-badge" className="hidden text-[10px] tracking-[0.1em] px-2 py-1 rounded bg-amber-500/20 text-amber-400">
                     Update Available
-
                   </span>
                   <span className={`text-[10px] tracking-[0.1em] px-2 py-1 rounded ${shell.panel} ${shell.textSoft} flex items-center gap-1`}>
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -1927,7 +1994,7 @@ function MissionControlContent() {
                           <div className="flex flex-wrap items-center gap-2 mt-2">
                             <button
                               onClick={() => handleCopyPost(`tweet-${idx}`, tweet)}
-                              className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30 active:scale-95 transition-transform touch-manipulation"
                             >
                               <Copy className="w-3.5 h-3.5" /> {copiedPostId === `tweet-${idx}` ? 'COPIED' : 'COPY'}
                             </button>
@@ -1936,7 +2003,7 @@ function MissionControlContent() {
                                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10"
+                                className="inline-flex items-center gap-2 px-3 py-1.5 border border-zinc-300 text-xs tracking-[0.14em] hover:bg-zinc-300/10 active:scale-95 transition-transform touch-manipulation"
                               >
                                 <Twitter className="w-3.5 h-3.5" /> POST
                               </a>
@@ -2026,7 +2093,7 @@ function MissionControlContent() {
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => handleCopyPost(post.id, post.text)}
-                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30 active:scale-95 transition-transform touch-manipulation"
                                 >
                                   <Copy className="w-3.5 h-3.5 inline mr-1" />COPY
                                 </button>
@@ -2035,7 +2102,7 @@ function MissionControlContent() {
                                     href={post.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex-1 px-3 py-1.5 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em] text-center"
+                                    className="flex-1 px-3 py-1.5 bg-zinc-200 text-black text-xs font-semibold tracking-[0.14em] text-center active:scale-95 transition-transform touch-manipulation"
                                   >
                                     POST
                                   </a>
@@ -2060,7 +2127,7 @@ function MissionControlContent() {
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => handleCopyPost(post.id, post.text)}
-                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30"
+                                  className="flex-1 px-3 py-1.5 border border-zinc-500 text-xs tracking-[0.14em] hover:bg-zinc-700/30 active:scale-95 transition-transform touch-manipulation"
                                 >
                                   <Copy className="w-3.5 h-3.5 inline mr-1" />COPY
                                 </button>
@@ -2332,6 +2399,7 @@ function MissionControlContent() {
                     {optionsData && optionsData.expirations.length === 0 && (
                       <p className={`text-sm ${shell.textMuted} break-words`}>No options data available for this symbol.</p>
                     )}
+
 
                     {!optionsData && (
                       <p className={`text-sm ${shell.textMuted} break-words`}>Click "FETCH OPTIONS" to view the options chain.</p>
