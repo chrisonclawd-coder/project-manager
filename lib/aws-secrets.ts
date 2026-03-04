@@ -36,27 +36,34 @@ export async function getSecret(paramName: string): Promise<string | null> {
 
 export async function getAllSecrets(): Promise<Record<string, string>> {
   const secrets: Record<string, string> = {}
-  
+
   // First check environment variables (for Vercel)
   for (const [param, envVar] of Object.entries(PARAM_TO_ENV)) {
     if (process.env[envVar]) {
+      // Store with env var name for consistent key access
       secrets[envVar] = process.env[envVar]!
     }
   }
-  
+
   // If we have env vars, return those (Vercel mode)
   if (Object.keys(secrets).length > 0) {
+    console.log('Using environment variables for secrets')
     return secrets
   }
-  
+
   // Otherwise, fall back to AWS Parameter Store (VPS mode)
+  console.log('Falling back to AWS Parameter Store')
   const params = Object.keys(PARAM_TO_ENV)
   for (const param of params) {
     const value = await getSecret(param)
     if (value) {
-      secrets[param] = value
+      // Store with env var name for consistent key access
+      const envVar = PARAM_TO_ENV[param]
+      if (envVar) {
+        secrets[envVar] = value
+      }
     }
   }
-  
+
   return secrets
 }
