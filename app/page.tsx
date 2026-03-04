@@ -661,12 +661,10 @@ function MissionControlContent() {
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
-    { id: 'pipeline', label: 'PIPELINE', icon: GitBranch },
-    { id: 'operations', label: 'OPERATIONS', icon: Activity },
+    { id: 'agents-gateway', label: 'AGENTS', icon: Activity },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
     { id: 'xmax-work', label: 'XMAX WORK', icon: Target },
     { id: 'bookmarks', label: 'BOOKMARKS', icon: Bookmark },
-    { id: 'agents-gateway', label: 'AGENTS', icon: Users },
   ]
 
   const filteredTasks = tasks.filter(
@@ -1715,101 +1713,6 @@ function MissionControlContent() {
             </motion.div>
           )}
 
-          {activeTab === 'operations' && (
-            <motion.div key="operations" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
-              <div className={`border p-4 ${shell.panel}`}>
-                <h2 className="text-lg font-semibold tracking-[0.14em] border-l-2 border-zinc-300 pl-3 mb-1">OPERATIONS</h2>
-                <p className={`text-xs tracking-[0.12em] ${shell.textSoft}`}>
-                  AGENTS · TOKENS · COSTS · STATUS · MODEL: GLM-4.7
-                </p>
-                <div className="flex items-center gap-4 mt-3">
-                  {agentLoading && (
-                    <span className="text-xs text-zinc-400">Loading...</span>
-                  )}
-                  {!agentLoading && (
-                    <span className={`text-xs ${shell.textMuted}`}>
-                      {agentData.length} agents · Updated: {formatUpdatedTimeIST(agentsLastUpdated)}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">GATEWAY</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <p className="text-sm font-semibold">Connected</p>
-                  </div>
-                </div>
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">AGENTS</p>
-                  <p className="text-2xl mt-1 font-semibold">{agentSummary.totalAgents}</p>
-                </div>
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">TOKENS</p>
-                  <p className="text-2xl mt-1 font-semibold">{(agentSummary.totalTokensToday / 1000).toFixed(1)}k</p>
-                </div>
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">COST</p>
-                  <p className="text-2xl mt-1 font-semibold">${agentSummary.costEstimate.toFixed(2)}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">RATE</p>
-                  <p className="text-sm mt-1 font-semibold">$0.001/1k tokens</p>
-                </div>
-                <div className={`border p-3 ${shell.panelMuted}`}>
-                  <p className="text-xs tracking-[0.14em] text-zinc-400">GATEWAY URL</p>
-                  <p className="text-sm mt-1 font-semibold">ws://127.0.0.1:18789</p>
-                </div>
-              </div>
-
-              <div className={`border p-3 ${shell.panelMuted}`}>
-                <div className="hidden md:grid md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 text-[10px] tracking-[0.14em] text-zinc-400 uppercase px-1">
-                  <span>Agent</span>
-                  <span>Current Task</span>
-                  <span>Status</span>
-                  <span>Tokens</span>
-                  <span>Last Active</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                {agentData.map(agent => (
-                  <div key={agent.sessionId} className={`border p-4 ${shell.panel}`}>
-                    <div className="grid grid-cols-1 md:grid-cols-[1.5fr_2fr_1fr_1fr_1fr] gap-3 items-start">
-                      <div>
-                        <p className="text-sm font-semibold">{agent.name}</p>
-                        <p className={`text-[11px] ${shell.textSoft}`}>{agent.sessionId.slice(0, 8)}</p>
-                      </div>
-                      <div className="text-sm">{agent.currentTask}</div>
-                      <div>
-                        <p className={`text-xs inline-flex items-center gap-2 capitalize ${
-                          agent.status === 'active' ? 'text-emerald-400' :
-                          agent.status === 'recent' ? 'text-sky-400' :
-                          agent.status === 'away' ? 'text-amber-400' :
-                          shell.textMuted
-                        }`}>
-                          <span className={`w-2 h-2 rounded-full ${
-                            agent.status === 'active' ? 'bg-emerald-500 animate-pulse' :
-                            agent.status === 'recent' ? 'bg-sky-500' :
-                            agent.status === 'away' ? 'bg-amber-500' :
-                            'bg-zinc-500'
-                          }`} />
-                          {agent.status}
-                        </p>
-                      </div>
-                      <div className="text-sm">{(agent.tokensUsed / 1000).toFixed(1)}k</div>
-                      <div className={`text-sm ${shell.textMuted}`}>{formatUpdatedTimeIST(agent.lastActive)}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
 
           {activeTab === 'bookmarks' && (
             <motion.div key="bookmarks" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-6">
