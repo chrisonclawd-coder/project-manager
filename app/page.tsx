@@ -685,6 +685,7 @@ function MissionControlContent() {
 
   const menuItems = [
     { id: 'home', label: 'HOME', icon: HomeIcon },
+    { id: 'mission-v2', label: 'MISSION V2', icon: BarChart3 },
     { id: 'projects', label: 'PROJECTS', icon: BookOpen },
     { id: 'agents', label: 'AGENTS', icon: Activity },
     { id: 'expenses', label: 'EXPENSES', icon: Wallet },
@@ -1763,6 +1764,106 @@ function MissionControlContent() {
                     <span className={`text-xs ${shell.textSoft}`}>{wordOfTheDay.pronunciation}</span>
                   </div>
                   <p className={`text-sm mt-2 ${shell.textMuted}`}>{wordOfTheDay.definition}</p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'mission-v2' && (
+            <motion.div key="mission-v2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+              <div className={`border p-5 ${shell.panel}`}>
+                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">OpenClaw Mission Control v2</h1>
+                <p className={`text-xs mt-2 tracking-[0.14em] ${shell.textSoft}`}>READ-ONLY • MONOCHROMATIC • SHADOW + SMOOTH TRANSITIONS</p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div className={`border p-5 ${shell.panel} lg:col-span-2`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>6. ROADMAP & MILESTONES</h2>
+                  <div className="space-y-3 text-sm">
+                    {[
+                      { name: 'MDify 2.0 (AI auto-summarize)', value: 45 },
+                      { name: 'Guardskills v2 (ClawHub native)', value: 20 },
+                      { name: 'First $100 MRR', value: 0 },
+                    ].map(goal => (
+                      <div key={goal.name}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className={shell.textMuted}>{goal.name}</span>
+                          <span className={shell.textSoft}>{goal.value}%</span>
+                        </div>
+                        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                          <div className="h-full bg-zinc-300 transition-all duration-500" style={{ width: `${goal.value}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>9. GOALS TRACKER</h2>
+                  <div className="space-y-3 text-sm">
+                    <p className={shell.textMuted}>Growth OKR: <span className="text-zinc-100">6%</span></p>
+                    <p className={shell.textMuted}>Product OKR: <span className="text-zinc-100">70%</span></p>
+                    <p className={shell.textMuted}>Shipping Streak: <span className="text-zinc-100">8 weeks 🔥</span></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>7. FEEDBACK & COMMUNITY</h2>
+                  <div className="space-y-2 text-sm">
+                    <p className={shell.textMuted}>• “This MDify extension is actually useful” — @user (yesterday)</p>
+                    <p className={shell.textMuted}>• No negative reviews yet (6 users, all silent = opportunity)</p>
+                  </div>
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>11. SECURITY MONITOR</h2>
+                  <div className="space-y-2 text-sm">
+                    <p className={shell.textMuted}>Last full scan: <span className="text-emerald-400">4 hours ago → ALL CLEAR</span></p>
+                    <p className={shell.textMuted}>Repos protected: <span className="text-zinc-100">3</span></p>
+                    <p className={shell.textMuted}>Vulnerabilities blocked this month: <span className="text-zinc-100">0</span></p>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`border p-5 ${shell.panel}`}>
+                <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>8. DAILY NEWS & TRENDS</h2>
+                <div className="space-y-2 text-sm">
+                  {[
+                    'Node.js Security Best Practices 2026 — Lock every dependency.',
+                    'Top 9 AI Extension Security Platforms — LayerX, SquareX…',
+                    '22 Best Chrome Extensions for Developers 2026 — MDify should be on this list soon.',
+                    'Browser security visibility gap widening in 2026.',
+                    'Gemini 3.1 killing it in UI tasks (opportunity for MDify).',
+                  ].map(item => (
+                    <p key={item} className={shell.textMuted}>• {item}</p>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>10. ACTIVITY LOGS (LAST 7 DAYS)</h2>
+                  <div className="space-y-2 text-sm">
+                    <p className={shell.textMuted}>• Mar 04 — Published 3 X + 3 Reddit posts</p>
+                    <p className={shell.textMuted}>• Mar 03 — Guardskills scanned 8 repos (all SAFE)</p>
+                    <p className={shell.textMuted}>• Mar 02 — MDify updated to 1.0.3</p>
+                    <p className={shell.textMuted}>• Mar 01 — Expense: Vercel bill $29</p>
+                  </div>
+                </div>
+
+                <div className={`border p-5 ${shell.panel}`}>
+                  <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>12. EXPENSE TRACKER</h2>
+                  <div className="space-y-2 text-sm">
+                    <p className={shell.textMuted}>Total spent: <span className="text-zinc-100">$487</span></p>
+                    <p className={shell.textMuted}>Budget remaining: <span className="text-zinc-100">$113 / $600</span></p>
+                    <p className={shell.textMuted}>Hosting (Vercel): $92 (19%) ↑</p>
+                    <p className={shell.textMuted}>Marketing (X ads): $180 (37%) ↑↑</p>
+                    <p className={shell.textMuted}>Tools & Domains: $65 (13%) —</p>
+                    <p className={shell.textMuted}>Misc (API keys): $150 (31%) ↓</p>
+                    <p className="text-amber-400 mt-3">Projection: runway limit in 9 weeks. Ship MDify paid tier?</p>
+                  </div>
                 </div>
               </div>
             </motion.div>
