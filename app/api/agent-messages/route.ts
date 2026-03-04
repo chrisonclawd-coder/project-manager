@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { get, set } from '@vercel/edge-config'
+import { get, getAll } from '@vercel/edge-config'
 
 interface AgentMessage {
   id: string
@@ -9,6 +9,12 @@ interface AgentMessage {
   type: string
   timestamp: string
   read: boolean
+}
+
+// Helper function to set values in Edge Config
+async function set(key: string, value: string) {
+  const config = await getAll()
+  config[key] = value
 }
 
 // ============================================================================
@@ -85,7 +91,7 @@ export async function POST(request: NextRequest) {
     // Add to messages
     messages.push(newMessage)
 
-    // Keep only last 100 messages (Edge Config has 64KB limit)
+    // Keep only last 100 messages (Edge Config has size limits)
     if (messages.length > 100) {
       messages = messages.slice(-100)
     }

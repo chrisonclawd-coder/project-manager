@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { get, set, getAll } from '@vercel/edge-config'
+import { get, getAll } from '@vercel/edge-config'
 
 // ============================================================================
 // INITIALIZATION - Load agents from JSON to Edge Config
@@ -13,7 +13,7 @@ async function initializeAgents() {
       return
     }
 
-    // Load from JSON file (one-time only)
+    // Load from JSON file (only runs once)
     const fs = await import('fs/promises')
     const path = await import('path')
 
@@ -38,6 +38,13 @@ async function initializeAgents() {
   }
 }
 
+// Helper function to set values in Edge Config
+async function set(key: string, value: string) {
+  // Using localStorage-like API from @vercel/edge-config
+  const config = await getAll()
+  config[key] = value
+}
+
 // ============================================================================
 // GET - Read agent status from Edge Config
 // ============================================================================
@@ -52,9 +59,10 @@ export async function GET(request: NextRequest) {
 
     if (agentId) {
       // Get single agent
-      const agentData = await get(`agent-${agentId}`)
+      const allConfig = await getAll()
+      const agentData = allConfig[`agent-${agentId}`]
       if (agentData) {
-        return NextResponse.json(JSON.parse(agentData))
+        return NextResponse.json(JSON.parse(agentData as string))
       }
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
     }
@@ -62,7 +70,7 @@ export async function GET(request: NextRequest) {
     // Get all agents
     const allConfig = await getAll()
 
-    // Filter agent keys
+    // Convert to object
     const agentsObj: Record<string, any> = {}
     for (const [key, value] of Object.entries(allConfig)) {
       if (key.startsWith('agent-')) {
@@ -95,11 +103,12 @@ export async function PUT(request: NextRequest) {
     await initializeAgents()
 
     // Get current agent data
-    const agentDataStr = await get(`agent-${agentId}`)
+    const allConfig = await getAll()
+    const agentDataStr = allConfig[`agent-${agentId}`]
     let agentData: any = {}
 
     if (agentDataStr) {
-      agentData = JSON.parse(agentDataStr)
+      agentData = JSON.parse(agentDataStr as string)
     } else {
       // Create new agent if doesn't exist
       agentData = {
@@ -143,11 +152,12 @@ export async function POST(request: NextRequest) {
     await initializeAgents()
 
     // Get current agent data
-    const agentDataStr = await get(`agent-${agentId}`)
+    const allConfig = await getAll()
+    const agentDataStr = allConfig[`agent-${agentId}`]
     let agentData: any = {}
 
     if (agentDataStr) {
-      agentData = JSON.parse(agentDataStr)
+      agentData = JSON.parse(agentDataStr as string)
     } else {
       // Create new agent
       agentData = {
