@@ -616,9 +616,9 @@ function ExpenseSection({ shell }: SectionProps) {
 
   useEffect(() => {
     fetch('/api/expenses')
-      .then(r => r.json())
+      .then(r => r.ok ? r.json() : [])
       .then(data => {
-        setExpenses(data || [])
+        setExpenses(Array.isArray(data) ? data : [])
         setLoading(false)
       })
       .catch(() => {
@@ -627,12 +627,16 @@ function ExpenseSection({ shell }: SectionProps) {
       })
   }, [])
 
-  const categories = expenses.reduce((acc, e) => {
-    acc[e.category] = (acc[e.category] || 0) + e.amount
-    return acc
-  }, {} as Record<string, number>)
+  const categories: Record<string, number> = {}
+  if (Array.isArray(expenses)) {
+    expenses.forEach(e => {
+      if (e && e.category && typeof e.amount === 'number') {
+        categories[e.category] = (categories[e.category] || 0) + e.amount
+      }
+    })
+  }
 
-  const total = Object.values(categories).reduce((a, b) => a + b, 0)
+  const total = Object.values(categories || {}).reduce((a: number, b: number) => a + b, 0)
   const budget = 600
   const remaining = budget - total
 
@@ -645,7 +649,7 @@ function ExpenseSection({ shell }: SectionProps) {
   }
 
   // Get recent expenses
-  const recentExpenses = expenses.slice(-5).reverse()
+  const recentExpenses = Array.isArray(expenses) ? expenses.slice(-5).reverse() : []
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
