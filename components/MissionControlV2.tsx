@@ -62,6 +62,7 @@ const staggerContainer = {
 function HomeSection({ shell }: SectionProps) {
   const [agentsStatus, setAgentsStatus] = useState<Record<string, AgentStatus>>({})
   const [products, setProducts] = useState<Product[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
 
   useEffect(() => {
     fetch('/api/agents').then(r => r.json()).then(data => {
@@ -70,62 +71,50 @@ function HomeSection({ shell }: SectionProps) {
       setAgentsStatus(statusMap)
     })
     fetch('/api/products').then(r => r.json()).then(setProducts).catch(() => setProducts([]))
+    fetch('/api/expenses').then(r => r.json()).then(setExpenses).catch(() => setExpenses([]))
   }, [])
 
   const activeAgents = Object.values(agentsStatus).filter(a => a.status === 'working').length
   const totalAgents = Object.keys(agentsStatus).length
+  const publishedProducts = products.filter(p => p.status === 'Published' || p.status === 'Active').length
+  const totalExpenses = expenses.reduce((sum, e) => sum + e.amount, 0)
+  const budget = 600
+  const remaining = budget - totalExpenses
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
         <h2 className={`text-[11px] tracking-[0.2em] mb-3 ${shell.textSoft}`}>1. HOME</h2>
-        <p className="text-sm mb-4">Hello Chris 👋 Welcome back to your command center. You're running strong.</p>
+        <p className="text-sm mb-4">Hello Chris 👋 Welcome back to your command center.</p>
         
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div className={`border p-3 ${shell.panelMuted}`}>
             <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>ACTIVE AGENTS</p>
-            <p className="text-xl font-semibold mt-1 text-emerald-400">{activeAgents}</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>of {totalAgents}</p>
+            <p className="text-xl font-semibold mt-1 text-emerald-400">{activeAgents}/{totalAgents}</p>
           </div>
           <div className={`border p-3 ${shell.panelMuted}`}>
             <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>PRODUCTS</p>
-            <p className="text-xl font-semibold mt-1 text-blue-400">{products.length}</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>published</p>
+            <p className="text-xl font-semibold mt-1 text-blue-400">{publishedProducts}</p>
           </div>
           <div className={`border p-3 ${shell.panelMuted}`}>
-            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>SYSTEM</p>
-            <p className="text-xl font-semibold mt-1 text-emerald-400">LIVE</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>operational</p>
+            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>EXPENSES</p>
+            <p className="text-xl font-semibold mt-1">${totalExpenses}</p>
+          </div>
+          <div className={`border p-3 ${shell.panelMuted}`}>
+            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>BUDGET</p>
+            <p className={`text-xl font-semibold mt-1 ${remaining > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>${remaining}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`border p-3 text-left ${shell.panelMuted} hover:border-zinc-500 transition-colors`}
-          >
-            <p className="text-lg mb-1">📋</p>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`border p-3 text-left ${shell.panelMuted}`}>
             <p className="text-xs font-medium">View Tasks</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>Manage projects</p>
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`border p-3 text-left ${shell.panelMuted} hover:border-zinc-500 transition-colors`}
-          >
-            <p className="text-lg mb-1">🤖</p>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`border p-3 text-left ${shell.panelMuted}`}>
             <p className="text-xs font-medium">Team</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>{totalAgents} agents</p>
           </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className={`border p-3 text-left ${shell.panelMuted} hover:border-zinc-500 transition-colors`}
-          >
-            <p className="text-lg mb-1">📊</p>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className={`border p-3 text-left ${shell.panelMuted}`}>
             <p className="text-xs font-medium">Products</p>
-            <p className={`text-[10px] ${shell.textMuted}`}>{products.length} active</p>
           </motion.button>
         </div>
       </motion.div>
@@ -243,40 +232,63 @@ function XMaxSection({ shell }: SectionProps) {
     fetch('/api/xmax').then(r => r.json()).then(setXmaxWork).catch(() => setXmaxWork(null))
   }, [])
 
+  const engagementQuestions = [
+    "What's the best database for a Node.js + AI side project in 2026 — SQLite, Postgres, or something newer?",
+    "Chrome extension devs: how do you handle token limits when injecting Markdown into LLMs?",
+    "Anyone using Guardskills in production yet? Real talk on false positives?",
+    "What's your biggest security scare with npm packages this year?",
+    "Best way to track 6-user growth on Chrome Store without ads?"
+  ]
+
+  const xPosts = [
+    { product: 'MDify', chars: 280, content: "Stop feeding your agents bloated HTML. #Mdify converts any article to clean .md—one click, no API keys. Your prompt saves hours. Your tokens drop 40%. https://chromewebstore.google.com/detail/mdify/kimahdiiopfklhcciaiknnfcobamjeki" },
+    { product: 'Guardskills', chars: 280, content: "Never install a malicious skill again. Guardskills scans every file before skills install. SAFE/WARNING/UNSAFE engine. npm i guardskills #DevSec #OpenSource" }
+  ]
+
+  const redditPosts = [
+    { product: 'MDify', chars: 580, content: "I built MDify — a Chrome extension that converts any webpage to clean markdown for AI agents. No API keys needed, runs locally in your browser. Been testing with Claude and GPT, token usage dropped 40%. Would love feedback from the community." },
+    { product: 'Guardskills', chars: 580, content: "Just published Guardskills — an npm package that scans AI skills for malicious code before installation. Uses static analysis to detect suspicious patterns, network calls, and file writes. Built it after a near-miss with a sketchy GitHub skill." }
+  ]
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
         <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>4. XMAX OPERATIONS</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">Ready</p>
-            <p className={`text-2xl font-bold mt-1 text-emerald-400`}>
-              {xmaxWork?.ready ? 'YES' : 'NO'}
-            </p>
-            <p className={`text-[10px] ${shell.textSoft}`}>to post</p>
-          </motion.div>
-          <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">Scheduled</p>
-            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>
-              {xmaxWork?.scheduled?.length || 0}
-            </p>
-            <p className={`text-[10px] ${shell.textSoft}`}>posts</p>
-          </motion.div>
-          <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">Content</p>
-            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>
-              {xmaxWork?.content?.length || 0}
-            </p>
-            <p className={`text-[10px] ${shell.textSoft}`}>drafts</p>
-          </motion.div>
+        {/* Daily Tech Questions */}
+        <div className={`border p-4 mb-4 ${shell.panelMuted}`}>
+          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>5 DAILY TECH ENGAGEMENT QUESTIONS</p>
+          {engagementQuestions.map((q, idx) => (
+            <p key={idx} className="text-sm mb-2 last:mb-0">• {q}</p>
+          ))}
         </div>
 
+        {/* X Posts */}
+        <div className={`border p-4 mb-4 ${shell.panelMuted}`}>
+          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>2 X POSTS DAILY (280 CHAR)</p>
+          {xPosts.map((post, idx) => (
+            <div key={idx} className={`border p-3 mb-2 last:mb-0 ${shell.panel}`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold">{post.product}</span>
+                <span className={`text-[10px] ${shell.textMuted}`}>{post.chars} char</span>
+              </div>
+              <p className="text-xs">{post.content}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Reddit Posts */}
         <div className={`border p-4 ${shell.panelMuted}`}>
-          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>XMAX WORK TAB</p>
-          <p className="text-sm mb-2">• Use XMAX WORK tab for full content generation</p>
-          <p className="text-sm mb-2">• Auto-generates X posts + Reddit drafts</p>
-          <p className="text-sm">• Scheduled runs: 10:30 AM, 3:30 PM, 6:30 PM, 9:30 PM IST</p>
+          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>2 REDDIT POSTS DAILY (580 CHAR)</p>
+          {redditPosts.map((post, idx) => (
+            <div key={idx} className={`border p-3 mb-2 last:mb-0 ${shell.panel}`}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold">{post.product}</span>
+                <span className={`text-[10px] ${shell.textMuted}`}>{post.chars} char</span>
+              </div>
+              <p className="text-xs">{post.content}</p>
+            </div>
+          ))}
         </div>
       </motion.div>
     </motion.div>
@@ -340,128 +352,122 @@ function KPIsSection({ shell }: SectionProps) {
 }
 
 function RoadmapSection({ shell }: SectionProps) {
+  const [products, setProducts] = useState<Product[]>([])
+
+  useEffect(() => {
+    fetch('/api/products').then(r => r.json()).then(setProducts).catch(() => setProducts([]))
+  }, [])
+
+  const milestones = [
+    { name: 'MDify 2.0', desc: 'AI auto-summarize feature', progress: 0, quarter: 'Q2 2026', status: 'planned' },
+    { name: 'Guardskills v2', desc: 'ClawHub native integration', progress: 0, quarter: 'Q3 2026', status: 'planned' },
+    { name: 'Mission Control v3', desc: 'Full dashboard rewrite', progress: 0, quarter: 'Q2 2026', status: 'planned' },
+    { name: 'ProgresX', desc: 'X Article Scroll extension', progress: 100, quarter: 'Q1 2026', status: 'completed' },
+  ]
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
         <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>6. ROADMAP & MILESTONES</h2>
         
-        <div className="space-y-4">
-          {[
-            { name: 'MDify 2.0 (AI auto-summarize)', progress: 0, quarter: 'Q2 2026', owners: ['Developer', 'Architect'] },
-            { name: 'Guardskills v2 (ClawHub native)', progress: 0, quarter: 'Q3 2026', owners: ['Architect'] },
-            { name: 'Mission Control v3', progress: 0, quarter: 'Q2 2026', owners: ['Developer'] },
-          ].map((milestone, idx) => (
+        <div className="space-y-3">
+          {milestones.map((milestone, idx) => (
             <motion.div 
               key={milestone.name}
               variants={fadeIn}
               className={`border p-4 ${shell.panelMuted}`}
             >
-              <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-medium text-sm">{milestone.name}</h3>
-                  <p className={`text-[10px] ${shell.textMuted}`}>{milestone.quarter}</p>
+                  <p className={`text-[10px] ${shell.textMuted}`}>{milestone.desc}</p>
                 </div>
-                <span className={`text-xs px-2 py-1 border border-zinc-600`}>
-                  {milestone.progress}%
+                <span className={`text-[10px] px-2 py-1 ${
+                  milestone.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-zinc-400'
+                }`}>
+                  {milestone.status}
                 </span>
               </div>
-              <div className="h-2 bg-zinc-800 rounded overflow-hidden mb-3">
+              <div className="h-2 bg-zinc-800 rounded overflow-hidden">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: `${milestone.progress}%` }}
                   transition={{ duration: 0.8, ease: 'easeOut', delay: idx * 0.1 }}
-                  className="h-full bg-zinc-400 rounded"
+                  className={`h-full rounded ${milestone.status === 'completed' ? 'bg-emerald-500' : 'bg-zinc-400'}`}
                 />
               </div>
-              <div className="flex gap-2">
-                {milestone.owners.map(owner => (
-                  <span key={owner} className={`text-[10px] px-2 py-1 ${shell.panel}`}>
-                    {owner}
-                  </span>
-                ))}
-              </div>
+              <p className={`text-[10px] mt-2 ${shell.textSoft}`}>{milestone.quarter}</p>
             </motion.div>
           ))}
         </div>
-      </motion.div>
-    </motion.div>
-  )
-}
 
-function FeedbackSection({ shell }: SectionProps) {
-  return (
-    <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
-      <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
-        <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>7. FEEDBACK & COMMUNITY</h2>
-        
-        <div className={`border p-4 mb-4 ${shell.panelMuted}`}>
-          <p className={`text-sm ${shell.textMuted}`}>
-            • No feedback recorded yet — use products tab to view reviews
-          </p>
-          <p className={`text-sm ${shell.textMuted}`}>
-            • Check Chrome Store for MDify reviews
-          </p>
-          <p className={`text-sm ${shell.textMuted}`}>
-            • Check npm for Guardskills feedback
-          </p>
-        </div>
-
-        <div className={`border p-4 ${shell.panelMuted}`}>
-          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>OPPORTUNITIES</p>
-          <p className="text-sm">• Request testimonials from users</p>
-          <p className="text-sm">• Monitor product reviews for feedback</p>
-          <p className="text-sm">• Build community engagement</p>
+        <div className={`border p-4 mt-4 ${shell.panelMuted}`}>
+          <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>CURRENT PRODUCTS</p>
+          <div className="flex flex-wrap gap-2">
+            {products.map(p => (
+              <span key={p.name} className={`text-[10px] px-2 py-1 ${shell.panel}`}>{p.name}</span>
+            ))}
+          </div>
         </div>
       </motion.div>
     </motion.div>
   )
 }
+
+// Feedback section removed - use PRODUCTS tab for reviews
 
 function NewsSection({ shell }: SectionProps) {
   const [xmaxWork, setXmaxWork] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/xmax').then(r => r.json()).then(setXmaxWork).catch(() => setXmaxWork(null))
+    fetch('/api/xmax')
+      .then(r => r.json())
+      .then(data => {
+        setXmaxWork(data)
+        setLoading(false)
+      })
+      .catch(() => {
+        setXmaxWork(null)
+        setLoading(false)
+      })
   }, [])
 
-  const trendingTopics = xmaxWork?.trending || [
-    { topic: 'AI Agent Security', relevance: 'high' },
-    { topic: 'Chrome Extension Development', relevance: 'high' },
-    { topic: 'npm Security Scanning', relevance: 'medium' },
-    { topic: 'LLM Integration Patterns', relevance: 'medium' },
-    { topic: 'Build in Public', relevance: 'high' },
-  ]
+  const trends = xmaxWork?.trending_topics_research?.confirmed_trends || []
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
         <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>8. DAILY NEWS & TRENDS</h2>
         
-        <div className={`border p-4 ${shell.panelMuted}`}>
-          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>TRENDING TOPICS</p>
-          {trendingTopics.map((item: any, idx: number) => (
-            <motion.div 
-              key={idx}
-              variants={fadeIn}
-              whileHover={{ x: 4 }}
-              className={`border p-3 mb-2 last:mb-0 flex items-center justify-between ${shell.panel}`}
-            >
-              <span className="text-sm">{item.topic}</span>
-              <span className={`text-[10px] px-2 py-0.5 ${
-                item.relevance === 'high' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-zinc-400'
-              }`}>
-                {item.relevance}
-              </span>
-            </motion.div>
-          ))}
-        </div>
+        {loading ? (
+          <p className={`text-sm ${shell.textMuted}`}>Loading from XMAX research...</p>
+        ) : trends.length > 0 ? (
+          <div className={`border p-4 ${shell.panelMuted}`}>
+            <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>XMAX RESEARCH</p>
+            {trends.map((trend: string, idx: number) => (
+              <motion.div 
+                key={idx}
+                variants={fadeIn}
+                whileHover={{ x: 4 }}
+                className={`border p-3 mb-2 last:mb-0 ${shell.panel}`}
+              >
+                <span className="text-sm">{trend}</span>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <div className={`border p-4 ${shell.panelMuted}`}>
+            <p className={`text-sm ${shell.textMuted} mb-3`}>No research data. Run XMAX WORK to fetch trending topics.</p>
+            <p className={`text-[10px] ${shell.textSoft}`}>Research sources: Exa AI search, CB Insights, Forbes, Gartner</p>
+          </div>
+        )}
 
         <div className={`border p-4 mt-4 ${shell.panelMuted}`}>
-          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>RESEARCH SOURCES</p>
-          <p className="text-sm mb-2">• XMAX WORK - generates content from trending topics</p>
-          <p className="text-sm mb-2">• Hacker News - tech trends</p>
-          <p className="text-sm mb-2">• Reddit r/SideProject - indie dev insights</p>
-          <p className="text-sm">• Product Hunt - new launches</p>
+          <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>RESEARCH SOURCES</p>
+          <p className="text-xs">• Exa AI-optimized search</p>
+          <p className="text-xs">• CB Insights, Forbes, Gartner</p>
+          <p className="text-xs">• Reddit r/SideProject, Hacker News</p>
         </div>
       </motion.div>
     </motion.div>
@@ -606,9 +612,19 @@ function SecuritySection({ shell }: SectionProps) {
 
 function ExpenseSection({ shell }: SectionProps) {
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/expenses').then(r => r.json()).then(setExpenses).catch(() => setExpenses([]))
+    fetch('/api/expenses')
+      .then(r => r.json())
+      .then(data => {
+        setExpenses(data || [])
+        setLoading(false)
+      })
+      .catch(() => {
+        setExpenses([])
+        setLoading(false)
+      })
   }, [])
 
   const categories = expenses.reduce((acc, e) => {
@@ -628,6 +644,9 @@ function ExpenseSection({ shell }: SectionProps) {
     Tools: 'bg-cyan-500',
   }
 
+  // Get recent expenses
+  const recentExpenses = expenses.slice(-5).reverse()
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
@@ -635,7 +654,7 @@ function ExpenseSection({ shell }: SectionProps) {
         
         <div className="grid grid-cols-3 gap-3 mb-4">
           <div className={`border p-3 ${shell.panelMuted}`}>
-            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL SPENT</p>
+            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>TOTAL</p>
             <p className="text-xl font-bold mt-1">${total}</p>
           </div>
           <div className={`border p-3 ${shell.panelMuted}`}>
@@ -643,44 +662,48 @@ function ExpenseSection({ shell }: SectionProps) {
             <p className="text-xl font-bold mt-1">${budget}</p>
           </div>
           <div className={`border p-3 ${shell.panelMuted}`}>
-            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>REMAINING</p>
+            <p className={`text-[9px] tracking-[0.14em] ${shell.textSoft}`}>LEFT</p>
             <p className={`text-xl font-bold mt-1 ${remaining > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>${remaining}</p>
           </div>
         </div>
 
-        {Object.keys(categories).length > 0 ? (
-          <div className={`border p-4 mb-4 ${shell.panelMuted}`}>
-            <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>BREAKDOWN</p>
-            <div className="space-y-2">
+        {/* Categories */}
+        {Object.keys(categories).length > 0 && (
+          <div className={`border p-3 mb-4 ${shell.panelMuted}`}>
+            <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>BY CATEGORY</p>
+            <div className="space-y-1">
               {Object.entries(categories).map(([cat, amount]) => (
-                <div key={cat} className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded ${categoryColors[cat] || 'bg-zinc-500'}`} />
-                  <span className="flex-1 text-sm">{cat}</span>
-                  <span className="text-sm font-medium">${amount}</span>
-                  <div className="w-20 h-1.5 bg-zinc-800 rounded overflow-hidden">
-                    <div 
-                      className={`h-full ${categoryColors[cat] || 'bg-zinc-500'} rounded`}
-                      style={{ width: `${(amount / total) * 100}%` }}
-                    />
+                <div key={cat} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-2 h-2 rounded ${categoryColors[cat] || 'bg-zinc-500'}`} />
+                    <span>{cat}</span>
                   </div>
+                  <span className="font-medium">${amount}</span>
                 </div>
               ))}
             </div>
           </div>
-        ) : (
-          <div className={`border p-4 mb-4 ${shell.panelMuted}`}>
-            <p className={`text-sm ${shell.textMuted}`}>No expenses recorded. Use EXPENSES tab to add.</p>
+        )}
+
+        {/* Recent expenses */}
+        {recentExpenses.length > 0 && (
+          <div className={`border p-3 ${shell.panelMuted}`}>
+            <p className={`text-[10px] tracking-[0.18em] mb-2 ${shell.textSoft}`}>RECENT</p>
+            <div className="space-y-1">
+              {recentExpenses.map(e => (
+                <div key={e.id} className="flex items-center justify-between text-xs">
+                  <span className={shell.textMuted}>{e.description}</span>
+                  <span className="font-medium">${e.amount}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        <motion.div variants={fadeIn} className={`border p-3 ${shell.panelMuted}`}>
-          <p className={`text-sm ${remaining > 0 ? shell.textMuted : 'text-amber-400'}`}>
-            {remaining > 0 
-              ? `$${remaining} remaining this month. Track expenses in EXPENSES tab.`
-              : `Over budget by $${Math.abs(remaining)}. Review spending.`
-            }
-          </p>
-        </motion.div>
+        {loading && <p className={`text-sm ${shell.textMuted}`}>Loading...</p>}
+        {!loading && expenses.length === 0 && (
+          <p className={`text-sm ${shell.textMuted}`}>No expenses. Use EXPENSES tab to add.</p>
+        )}
       </motion.div>
     </motion.div>
   )
@@ -711,9 +734,7 @@ export default function MissionControlV2({ shell, section = 'all' }: { shell: Sh
       {show('products') && <ProductsSection shell={shell} />}
       {show('team') && <TeamSection shell={shell} />}
       {show('xmax') && <XMaxSection shell={shell} />}
-      {show('kpis') && <KPIsSection shell={shell} />}
       {show('roadmap') && <RoadmapSection shell={shell} />}
-      {show('feedback') && <FeedbackSection shell={shell} />}
       {show('news') && <NewsSection shell={shell} />}
       {show('goals') && <GoalsSection shell={shell} />}
       {show('activity') && <ActivitySection shell={shell} />}

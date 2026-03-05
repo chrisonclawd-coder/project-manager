@@ -689,9 +689,7 @@ function MissionControlContent() {
     { id: 'products', label: 'PRODUCTS', icon: BookOpen },
     { id: 'team', label: 'TEAM', icon: Users },
     { id: 'xmax-nav', label: 'XMAX', icon: TrendingUp },
-    { id: 'kpis', label: 'KPIS', icon: BarChart3 },
     { id: 'roadmap', label: 'ROADMAP', icon: Target },
-    { id: 'feedback', label: 'FEEDBACK', icon: Bell },
     { id: 'news', label: 'NEWS', icon: Calendar },
     { id: 'goals', label: 'GOALS', icon: Zap },
     { id: 'activity', label: 'ACTIVITY', icon: Activity },
@@ -1626,7 +1624,7 @@ function MissionControlContent() {
       >
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
-          {['home','products','team','xmax-nav','kpis','roadmap','feedback','news','goals','activity','security','expense'].includes(activeTab) && (
+          {['home','products','team','xmax-nav','roadmap','news','goals','activity','security','expense'].includes(activeTab) && (
             <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
               <MissionControlV2 shell={shell} section={activeTab === 'xmax-nav' ? 'xmax' : activeTab} />
             </motion.div>
