@@ -685,18 +685,18 @@ function MissionControlContent() {
   }, [])
 
   const menuItems = [
-    { id: 'home', label: '1 HOME', icon: HomeIcon },
-    { id: 'products', label: '2 PRODUCTS', icon: BookOpen },
-    { id: 'team', label: '3 TEAM', icon: Users },
-    { id: 'x-growth', label: '4 X GROWTH', icon: TrendingUp },
-    { id: 'kpis', label: '5 KPIS', icon: BarChart3 },
-    { id: 'roadmap', label: '6 ROADMAP', icon: Target },
-    { id: 'feedback', label: '7 FEEDBACK', icon: Bell },
-    { id: 'news', label: '8 NEWS', icon: Calendar },
-    { id: 'goals', label: '9 GOALS', icon: Zap },
-    { id: 'activity', label: '10 ACTIVITY', icon: Activity },
-    { id: 'security', label: '11 SECURITY', icon: AlertCircle },
-    { id: 'expense', label: '12 EXPENSE', icon: Wallet },
+    { id: 'home', label: 'HOME', icon: HomeIcon },
+    { id: 'products', label: 'PRODUCTS', icon: BookOpen },
+    { id: 'team', label: 'TEAM', icon: Users },
+    { id: 'xmax-nav', label: 'XMAX', icon: TrendingUp },
+    { id: 'kpis', label: 'KPIS', icon: BarChart3 },
+    { id: 'roadmap', label: 'ROADMAP', icon: Target },
+    { id: 'feedback', label: 'FEEDBACK', icon: Bell },
+    { id: 'news', label: 'NEWS', icon: Calendar },
+    { id: 'goals', label: 'GOALS', icon: Zap },
+    { id: 'activity', label: 'ACTIVITY', icon: Activity },
+    { id: 'security', label: 'SECURITY', icon: AlertCircle },
+    { id: 'expense', label: 'EXPENSE', icon: Wallet },
   ]
 
   const filteredTasks = tasks.filter(
@@ -1626,9 +1626,9 @@ function MissionControlContent() {
       >
         <div className="max-w-6xl mx-auto">
         <AnimatePresence mode="wait">
-          {['home','products','team','x-growth','kpis','roadmap','feedback','news','goals','activity','security','expense'].includes(activeTab) && (
+          {['home','products','team','xmax-nav','kpis','roadmap','feedback','news','goals','activity','security','expense'].includes(activeTab) && (
             <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
-              <MissionControlV2 shell={shell} section={activeTab} />
+              <MissionControlV2 shell={shell} section={activeTab === 'xmax-nav' ? 'xmax' : activeTab} />
             </motion.div>
           )}
 

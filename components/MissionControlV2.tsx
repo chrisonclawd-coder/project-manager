@@ -236,35 +236,47 @@ function TeamSection({ shell }: SectionProps) {
   )
 }
 
-function XGrowthSection({ shell }: SectionProps) {
+function XMaxSection({ shell }: SectionProps) {
+  const [xmaxWork, setXmaxWork] = useState<any>(null)
+
+  useEffect(() => {
+    fetch('/api/xmax').then(r => r.json()).then(setXmaxWork).catch(() => setXmaxWork(null))
+  }, [])
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
-        <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>4. X GROWTH</h2>
+        <h2 className={`text-[11px] tracking-[0.2em] mb-4 ${shell.textSoft}`}>4. XMAX OPERATIONS</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">X (Twitter)</p>
-            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>Post campaigns</p>
-            <p className={`text-[10px] ${shell.textSoft}`}>Use XMAX WORK tab</p>
+            <p className="font-semibold">Ready</p>
+            <p className={`text-2xl font-bold mt-1 text-emerald-400`}>
+              {xmaxWork?.ready ? 'YES' : 'NO'}
+            </p>
+            <p className={`text-[10px] ${shell.textSoft}`}>to post</p>
           </motion.div>
           <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">Reddit</p>
-            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>Draft posts</p>
-            <p className={`text-[10px] ${shell.textSoft}`}>Copy from XMAX</p>
+            <p className="font-semibold">Scheduled</p>
+            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>
+              {xmaxWork?.scheduled?.length || 0}
+            </p>
+            <p className={`text-[10px] ${shell.textSoft}`}>posts</p>
           </motion.div>
           <motion.div variants={fadeIn} className={`border p-4 ${shell.panelMuted}`}>
-            <p className="font-semibold">LinkedIn</p>
-            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>Not connected</p>
-            <p className={`text-[10px] ${shell.textSoft}`}>Future expansion</p>
+            <p className="font-semibold">Content</p>
+            <p className={`text-2xl font-bold mt-1 ${shell.textMuted}`}>
+              {xmaxWork?.content?.length || 0}
+            </p>
+            <p className={`text-[10px] ${shell.textSoft}`}>drafts</p>
           </motion.div>
         </div>
 
         <div className={`border p-4 ${shell.panelMuted}`}>
-          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>GROWTH TIPS</p>
-          <p className="text-sm mb-2">• Use XMAX WORK tab to generate and schedule posts</p>
-          <p className="text-sm mb-2">• Post during US morning (9-11 AM EST)</p>
-          <p className="text-sm">• Include visuals with text posts</p>
+          <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>XMAX WORK TAB</p>
+          <p className="text-sm mb-2">• Use XMAX WORK tab for full content generation</p>
+          <p className="text-sm mb-2">• Auto-generates X posts + Reddit drafts</p>
+          <p className="text-sm">• Scheduled runs: 10:30 AM, 3:30 PM, 6:30 PM, 9:30 PM IST</p>
         </div>
       </motion.div>
     </motion.div>
@@ -406,6 +418,20 @@ function FeedbackSection({ shell }: SectionProps) {
 }
 
 function NewsSection({ shell }: SectionProps) {
+  const [xmaxWork, setXmaxWork] = useState<any>(null)
+
+  useEffect(() => {
+    fetch('/api/xmax').then(r => r.json()).then(setXmaxWork).catch(() => setXmaxWork(null))
+  }, [])
+
+  const trendingTopics = xmaxWork?.trending || [
+    { topic: 'AI Agent Security', relevance: 'high' },
+    { topic: 'Chrome Extension Development', relevance: 'high' },
+    { topic: 'npm Security Scanning', relevance: 'medium' },
+    { topic: 'LLM Integration Patterns', relevance: 'medium' },
+    { topic: 'Build in Public', relevance: 'high' },
+  ]
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4">
       <motion.div variants={fadeIn} className={`border p-5 ${shell.panel}`}>
@@ -413,17 +439,29 @@ function NewsSection({ shell }: SectionProps) {
         
         <div className={`border p-4 ${shell.panelMuted}`}>
           <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>TRENDING TOPICS</p>
-          <p className="text-sm mb-2">• AI agent security — relevant for Guardskills</p>
-          <p className="text-sm mb-2">• Chrome extension best practices — for MDify</p>
-          <p className="text-sm mb-2">• Node.js security — dependency scanning</p>
-          <p className="text-sm">• LLM integration patterns — product ideas</p>
+          {trendingTopics.map((item: any, idx: number) => (
+            <motion.div 
+              key={idx}
+              variants={fadeIn}
+              whileHover={{ x: 4 }}
+              className={`border p-3 mb-2 last:mb-0 flex items-center justify-between ${shell.panel}`}
+            >
+              <span className="text-sm">{item.topic}</span>
+              <span className={`text-[10px] px-2 py-0.5 ${
+                item.relevance === 'high' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-zinc-700 text-zinc-400'
+              }`}>
+                {item.relevance}
+              </span>
+            </motion.div>
+          ))}
         </div>
 
         <div className={`border p-4 mt-4 ${shell.panelMuted}`}>
           <p className={`text-[10px] tracking-[0.18em] mb-3 ${shell.textSoft}`}>RESEARCH SOURCES</p>
-          <p className="text-sm">• Use XMAX WORK tab for live research</p>
-          <p className="text-sm">• Check Hacker News, Reddit r/SideProject</p>
-          <p className="text-sm">• Monitor competitor product updates</p>
+          <p className="text-sm mb-2">• XMAX WORK - generates content from trending topics</p>
+          <p className="text-sm mb-2">• Hacker News - tech trends</p>
+          <p className="text-sm mb-2">• Reddit r/SideProject - indie dev insights</p>
+          <p className="text-sm">• Product Hunt - new launches</p>
         </div>
       </motion.div>
     </motion.div>
@@ -672,7 +710,7 @@ export default function MissionControlV2({ shell, section = 'all' }: { shell: Sh
       {show('home') && <HomeSection shell={shell} />}
       {show('products') && <ProductsSection shell={shell} />}
       {show('team') && <TeamSection shell={shell} />}
-      {show('x-growth') && <XGrowthSection shell={shell} />}
+      {show('xmax') && <XMaxSection shell={shell} />}
       {show('kpis') && <KPIsSection shell={shell} />}
       {show('roadmap') && <RoadmapSection shell={shell} />}
       {show('feedback') && <FeedbackSection shell={shell} />}

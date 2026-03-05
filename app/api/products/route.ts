@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server'
+import { promises as fs } from 'fs'
+import { join } from 'path'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
-  const packages = ['guardskills', 'mdify']
-  const results = await Promise.all(
-    packages.map(async (pkg) => {
-      try {
-        const res = await fetch(`https://api.npmjs.org/downloads/point/last-month/${pkg}`)
-        const data = await res.json()
-        return { package: pkg, downloads: data.downloads || 0 }
-      } catch {
-        return { package: pkg, downloads: 0 }
-      }
-    })
-  )
-  return NextResponse.json(results)
+  try {
+    const products = JSON.parse(
+      await fs.readFile(join(process.cwd(), 'data', 'products.json'), 'utf-8')
+    )
+    return NextResponse.json(products)
+  } catch (error) {
+    console.error('Error loading products:', error)
+    return NextResponse.json([], { status: 500 })
+  }
 }
